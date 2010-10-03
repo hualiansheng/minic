@@ -60,13 +60,17 @@ function_list	:	function_list function_def
 //modifier	:	
 //	| 	EXTERN 
 //	| 	REGISTER;
-type_name	:	VOID | INT | CHAR;
+type_name
+	:	VOID | INT | CHAR;
 var_list	:	var_list ',' var_item 
 	| 	var_item;
 var_item	:	array_var 
 	| 	scalar_var 
 	| 	'*' scalar_var;
-array_var	:	IDENT '[' ICONSTANT ']';
+array_var	:	IDENT '[' ICONSTANT ']'
+	|	IDENT '[' ICONSTANT error {yyclearin;
+		fprintf(stderr, "line!!!: %d\n",@4.first_column);}
+	;
 scalar_var	:	IDENT 
 	| 	IDENT '(' parm_type_list ')';
 function_def	:	function_hdr '{' function_body '}';
