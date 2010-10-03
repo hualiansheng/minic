@@ -44,7 +44,3 @@ int yywrap()
 {
 	return 1;
 }
-void main()
-{
-	yylex();
-}

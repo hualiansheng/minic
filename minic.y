@@ -1,8 +1,11 @@
 %{
+#define YYSTYPE int
 #include <memory.h>
+#include <stdio.h>
+#include <assert.h>
 int yylex (void);
 void yyerror (char const*);
-
+extern FILE* yyin;
 %}
 
 
@@ -42,7 +45,7 @@ void yyerror (char const*);
 %nonassoc UIF
 %nonassoc ELSE
 %%
-program		:	external_decls {printf("ok");}
+program		:	external_decls {fprintf( stderr, "ok");}
 		 ;
 external_decls	:	declaration external_decls 
 	| function_list
@@ -130,12 +133,20 @@ argument_list	:	argument_list ',' expression
 	| 	expression;
 
 %%
-int main()
+int main(int argc, char** argv)
 {
-	return yyparse();
+	yydebug=1;
+	FILE* source_file;
+	argc--,argv++;
+	if(argc)
+		source_file = fopen (argv[0], "r" );
+	assert( source_file != NULL );
+	fprintf(stderr,"sdf\n");
+	yyin = source_file;
+	yyparse();
+	fclose(source_file);
 }
-#include<stdio.h>
 void yyerror(char const * s)
 {
-	fprintf(stderr, "%s\n");
+	fprintf(stderr, "%s\n",s);
 }
