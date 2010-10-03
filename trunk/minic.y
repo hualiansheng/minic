@@ -26,8 +26,9 @@ void yyerror (char const*);
 %%
 program		:	external_decls {printf("ok");};
 external_decls	:	declaration external_decls 
-	| function_def;
+	| function_list;
 declaration	:	modifier type_name varlist;
+functionlist	:	function_list, function_def | function_def;
 modifier	:	
 	| 	EXTERN 
 	| 	REGISTER;
