@@ -17,6 +17,10 @@ void yyerror (char const*);
 %token BOOLEAN_OP
 %token REL_OP
 %token DOUBLE_OP
+%token ICONSTANT
+%token FCONSTANT
+%token CHAR_CONSTANT
+%token STRING_CONSTANT
 
 
 %%
@@ -36,7 +40,7 @@ var_item	:	array_var
 array_var	:	IDENT '[' ICONSTANT ']';
 scalar_var	:	IDENT 
 	| 	IDNET '(' parm_type_list ')';
-function_def	:	functionhdr '(' function_body ')';
+function_def	:	functionhdr '{' function_body '}';
 function_hdr	:	type_name IDENT '(' parm_type_list ')'
 	|	type_name '*' IDENT '(' parm_type_list ')'
 	|	IDNET '(' parm_type_list ')';
