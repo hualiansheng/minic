@@ -94,7 +94,6 @@ statement	:	compoundstmt
 compoundstmt	:	'{' statement_list '}';
 nullstmt	:	';' ;
 expression_stmt	:	expression ';' 
-	|	assignment_expression ';'
 	;
 ifstmt	:	IF '(' expression ')' statement %prec UIF
 	|	IF '(' expression ')' statement ELSE statement; 
@@ -103,6 +102,7 @@ while_stmt	:	WHILE '(' expression ')' statement;
 return_stmt	:	RETURN expression ';' 
 	| 	RETURN ';';
 expression	:	rvalue 
+	|	assignment_expression
 	;
 assignment_expression:
 		lvalue '=' assignment_expression
