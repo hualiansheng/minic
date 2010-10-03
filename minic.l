@@ -6,8 +6,8 @@
 id			[_a-zA-Z][_a-zA-Z0-9]*
 special			[{}\(\)\[\];,\.+\-\*\!\&\=]
 iconstant		[0-9]+
-char_constant		\'.\'
-string_constant		\".*\"
+char_constant		\'(.|\\n)\'
+string_constant		\"(.|\\n)*\"
 
 %%
 

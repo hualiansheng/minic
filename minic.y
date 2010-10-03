@@ -75,7 +75,7 @@ function_hdr	:	type_name IDENT '(' parm_type_list ')'
 	|	IDENT '(' parm_type_list ')';
 parm_type_list	:	VOID 
 	| 	parm_list;
-parm_list	:	parm_list  parm_decl 
+parm_list	:	parm_list ',' parm_decl 
 	| 	parm_decl;
 parm_decl	:	type_name IDENT
 	| 	type_name '*' IDENT;
