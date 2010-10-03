@@ -1,0 +1,12 @@
+Mini C Project
+***********************
+
+Author:
+Peng Zhuo	(brillsp@gmail.com)
+Wang Kan	(kerrywang881122@gmail.com)
+Hua Liansheng	(hualiansheng@gmail.com)
+Li Chunqi	(yzt356@gmail.com)
+
+***********************
+
+MiniC is a C-subset compiler whose target machine is UniCore architecture designed by Peking University.
