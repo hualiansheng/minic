@@ -1,7 +1,6 @@
 %{
 #include <stdio.h>
-MODIFIER, VOID, INT, CHAR, IF, ELSE, FOR, WHILE, RETURN, IDENT, 
-BOOLEAN_OP, REL_OP, DOUBLE_OP, ICONSTANT, CHAR_CONSTANT, STRING_CONSTANT
+#include "minic.tab.h"
 %}
 
 id			[_a-zA-Z][_a-zA-Z0-9]*
@@ -12,8 +11,8 @@ string_constant		\".*\"
 
 %%
 
-extern			printf("MODIFIER\n");return MODIFIER;
-register		printf("MODIFIER\n");return MODIFIER;
+extern			printf("MODIFIER\n");return EXTERN;
+register		printf("MODIFIER\n");return EXTERN;
 void			printf("VOID\n");return VOID;
 int			printf("INT\n");return INT;
 char			printf("CHAR\n");return CHAR;
