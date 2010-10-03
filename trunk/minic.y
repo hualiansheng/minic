@@ -31,8 +31,16 @@ void yyerror (char const*);
 %left '+' '-'
 %left '*'
 
-%left UMINUS UPLUS
-%left UASTAR
+%left BOOLEAN_OP REL_OP
+%right DOUBLE
+%right DOUBLE_OP
+%right NOT
+%right ADDRESS
+%right UMINUS UPLUS
+%right UASTAR
+
+%nonassoc UIF
+%nonassoc ELSE
 %%
 program		:	external_decls {printf("ok");}
 		 ;
@@ -83,40 +91,37 @@ statement	:	compoundstmt
 compoundstmt	:	'{' statement_list '}';
 nullstmt	:	';' ;
 expression_stmt	:	expression ';' ;
-ifstmt	:	IF '(' expression ')' statement
-	|	IF '(' expression ')' statement ELSE statement;
+ifstmt	:	IF '(' expression ')' statement %prec UIF
+	|	IF '(' expression ')' statement ELSE statement; 
 for_stmt	:	FOR '(' expression ';' expression ';' expression ')' statement;
 while_stmt	:	WHILE '(' expression ')' statement;
 return_stmt	:	RETURN expression ';' 
 	| 	RETURN ';';
-expression	:	assignment_expr 
-	| 	binary_expr;
-assignment_expr	:	lvalue '=' expression;
-lvalue		:	'*' expression 
-	| 	IDENT 
-	| 	IDENT '[' expression ']';
-binary_expr	:	binary_expr binary_op unary_expr 
-	|	unary_expr;
-binary_op	:	BOOLEAN_OP 
-	| 	REL_OP
-	| 	'+' 
-	| 	'-' 
-	| 	'*';
-unary_expr	:	'!' unary_expr 
-	| 	'+' unary_expr 
-	| 	'-' unary_expr 
-	| 	'&' unary_expr
-	| 	'*' unary_expr 
-	| 	DOUBLE_OP unary_expr
-	| 	postfix_expr
+expression	:	rvalue;
+lvalue		:	'*' rvalue 
+	|	IDENT
+	|	IDENT '[' expression ']'
 	;
-postfix_expr	:	IDENT '[' expression ']'
+rvalue		:	lvalue %prec '-'
+	|	rvalue '+' rvalue
+	|	rvalue '-' rvalue
+	|	rvalue '*' rvalue
+	|	rvalue op  rvalue %prec BOOLEAN_OP
+	|	'(' rvalue ')'
+	|	'+' rvalue %prec UPLUS
+	|	'-' rvalue %prec UMINUS
+
+	|	'!' rvalue %prec NOT
+	|	'&' lvalue %prec ADDRESS
+	|	DOUBLE_OP lvalue %prec DOUBLE
+	|	lvalue DOUBLE_OP %prec DOUBLE
+	|	constant
 	|	IDENT '(' argument_list ')'
 	|	IDENT '(' ')'
-	|	postfix_expr DOUBLE_OP
-	|	postfix_expr DOUBLE_OP
-		primary_expr;
-primary_expr	:	IDENT | constant | '(' expression ')';
+	;
+op:		BOOLEAN_OP 
+	| 	REL_OP
+	;
 constant	:	ICONSTANT 
 	| 	FCONSTANT
 	| 	CHAR_CONSTANT 
