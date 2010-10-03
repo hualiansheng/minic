@@ -1,5 +1,6 @@
 OBJECT = calc.tab.o lex.yy.o symrec.o
 
+
 calc: $(OBJECT)
 	gcc -lm -o calc $(OBJECT)
 calc.tab.o: calc.tab.c calc.tab.h
