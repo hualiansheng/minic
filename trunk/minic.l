@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include "minic.tab.h"
+extern YYLTYPE yylloc;
 %}
 
 id			[_a-zA-Z][_a-zA-Z0-9]*
