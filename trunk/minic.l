@@ -4,7 +4,7 @@
 %}
 
 id			[_a-zA-Z][_a-zA-Z0-9]*
-special			[{}\(\)\[\];,\.+\-\*\!\&]
+special			[{}\(\)\[\];,\.+\-\*\!\&\=]
 iconstant		[0-9]+
 char_constant		\'.\'
 string_constant		\".*\"
