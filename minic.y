@@ -2,7 +2,10 @@
 #include <memory.h>
 int yylex (void);
 void yyerror (char const*);
+
 %}
+
+%glr-parser
 %token EXTERN
 %token REGISTER
 %token VOID
@@ -23,6 +26,13 @@ void yyerror (char const*);
 %token STRING_CONSTANT
 
 
+
+%right '='
+%left '+' '-'
+%left '*'
+
+%left UMINUS UPLUS
+%left UASTAR
 %%
 program		:	external_decls {printf("ok");}
 		 ;
@@ -93,10 +103,10 @@ binary_op	:	BOOLEAN_OP
 	| 	'-' 
 	| 	'*';
 unary_expr	:	'!' unary_expr 
-	| 	'+' unary_expr
-	| 	'-' unary_expr
+	| 	'+' unary_expr 
+	| 	'-' unary_expr 
 	| 	'&' unary_expr
-	| 	'*' unary_expr
+	| 	'*' unary_expr 
 	| 	DOUBLE_OP unary_expr
 	| 	postfix_expr
 	;
