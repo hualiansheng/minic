@@ -5,7 +5,7 @@ void yyerror (char const*);
 
 %}
 
-%glr-parser
+
 %token EXTERN
 %token REGISTER
 %token VOID
