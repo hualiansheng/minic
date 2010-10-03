@@ -24,32 +24,39 @@ void yyerror (char const*);
 
 
 %%
-program		:	external_decls {printf("ok");};
+program		:	external_decls {printf("ok");}
+		 ;
 external_decls	:	declaration external_decls 
-	| function_list;
-declaration	:	modifier type_name varlist;
-functionlist	:	function_list, function_def | function_def;
-modifier	:	
-	| 	EXTERN 
-	| 	REGISTER;
+	| function_list
+	;
+declaration	:	EXTERN type_name var_list ';'
+			|	REGISTER type_name var_list ';'
+			|   type_name var_list ';'
+			;
+function_list	:	function_list function_def 
+			  | function_def
+			  ;
+//modifier	:	
+//	| 	EXTERN 
+//	| 	REGISTER;
 type_name	:	VOID | INT | CHAR;
-var_list	:	varlist ',' var_item 
+var_list	:	var_list ',' var_item 
 	| 	var_item;
 var_item	:	array_var 
 	| 	scalar_var 
 	| 	'*' scalar_var;
 array_var	:	IDENT '[' ICONSTANT ']';
 scalar_var	:	IDENT 
-	| 	IDNET '(' parm_type_list ')';
-function_def	:	functionhdr '{' function_body '}';
+	| 	IDENT '(' parm_type_list ')';
+function_def	:	function_hdr '{' function_body '}';
 function_hdr	:	type_name IDENT '(' parm_type_list ')'
 	|	type_name '*' IDENT '(' parm_type_list ')'
-	|	IDNET '(' parm_type_list ')';
+	|	IDENT '(' parm_type_list ')';
 parm_type_list	:	VOID 
-	| 	parmlist;
-parm_list	:	parmlist , parm_decl 
+	| 	parm_list;
+parm_list	:	parm_list  parm_decl 
 	| 	parm_decl;
-parm_decl	:	type_name ident 
+parm_decl	:	type_name IDENT
 	| 	type_name '*' IDENT;
 function_body	:	internal_decls statement_list;
 internal_decls	:	
@@ -60,12 +67,12 @@ statement	:	compoundstmt
 	| 	nullstmt 
 	| 	expression_stmt 
 	| 	ifstmt
-	| 	forstmt 
-	| 	whilestmt 
+	| 	for_stmt 
+	| 	while_stmt 
 	| 	return_stmt;
 compoundstmt	:	'{' statement_list '}';
-nullstmt	:	;
-expression_stmt	:	expression ;
+nullstmt	:	';' ;
+expression_stmt	:	expression ';' ;
 ifstmt	:	IF '(' expression ')' statement
 	|	IF '(' expression ')' statement ELSE statement;
 for_stmt	:	FOR '(' expression ';' expression ';' expression ')' statement;
@@ -94,12 +101,12 @@ unary_expr	:	'!' unary_expr
 	| 	postfix_expr
 	;
 postfix_expr	:	IDENT '[' expression ']'
-	|	IDENT '(' argumentlist ')'
+	|	IDENT '(' argument_list ')'
 	|	IDENT '(' ')'
 	|	postfix_expr DOUBLE_OP
 	|	postfix_expr DOUBLE_OP
 		primary_expr;
-primary_expr	:	IDENT | CONSTANT | '(' expression ')';
+primary_expr	:	IDENT | constant | '(' expression ')';
 constant	:	ICONSTANT 
 	| 	FCONSTANT
 	| 	CHAR_CONSTANT 
