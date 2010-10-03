@@ -1,18 +1,17 @@
-OBJECT = calc.tab.o lex.yy.o symrec.o
+OBJECT = minic.tab.o lex.yy.o
 
-calc: $(OBJECT)
-	gcc -lm -o calc $(OBJECT)
-calc.tab.o: calc.tab.c calc.tab.h
-	gcc -c calc.tab.c
-lex.yy.o: lex.yy.c calc.tab.h
+minic: $(OBJECT)
+	gcc -lm -o minic $(OBJECT)
+minic.tab.o: minic.tab.c minic.tab.h
+	gcc -c minic.tab.c
+lex.yy.o: lex.yy.c minic.tab.h
 	gcc -c lex.yy.c
-calc.tab.c: calc.y symrec.h
-	bison -d calc.y
-calc.tab.h: calc.y
-	bison -d calc.y
-lex.yy.c: calc.l symrec.h
-	flex calc.l
-symrec.o: symrec.c symrec.h
-	gcc -c symrec.c
+minic.tab.c: minic.y
+	bison -d minic.y
+minic.tab.h: minic.y
+	bison -d minic.y
+lex.yy.c: minic.l 
+	flex minic.l
+
 clean:
-	rm *.o; rm calc; rm yy.lex.c; rm calc.tab.*
+	rm *.o; rm minic; rm yy.lex.c; rm minic.tab.*
