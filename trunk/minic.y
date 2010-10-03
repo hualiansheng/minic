@@ -3,9 +3,24 @@
 int yylex (void);
 void yyerror (char const*);
 %}
+%token EXTERN
+%token REGISTER
+%token VOID
+%token INT
+%token CHAR
+%token IDENT
+%token IF
+%token ELSE
+%token FOR
+%token WHILE
+%token RETURN
+%token BOOLEAN_OP
+%token REL_OP
+%token DOUBLE_OP
+
 
 %%
-program	:	external_decls;
+program		:	external_decls {printf("ok");};
 external_decls	:	declaration external_decls 
 	| function_def;
 declaration	:	modifier type_name varlist;
@@ -88,3 +103,12 @@ argument_list	:	argument_list ',' expression
 	| 	expression;
 
 %%
+int main()
+{
+	return yyparse();
+}
+#include<stdio.h>
+void yyerror(char const * s)
+{
+	fprintf(stderr, "%s\n");
+}
