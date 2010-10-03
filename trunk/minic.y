@@ -93,14 +93,22 @@ statement	:	compoundstmt
 	| 	return_stmt;
 compoundstmt	:	'{' statement_list '}';
 nullstmt	:	';' ;
-expression_stmt	:	expression ';' ;
+expression_stmt	:	expression ';' 
+	|	assignment_expression ';'
+	;
 ifstmt	:	IF '(' expression ')' statement %prec UIF
 	|	IF '(' expression ')' statement ELSE statement; 
 for_stmt	:	FOR '(' expression ';' expression ';' expression ')' statement;
 while_stmt	:	WHILE '(' expression ')' statement;
 return_stmt	:	RETURN expression ';' 
 	| 	RETURN ';';
-expression	:	rvalue;
+expression	:	rvalue 
+	;
+assignment_expression:
+		lvalue '=' assignment_expression
+	|	lvalue '=' rvalue
+	;
+	
 lvalue		:	'*' rvalue 
 	|	IDENT
 	|	IDENT '[' expression ']'
