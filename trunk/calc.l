@@ -6,29 +6,36 @@
 int yywrap();
 %}
 
-
-DIGIT	[0-9]
-SYMBOL [+-/*\n()=]
-ID [_a-zA-Z][_a-zA-Z0-9]*
+id		[_a-zA-Z][_a-zA-Z0-9]*
+special		[{}\(\)\[\];,\.+-\*]
+iconstant	(+|-)?[0][0-9]+(o|x)?
+char_constant	\'.\'
+string_constant	\".*\"
 
 %%
-"var"	return VAR;
-"list"	return LIST;
-{DIGIT}+	yylval.val=atof(yytext);return NUM;
 
-{DIGIT}+"."{DIGIT}*	yylval.val=atof(yytext);  return NUM;
-
-{SYMBOL}	return yytext[0];
-
-{ID}		{	
-				//printf("id detected! len=%d \n",yyleng);
-				yylval.tptr = (symrec*) malloc(sizeof(symrec));
-				yylval.tptr->name = (char*)calloc(1 , yyleng + 1);
-				//printf("malloc complete!\n");
-				strncpy(yylval.tptr->name, yytext, yyleng);
-				//printf("cpy complete!\n");
-				return ID;
-				}
+extern		return MODIFIER;
+register	return MODIFIER;
+void		return VOID;
+int		return INT;
+char		return CHAR;
+{id}		return IDENT;
+{special}	return yytext(0);
+if 		return IF;
+else		return ELSE;
+for 		return FOR;
+while 		return WHILE;
+return 		return RETURN;
+"&&"		return BOOLEAN_OP;
+"||"		return BOOLEAN_OP;
+"=="		return REL_OP;
+"!="		return REL_OP;
+">"		return REL_OP;
+"<"		return REL_OP;
+">="		return REL_OP;
+"<="		return REL_OP;
+"++"		return DOUBLE_OP;
+"--"		return DOUBLE_OP;
 		
 %%
 int yywrap()
