@@ -1,5 +1,7 @@
 #include "AST.h"
 #include <stdio.h>
+#include <memory.h>
+#include <stdlib.h>
 
 AST_NODE* AST_new_Node(){
   	AST_NODE* result = (AST_NODE *)malloc(sizeof(AST_NODE));
