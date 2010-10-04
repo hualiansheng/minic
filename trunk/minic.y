@@ -1,35 +1,83 @@
 %{
-#define YYSTYPE int
 #include <memory.h>
 #include <stdio.h>
 #include <assert.h>
-#include "AST.h"
+#include "attr.h"
+#define BOOL_AND 1
+#define BOOL_OR 2
+#define REL_EQ 3
+#define REL_NEQ 4
+#define REL_GRT 5
+#define REL_SML 6
+#define REL_GRE 7
+#define REL_SME 8
+#define REL_DAD 9
+#define REL_DSU 0
 int yylex (void);
 void yyerror (char const*);
 AST_NODE* tree_root;
 AST_NODE* root;
 extern FILE* yyin;
+extern YYSTYPE yylval;
 %}
 
+%union {
+	iattr int_attr;
+	cattr char_attr;
+	sattr string_attr;
+	AST_NODE* ptr;
+}
 
-%token EXTERN
-%token REGISTER
-%token VOID
-%token INT
-%token CHAR
-%token IDENT
-%token IF
-%token ELSE
-%token FOR
-%token WHILE
-%token RETURN
-%token BOOLEAN_OP
-%token REL_OP
-%token DOUBLE_OP
-%token ICONSTANT
-%token CHAR_CONSTANT
-%token STRING_CONSTANT
-
+%token <sattr> EXTERN
+%token <sattr> REGISTER
+%token <sattr> VOID
+%token <sattr> INT
+%token <sattr> CHAR
+%token <sattr> IDENT
+%token <sattr> IF
+%token <sattr> ELSE
+%token <sattr> FOR
+%token <sattr> WHILE
+%token <sattr> RETURN
+%token <iattr> BOOLEAN_OP
+%token <iattr> REL_OP
+%token <iattr> DOUBLE_OP
+%token <iattr> ICONSTANT
+%token <iattr> FCONSTANT
+%token <cattr> CHAR_CONSTANT
+%token <sattr> STRING_CONSTANT
+%type <AST_NODE*> program
+%type <AST_NODE*> external_decls
+%type <AST_NODE*> declaration
+%type <AST_NODE*> function_list
+%type <AST_NODE*> type_name
+%type <AST_NODE*> var_list
+%type <AST_NODE*> var_item
+%type <AST_NODE*> array_var
+%type <AST_NODE*> scalar_var
+%type <AST_NODE*> function_def
+%type <AST_NODE*> function_hdr
+%type <AST_NODE*> parm_type_list
+%type <AST_NODE*> parm_list
+%type <AST_NODE*> parm_decl
+%type <AST_NODE*> function_body
+%type <AST_NODE*> internal_decls
+%type <AST_NODE*> statement_list
+%type <AST_NODE*> statement
+%type <AST_NODE*> compoundstmt
+%type <AST_NODE*> nullstmt
+%type <AST_NODE*> expression_stmt
+%type <AST_NODE*> ifstmt
+%type <AST_NODE*> for_stmt
+%type <AST_NODE*> while_stmt
+%type <AST_NODE*> return_stmt
+%type <AST_NODE*> expression
+%type <AST_NODE*> assignment_expression
+%type <AST_NODE*> lvalue
+%type <AST_NODE*> rvalue
+%type <AST_NODE*> op
+%type <AST_NODE*> constant
+%type <AST_NODE*> argument_list
 
 
 %right '='
