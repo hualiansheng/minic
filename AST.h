@@ -86,4 +86,4 @@ typedef struct AST_NODE{
   	struct AST_NODE * leftChild;//Left child node
   	struct AST_NODE * rightSibling;//Right sibling node
 } AST_NODE;
-#endif _AST_H_
+#endif

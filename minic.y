@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "attr.h"
+#include "AST.h"
 #define BOOL_AND 1
 #define BOOL_OR 2
 #define REL_EQ 3
@@ -18,7 +19,7 @@ void yyerror (char const*);
 AST_NODE* tree_root;
 AST_NODE* root;
 extern FILE* yyin;
-extern YYSTYPE yylval;
+
 %}
 
 %union {
@@ -28,58 +29,58 @@ extern YYSTYPE yylval;
 	AST_NODE* ptr;
 }
 
-%token <sattr> EXTERN
-%token <sattr> REGISTER
-%token <sattr> VOID
-%token <sattr> INT
-%token <sattr> CHAR
-%token <sattr> IDENT
-%token <sattr> IF
-%token <sattr> ELSE
-%token <sattr> FOR
-%token <sattr> WHILE
-%token <sattr> RETURN
-%token <iattr> BOOLEAN_OP
-%token <iattr> REL_OP
-%token <iattr> DOUBLE_OP
-%token <iattr> ICONSTANT
-%token <iattr> FCONSTANT
-%token <cattr> CHAR_CONSTANT
-%token <sattr> STRING_CONSTANT
-%token <cattr> '{' '}' '(' ')' '[' ']' ';' ',' '.' '+' '-' '*' '!' '&' '='
+%token <string_attr> EXTERN
+%token <string_attr> REGISTER
+%token <string_attr> VOID
+%token <string_attr> INT
+%token <string_attr> CHAR
+%token <string_attr> IDENT
+%token <string_attr> IF
+%token <string_attr> ELSE
+%token <string_attr> FOR
+%token <string_attr> WHILE
+%token <string_attr> RETURN
+%token <int_attr> BOOLEAN_OP
+%token <int_attr> REL_OP
+%token <int_attr> DOUBLE_OP
+%token <int_attr> ICONSTANT
+%token <int_attr> FCONSTANT
+%token <char_attr> CHAR_CONSTANT
+%token <string_attr> STRING_CONSTANT
+%token <char_attr> '{' '}' '(' ')' '[' ']' ';' ',' '.' '+' '-' '*' '!' '&' '='
 
-%type <AST_NODE*> program
-%type <AST_NODE*> external_decls
-%type <AST_NODE*> declaration
-%type <AST_NODE*> function_list
-%type <AST_NODE*> type_name
-%type <AST_NODE*> var_list
-%type <AST_NODE*> var_item
-%type <AST_NODE*> array_var
-%type <AST_NODE*> scalar_var
-%type <AST_NODE*> function_def
-%type <AST_NODE*> function_hdr
-%type <AST_NODE*> parm_type_list
-%type <AST_NODE*> parm_list
-%type <AST_NODE*> parm_decl
-%type <AST_NODE*> function_body
-%type <AST_NODE*> internal_decls
-%type <AST_NODE*> statement_list
-%type <AST_NODE*> statement
-%type <AST_NODE*> compoundstmt
-%type <AST_NODE*> nullstmt
-%type <AST_NODE*> expression_stmt
-%type <AST_NODE*> ifstmt
-%type <AST_NODE*> for_stmt
-%type <AST_NODE*> while_stmt
-%type <AST_NODE*> return_stmt
-%type <AST_NODE*> expression
-%type <AST_NODE*> assignment_expression
-%type <AST_NODE*> lvalue
-%type <AST_NODE*> rvalue
-%type <AST_NODE*> op
-%type <AST_NODE*> constant
-%type <AST_NODE*> argument_list
+%type <ptr> program
+%type <ptr> external_decls
+%type <ptr> declaration
+%type <ptr> function_list
+%type <ptr> type_name
+%type <ptr> var_list
+%type <ptr> var_item
+%type <ptr> array_var
+%type <ptr> scalar_var
+%type <ptr> function_def
+%type <ptr> function_hdr
+%type <ptr> parm_type_list
+%type <ptr> parm_list
+%type <ptr> parm_decl
+%type <ptr> function_body
+%type <ptr> internal_decls
+%type <ptr> statement_list
+%type <ptr> statement
+%type <ptr> compoundstmt
+%type <ptr> nullstmt
+%type <ptr> expression_stmt
+%type <ptr> ifstmt
+%type <ptr> for_stmt
+%type <ptr> while_stmt
+%type <ptr> return_stmt
+%type <ptr> expression
+%type <ptr> assignment_expression
+%type <ptr> lvalue
+%type <ptr> rvalue
+%type <ptr> op
+%type <ptr> constant
+%type <ptr> argument_list
 
 
 %right '='
@@ -514,7 +515,7 @@ for_stmt	:	FOR '(' expression ';' expression ';' expression ')' statement
 			AST_addChild(root,SEMICOLON,$6.ptr);
 			AST_addChild(root,EXPRESSION,$7);
 			AST_addChild(root,RIGHT_PARENTHESES,$8.ptr);			
-			AST_addChild(root,STATEMENT,$9.ptr);
+			AST_addChild(root,STATEMENT,$9);
 			$$ = root;
 			}
 		;
@@ -765,7 +766,7 @@ constant	:	ICONSTANT
 			{
 			root = AST_new_Node();
 			root -> nodeType = CONSTANT;
-			AST_addChild(root,CHAR_CONSTANTs,$1.ptr);
+			AST_addChild(root,CHAR_CONSTANT,$1.ptr);
 			$$ = root;
 			}
 		| 	STRING_CONSTANT

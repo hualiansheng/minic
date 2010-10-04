@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "minic.tab.h"
 #include "attr.h"
+#include "minic.tab.h"
+extern YYSTYPE yylval;
 %}
 
 id			[_a-zA-Z][_a-zA-Z0-9]*
