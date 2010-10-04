@@ -1,4 +1,5 @@
 #ifndef _AST_H_
+#define _AST_H_
 //Node macro
 #define PROGRAM 1001
 #define EXTERNAL_DECLS 1002
@@ -26,7 +27,7 @@
 #define WHILE_STMT 1026
 #define RETURN_STMT 1027
 #define EXPRESSION 1028
-#define ASSIGNMENT_EXPR 1029
+#define ASSIGNMENT_EXPRESSION 1029
 #define LVALUE 1030
 #define RVALUE 1031
 #define OP 1032
@@ -47,7 +48,6 @@
 #define REL_OP 1047
 #define DOUBLE_OP 1048
 #define ICONSTANT 1049
-#define FCONSTANT 1050
 #define CHAR_CONSTANT 1051
 #define STRING_CONSTANT 1052
 #define SEMICOLON 1053
@@ -71,14 +71,19 @@
 #define IDENT 1071
 #define BOOLEAN_OP 1072
 #define REL_OP 1073
-#endif _AST_H_
-
-struct AST_NODE{
-  int nodeType;//The type of node, defined above
-  char* nodeContent;//The content of the node, int char or string
-  int scopeIndex;//The scope of an identifier belongs, if the node represents an identifier
-  int nodeLevel;//Level of the node
-  struct AST_NODE * father;//Father node
-  struct AST_NODE * leftChild;//Left child node
-  struct AST_NODE * rightSibling;//Right sibling node
+#define EPSILON 1074
+union node_content
+{
+	char c_content;
+	char* s_content;
+	int i_content;
 };
+typedef struct AST_NODE{
+  	int nodeType;//The type of node, defined above
+  	int nodeLevel;//Level of the node
+	union node_content content;
+  	struct AST_NODE * father;//Father node
+  	struct AST_NODE * leftChild;//Left child node
+  	struct AST_NODE * rightSibling;//Right sibling node
+} AST_NODE;
+#endif _AST_H_
