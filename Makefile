@@ -1,8 +1,8 @@
 OBJECT = minic.tab.o lex.yy.o AST_operation.o
-ARGS = -g
+ARGS = -g -Wall
 minic: $(OBJECT)
 	gcc -lm $(ARGS) -o minic $(OBJECT)
-minic.tab.o: minic.tab.c minic.tab.h AST.h
+minic.tab.o: minic.tab.c minic.tab.h AST.h attr.h
 	gcc $(ARGS) -c minic.tab.c
 lex.yy.o: lex.yy.c minic.tab.h
 	gcc $(ARGS) -c lex.yy.c

@@ -807,6 +807,7 @@ int main(int argc, char** argv)
 	yyin = source_file;
 	yyparse();
 	fclose(source_file);
+	return 1;
 }
 void yyerror(char const * s)
 {
