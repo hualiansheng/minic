@@ -33,22 +33,22 @@
 #define OP 1032
 #define CONSTANT 1033
 #define ARGUMENT_LIST 1034
-#define EXTERN 1035
-#define REGISTER 1036
-#define VOID 1037
-#define INT 1038
-#define CHAR 1039
-#define IF 1041
-#define ELSE 1042
-#define FOR 1043
-#define WHILE 1044
-#define RETURN 1045
-#define BOOLEAN_OP 1046
-#define REL_OP 1047
-#define DOUBLE_OP 1048
-#define ICONSTANT 1049
-#define CHAR_CONSTANT 1051
-#define STRING_CONSTANT 1052
+#define EXTERN_T 1035
+#define REGISTER_T 1036
+#define VOID_T 1037
+#define INT_T 1038
+#define CHAR_T 1039
+#define IF_T 1041
+#define ELSE_T 1042
+#define FOR_T 1043
+#define WHILE_T 1044
+#define RETURN_T 1045
+#define BOOLEAN_OP_T 1046
+#define REL_OP_T 1047
+#define DOUBLE_OP_T 1048
+#define ICONSTANT_T 1049
+#define CHAR_CONSTANT_T 1051
+#define STRING_CONSTANT_T 1052
 #define SEMICOLON 1053
 #define COMMA 1054
 #define STAR 1055
@@ -66,7 +66,7 @@
 #define NEGATIVE_SIGN 1067
 #define NOT_SIGN 1068
 #define ADDRESS_SIGN 1069
-#define IDENT 1071
+#define IDENT_T 1071
 #define EPSILON 1074
 union node_content
 {
@@ -82,4 +82,7 @@ typedef struct AST_NODE{
   	struct AST_NODE * leftChild;//Left child node
   	struct AST_NODE * rightSibling;//Right sibling node
 } AST_NODE;
+
+AST_NODE* AST_new_Node();
+void AST_addChild(AST_NODE* root, int child_nodeType, AST_NODE* child);
 #endif
