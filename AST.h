@@ -38,7 +38,6 @@
 #define VOID 1037
 #define INT 1038
 #define CHAR 1039
-#define IDENT 1040
 #define IF 1041
 #define ELSE 1042
 #define FOR 1043
@@ -55,7 +54,7 @@
 #define STAR 1055
 #define LEFT_SQUARE_BRACKET 1056
 #define RIGHT_SQUARE_BRACKET 1057
-#define LEFT_PARENTHESES 1058
+#define LEFT_PARENTHESE 1058
 #define RIGHT_PARENTHESE 1059
 #define LEFT_BRACE 1060
 #define RIGHT_BRACE 1061
@@ -67,10 +66,7 @@
 #define NEGATIVE_SIGN 1067
 #define NOT_SIGN 1068
 #define ADDRESS_SIGN 1069
-#define DOUBLE_OP 1070
 #define IDENT 1071
-#define BOOLEAN_OP 1072
-#define REL_OP 1073
 #define EPSILON 1074
 union node_content
 {
