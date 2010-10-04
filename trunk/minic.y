@@ -46,6 +46,8 @@ extern YYSTYPE yylval;
 %token <iattr> FCONSTANT
 %token <cattr> CHAR_CONSTANT
 %token <sattr> STRING_CONSTANT
+%token <cattr> '{' '}' '(' ')' '[' ']' ';' ',' '.' '+' '-' '*' '!' '&' '='
+
 %type <AST_NODE*> program
 %type <AST_NODE*> external_decls
 %type <AST_NODE*> declaration
@@ -366,7 +368,7 @@ internal_decls	:
 			{
 			root = AST_new_Node();
 			root -> nodeType = INTERNAL_DECLS;
-			AST_addChild(root,EPSILON,$1);
+			AST_addChild(root,EPSILON,AST_new_NODE());
 			$$ = root;
 			}
 		| 	declaration internal_decls
@@ -383,7 +385,7 @@ statement_list	:
 			{
 			root = AST_new_Node();
 			root -> nodeType = STATEMENT_LIST;
-			AST_addChild(root,EPSILON,$1);
+			AST_addChild(root,EPSILON,AST_new_NODE());
 			$$ = root;
 			}
 		| 	statement statement_list 
