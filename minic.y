@@ -44,7 +44,6 @@ extern FILE* yyin;
 %token <int_attr> REL_OP
 %token <int_attr> DOUBLE_OP
 %token <int_attr> ICONSTANT
-%token <int_attr> FCONSTANT
 %token <char_attr> CHAR_CONSTANT
 %token <string_attr> STRING_CONSTANT
 %token <char_attr> '{' '}' '(' ')' '[' ']' ';' ',' '.' '+' '-' '*' '!' '&' '='
@@ -124,7 +123,7 @@ declaration	:	EXTERN type_name var_list ';'
 			{
 			root = AST_new_Node();
 			root -> nodeType = DECLARATION;
-			AST_addChild(root,EXTERN,$1);
+			AST_addChild(root,EXTERN_T,$1.ptr);
 			AST_addChild(root,TYPE_NAME,$2);
 			AST_addChild(root,VAR_LIST,$3);
 			AST_addChild(root,SEMICOLON,$4.ptr);
@@ -134,7 +133,7 @@ declaration	:	EXTERN type_name var_list ';'
 			{
 			root = AST_new_Node();
 			root -> nodeType = DECLARATION;
-			AST_addChild(root,REGISTER,$1);
+			AST_addChild(root,REGISTER_T,$1.ptr);
 			AST_addChild(root,TYPE_NAME,$2);
 			AST_addChild(root,VAR_LIST,$3);
 			AST_addChild(root,SEMICOLON,$4.ptr);
@@ -171,21 +170,21 @@ type_name	:	VOID
 			{
 			root = AST_new_Node();
 			root -> nodeType = TYPE_NAME;
-			AST_addChild(root,VOID,$1.ptr);
+			AST_addChild(root,VOID_T,$1.ptr);
 			$$ = root;
 			} 
 		|	INT 
 			{
 			root = AST_new_Node();
 			root -> nodeType = TYPE_NAME;
-			AST_addChild(root,INT,$1.ptr);
+			AST_addChild(root,INT_T,$1.ptr);
 			$$ = root;
 			} 
 		|	CHAR
 			{
 			root = AST_new_Node();
 			root -> nodeType = TYPE_NAME;
-			AST_addChild(root,CHAR,$1.ptr);
+			AST_addChild(root,CHAR_T,$1.ptr);
 			$$ = root;
 			} 
 		;
@@ -233,9 +232,9 @@ array_var	:	IDENT '[' ICONSTANT ']'
 			{
 			root = AST_new_Node();
 			root -> nodeType = ARRAY_VAR;
-			AST_addChild(root,IDENT,$1.ptr);
+			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_SQUARE_BRACKET,$2.ptr);
-			AST_addChild(root,ICONSTANT,$3.ptr);
+			AST_addChild(root,ICONSTANT_T,$3.ptr);
 			AST_addChild(root,RIGHT_SQUARE_BRACKET,$4.ptr);
 			$$ = root;
 			}
@@ -244,7 +243,7 @@ scalar_var	:	IDENT
 			{
 			root = AST_new_Node();
 			root -> nodeType = SCALAR_VAR;
-			AST_addChild(root,IDENT,$1.ptr);
+			AST_addChild(root,IDENT_T,$1.ptr);
 			$$ = root;
 			}
 			 
@@ -252,7 +251,7 @@ scalar_var	:	IDENT
 			{
 			root = AST_new_Node();
 			root -> nodeType = SCALAR_VAR;
-			AST_addChild(root,IDENT,$1.ptr);
+			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,PARM_TYPE_LIST,$3);
 			AST_addChild(root,RIGHT_PARENTHESE,$4.ptr);
@@ -275,7 +274,7 @@ function_hdr	:	type_name IDENT '(' parm_type_list ')'
 			root = AST_new_Node();
 			root -> nodeType = FUNCTION_HDR;
 			AST_addChild(root,TYPE_NAME,$1);
-			AST_addChild(root,IDENT,$2.ptr);
+			AST_addChild(root,IDENT_T,$2.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$3.ptr);
 			AST_addChild(root,PARM_TYPE_LIST,$4);
 			AST_addChild(root,LEFT_PARENTHESE,$5.ptr);
@@ -287,7 +286,7 @@ function_hdr	:	type_name IDENT '(' parm_type_list ')'
 			root -> nodeType = FUNCTION_HDR;
 			AST_addChild(root,TYPE_NAME,$1);
 			AST_addChild(root,STAR,$2.ptr);
-			AST_addChild(root,IDENT,$3.ptr);
+			AST_addChild(root,IDENT_T,$3.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
 			AST_addChild(root,PARM_TYPE_LIST,$5);
 			AST_addChild(root,LEFT_PARENTHESE,$6.ptr);
@@ -298,7 +297,7 @@ function_hdr	:	type_name IDENT '(' parm_type_list ')'
 			{
 			root = AST_new_Node();
 			root -> nodeType = FUNCTION_HDR;
-			AST_addChild(root,IDENT,$1.ptr);
+			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,PARM_TYPE_LIST,$3);
 			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
@@ -309,7 +308,7 @@ parm_type_list	:	VOID
 			{
 			root = AST_new_Node();
 			root -> nodeType = PARM_TYPE_LIST;
-			AST_addChild(root,VOID,$1.ptr);
+			AST_addChild(root,VOID_T,$1.ptr);
 			$$ = root;
 			}
 			
@@ -343,7 +342,7 @@ parm_decl	:	type_name IDENT
 			root = AST_new_Node();
 			root -> nodeType = PARM_DECL;
 			AST_addChild(root,TYPE_NAME,$1);
-			AST_addChild(root,IDENT,$2.ptr);
+			AST_addChild(root,IDENT_T,$2.ptr);
 			$$ = root;
 			}
 		| 	type_name '*' IDENT
@@ -352,7 +351,7 @@ parm_decl	:	type_name IDENT
 			root -> nodeType = PARM_DECL;
 			AST_addChild(root,TYPE_NAME,$1);
 			AST_addChild(root,STAR,$2.ptr);
-			AST_addChild(root,IDENT,$3.ptr);
+			AST_addChild(root,IDENT_T,$3.ptr);
 			$$ = root;
 			}
 		;
@@ -369,7 +368,7 @@ internal_decls	:
 			{
 			root = AST_new_Node();
 			root -> nodeType = INTERNAL_DECLS;
-			AST_addChild(root,EPSILON,AST_new_NODE());
+			AST_addChild(root,EPSILON,AST_new_Node());
 			$$ = root;
 			}
 		| 	declaration internal_decls
@@ -386,7 +385,7 @@ statement_list	:
 			{
 			root = AST_new_Node();
 			root -> nodeType = STATEMENT_LIST;
-			AST_addChild(root,EPSILON,AST_new_NODE());
+			AST_addChild(root,EPSILON,AST_new_Node());
 			$$ = root;
 			}
 		| 	statement statement_list 
@@ -481,7 +480,7 @@ ifstmt		:	IF '(' expression ')' statement %prec UIF
 			{
 			root = AST_new_Node();
 			root -> nodeType = IFSTMT;
-			AST_addChild(root,IF,$1.ptr);
+			AST_addChild(root,IF_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,EXPRESSION,$3);
 			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
@@ -493,12 +492,12 @@ ifstmt		:	IF '(' expression ')' statement %prec UIF
 			{
 			root = AST_new_Node();
 			root -> nodeType = IFSTMT;
-			AST_addChild(root,IF,$1.ptr);
+			AST_addChild(root,IF_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,EXPRESSION,$3);
 			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
 			AST_addChild(root,STATEMENT,$5);
-			AST_addChild(root,ELSE,$6.ptr);
+			AST_addChild(root,ELSE_T,$6.ptr);
 			AST_addChild(root,STATEMENT,$7);
 			$$ = root;
 			}
@@ -507,7 +506,7 @@ for_stmt	:	FOR '(' expression ';' expression ';' expression ')' statement
 			{
 			root = AST_new_Node();
 			root -> nodeType = FOR_STMT;
-			AST_addChild(root,FOR,$1.ptr);
+			AST_addChild(root,FOR_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,EXPRESSION,$3);
 			AST_addChild(root,SEMICOLON,$4.ptr);
@@ -523,7 +522,7 @@ while_stmt	:	WHILE '(' expression ')' statement
 			{
 			root = AST_new_Node();
 			root -> nodeType = WHILE_STMT;
-			AST_addChild(root,WHILE,$1.ptr);
+			AST_addChild(root,WHILE_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,EXPRESSION,$3);
 			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
@@ -535,7 +534,7 @@ return_stmt	:	RETURN expression ';'
 			{
 			root = AST_new_Node();
 			root -> nodeType = RETURN_STMT;
-			AST_addChild(root,RETURN,$1.ptr);
+			AST_addChild(root,RETURN_T,$1.ptr);
 			AST_addChild(root,EXPRESSION,$2);
 			AST_addChild(root,SEMICOLON,$3.ptr);
 			$$ = root;
@@ -544,7 +543,7 @@ return_stmt	:	RETURN expression ';'
 			{
 			root = AST_new_Node();
 			root -> nodeType = RETURN_STMT;
-			AST_addChild(root,RETURN,$1.ptr);
+			AST_addChild(root,RETURN_T,$1.ptr);
 			AST_addChild(root,SEMICOLON,$2.ptr);
 			$$ = root;
 			} 
@@ -598,14 +597,14 @@ lvalue		:	'*' rvalue
 			{
 			root = AST_new_Node();
 			root -> nodeType = LVALUE;
-			AST_addChild(root,IDENT,$1.ptr);
+			AST_addChild(root,IDENT_T,$1.ptr);
 			$$ = root;
 			} 
 		|	IDENT '[' expression ']'
 			{
 			root = AST_new_Node();
 			root -> nodeType = LVALUE;
-			AST_addChild(root,IDENT,$1.ptr);
+			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_SQUARE_BRACKET,$2.ptr);
 			AST_addChild(root,EXPRESSION,$3);
 			AST_addChild(root,RIGHT_SQUARE_BRACKET,$4.ptr);
@@ -700,7 +699,7 @@ rvalue		:	lvalue %prec '-'
 			{
 			root = AST_new_Node();
 			root -> nodeType = RVALUE;
-			AST_addChild(root,DOUBLE_OP,$1.ptr);
+			AST_addChild(root,DOUBLE_OP_T,$1.ptr);
 			AST_addChild(root,LVALUE,$2);
 			$$ = root;
 			} 
@@ -709,7 +708,7 @@ rvalue		:	lvalue %prec '-'
 			root = AST_new_Node();
 			root -> nodeType = RVALUE;
 			AST_addChild(root,LVALUE,$1);
-			AST_addChild(root,DOUBLE_OP,$2.ptr);
+			AST_addChild(root,DOUBLE_OP_T,$2.ptr);
 			$$ = root;
 			} 
 		|	constant
@@ -724,9 +723,9 @@ rvalue		:	lvalue %prec '-'
 			{
 			root = AST_new_Node();
 			root -> nodeType = RVALUE;
-			AST_addChild(root,IDENT,$1.ptr);
+			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
-			AST_AddChild(root,ARGUMENT_LIST,$3);
+			AST_addChild(root,ARGUMENT_LIST,$3);
 			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
 			$$ = root;
 			} 
@@ -734,7 +733,7 @@ rvalue		:	lvalue %prec '-'
 			{
 			root = AST_new_Node();
 			root -> nodeType = RVALUE;
-			AST_addChild(root,IDENT,$1.ptr);
+			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$3.ptr);
 			$$ = root;
@@ -744,14 +743,14 @@ op		:	BOOLEAN_OP
 			{
 			root = AST_new_Node();
 			root -> nodeType = OP;
-			AST_addChild(root,BOOLEAN_OP,$1.ptr);
+			AST_addChild(root,BOOLEAN_OP_T,$1.ptr);
 			$$ = root;
 			}
 		| 	REL_OP
 			{
 			root = AST_new_Node();
 			root -> nodeType = OP;
-			AST_addChild(root,REL_OP,$1.ptr);
+			AST_addChild(root,REL_OP_T,$1.ptr);
 			$$ = root;
 			}
 		;
@@ -759,21 +758,21 @@ constant	:	ICONSTANT
 			{
 			root = AST_new_Node();
 			root -> nodeType = CONSTANT;
-			AST_addChild(root,ICONSTANT,$1.ptr);
+			AST_addChild(root,ICONSTANT_T,$1.ptr);
 			$$ = root;
 			}
 		| 	CHAR_CONSTANT 
 			{
 			root = AST_new_Node();
 			root -> nodeType = CONSTANT;
-			AST_addChild(root,CHAR_CONSTANT,$1.ptr);
+			AST_addChild(root,CHAR_CONSTANT_T,$1.ptr);
 			$$ = root;
 			}
 		| 	STRING_CONSTANT
 			{
 			root = AST_new_Node();
 			root -> nodeType = CONSTANT;
-			AST_addChild(root,STRING_CONSTANT,$1.ptr);
+			AST_addChild(root,STRING_CONSTANT_T,$1.ptr);
 			$$ = root;
 			}
 		;

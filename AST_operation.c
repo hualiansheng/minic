@@ -1,7 +1,7 @@
 #include "AST.h"
 #include <stdio.h>
 
-AST_NODE* AST_new_node(){
+AST_NODE* AST_new_Node(){
   	AST_NODE* result = (AST_NODE *)malloc(sizeof(AST_NODE));
   	result->father = NULL;
   	result->leftChild = NULL;
