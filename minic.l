@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "minic.tab.h"
+#include "attr.h"
 %}
 
 id			[_a-zA-Z][_a-zA-Z0-9]*
@@ -14,7 +15,7 @@ string_constant		\"(.|\\n)*\"
 %%
 
 extern			return EXTERN;
-register		return EXTERN;
+register		return REGISTER;
 void			return VOID;
 int			return INT;
 char			return CHAR;
