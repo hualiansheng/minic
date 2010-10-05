@@ -25,6 +25,6 @@ main.o : main.c validation_utils.h main.h
 
 
 clean:
-	rm *.o; rm minic; rm yy.lex.c; rm minic.tab.*
+	rm *.o; rm minic; rm lex.yy.c; rm minic.tab.*
 cleanw:
-	del *.o; rm minic; rm yy.lex.c; rm minic.tab.*
+	del *.o; rm minic; rm lex.yy.c; rm minic.tab.*
