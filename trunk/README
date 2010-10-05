@@ -10,3 +10,11 @@ Li Chunqi	(yzt356@gmail.com)
 ***********************
 
 MiniC is a C-subset compiler whose target machine is UniCore architecture designed by Peking University.
+
+minic.y目前完成的功能是:建立包含节点类型的语法树,没有包含节点内容.
+main函数里面可以打印出语法树
+用法:
+make
+./minic test.c > out
+gedit out
+即可看到语法树
