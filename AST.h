@@ -76,7 +76,8 @@ union node_content
 	char* s_content;
 	int i_content;
 };
-typedef struct AST_NODE{
+typedef struct AST_NODE AST_NODE;
+struct AST_NODE{
   	int nodeType;//The type of node, defined above
   	int nodeLevel;//Level of the node
 	union node_content content;
@@ -85,7 +86,7 @@ typedef struct AST_NODE{
   	AST_NODE * rightSibling;//Right sibling node
 
 	symtbl_hdr* symtbl;
-} AST_NODE;
+};
 
 AST_NODE* AST_new_Node();
 void AST_addChild(AST_NODE* root, int child_nodeType, AST_NODE* child);
