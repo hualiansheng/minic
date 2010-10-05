@@ -309,7 +309,14 @@ function_hdr	:	type_name IDENT '(' parm_type_list ')'
 			$$ = root;
 			}
 		;
-parm_type_list	:	VOID
+parm_type_list	:	
+			{
+			root = AST_new_Node();
+			root -> nodeType = PARM_TYPE_LIST;
+			AST_addChild(root,EPSILON,AST_new_Node());
+			$$ = root;
+			}	
+		|	VOID
 			{
 			root = AST_new_Node();
 			root -> nodeType = PARM_TYPE_LIST;
