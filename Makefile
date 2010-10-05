@@ -18,5 +18,3 @@ AST_operation.o: AST.h AST_operation.c
 
 clean:
 	rm *.o; rm minic; rm yy.lex.c; rm minic.tab.*
-cleanw:
-	del *.o; rm minic; rm yy.lex.c; rm minic.tab.*
