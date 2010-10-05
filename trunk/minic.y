@@ -14,6 +14,10 @@
 #define REL_SME 8
 #define REL_DAD 9
 #define REL_DSU 0
+
+//symtable support: scope number
+int scope_number;
+
 int yylex (void);
 void yyerror (char const*);
 AST_NODE* tree_root;
@@ -404,6 +408,8 @@ statement	:	compoundstmt
 			root = AST_new_Node();
 			root -> nodeType = STATEMENT;
 			AST_addChild(root,COMPOUNDSTMT,$1);
+			//symtable support: scope number
+			$1->content.i_content = scope_number ++;
 			$$ = root;
 			}
 		| 	nullstmt 
@@ -449,13 +455,14 @@ statement	:	compoundstmt
 			$$ = root;
 			}
 		;
-compoundstmt	:	'{' statement_list '}'
+compoundstmt	:	'{' internal_decls statement_list '}'
 			{
 			root = AST_new_Node();
 			root -> nodeType = COMPOUNDSTMT;
 			AST_addChild(root,LEFT_BRACE,$1.ptr);
-			AST_addChild(root,STATEMENT_LIST,$2);
-			AST_addChild(root,RIGHT_BRACE,$3.ptr);
+			AST_addChild(root,INTERNAL_DECLS,$2);
+			AST_addChild(root,STATEMENT_LIST,$3);
+			AST_addChild(root,RIGHT_BRACE,$4.ptr);
 			$$ = root;
 			}
 		;
@@ -805,13 +812,21 @@ void dfs(AST_NODE* ptr, int level)
 		return;
 	for (i = 0; i < level; i++)
 		printf("|    ");
-	printf("%s\n", name[ptr->nodeType-1001]);
+	printf("%s", name[ptr->nodeType-1001]);
+	
+	// additional node information
+	if( ptr->nodeType == COMPOUNDSTMT )
+		printf(": scope_number=%d",ptr->content.i_content);
+	// additional node information end
+	printf("\n");
 	for (p = ptr->leftChild; p != NULL; p = p->rightSibling)
 		dfs(p, level+1);
 }
 int main(int argc, char** argv)
-{
-	yydebug=1;
+{	
+	//symtable support: scope number
+	scope_number = 0;
+	yydebug = 1;
 	FILE* source_file;
 	argc--,argv++;
 	if(argc)
