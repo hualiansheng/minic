@@ -265,7 +265,7 @@ function_def	:	function_hdr '{' function_body '}'
 			AST_addChild(root,FUNCTION_HDR,$1);
 			AST_addChild(root,LEFT_BRACE,$2.ptr);
 			AST_addChild(root,FUNCTION_BODY,$3);
-			AST_addChild(root,LEFT_BRACE,$4.ptr);
+			AST_addChild(root,RIGHT_BRACE,$4.ptr);
 			$$ = root;
 			}			
 		;
@@ -277,7 +277,7 @@ function_hdr	:	type_name IDENT '(' parm_type_list ')'
 			AST_addChild(root,IDENT_T,$2.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$3.ptr);
 			AST_addChild(root,PARM_TYPE_LIST,$4);
-			AST_addChild(root,LEFT_PARENTHESE,$5.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$5.ptr);
 			$$ = root;
 			}
 		|	type_name '*' IDENT '(' parm_type_list ')'
@@ -289,7 +289,7 @@ function_hdr	:	type_name IDENT '(' parm_type_list ')'
 			AST_addChild(root,IDENT_T,$3.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
 			AST_addChild(root,PARM_TYPE_LIST,$5);
-			AST_addChild(root,LEFT_PARENTHESE,$6.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$6.ptr);
 			$$ = root;
 			}
 
@@ -300,7 +300,7 @@ function_hdr	:	type_name IDENT '(' parm_type_list ')'
 			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,PARM_TYPE_LIST,$3);
-			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$4.ptr);
 			$$ = root;
 			}
 		;
@@ -483,7 +483,7 @@ ifstmt		:	IF '(' expression ')' statement %prec UIF
 			AST_addChild(root,IF_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,EXPRESSION,$3);
-			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$4.ptr);
 			AST_addChild(root,STATEMENT,$5);
 			$$ = root;
 			}
@@ -495,7 +495,7 @@ ifstmt		:	IF '(' expression ')' statement %prec UIF
 			AST_addChild(root,IF_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,EXPRESSION,$3);
-			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$4.ptr);
 			AST_addChild(root,STATEMENT,$5);
 			AST_addChild(root,ELSE_T,$6.ptr);
 			AST_addChild(root,STATEMENT,$7);
@@ -513,7 +513,7 @@ for_stmt	:	FOR '(' expression ';' expression ';' expression ')' statement
 			AST_addChild(root,EXPRESSION,$5);
 			AST_addChild(root,SEMICOLON,$6.ptr);
 			AST_addChild(root,EXPRESSION,$7);
-			AST_addChild(root,LEFT_PARENTHESE,$8.ptr);			
+			AST_addChild(root,RIGHT_PARENTHESE,$8.ptr);			
 			AST_addChild(root,STATEMENT,$9);
 			$$ = root;
 			}
@@ -525,7 +525,7 @@ while_stmt	:	WHILE '(' expression ')' statement
 			AST_addChild(root,WHILE_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,EXPRESSION,$3);
-			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$4.ptr);
 			AST_addChild(root,STATEMENT,$5);
 			$$ = root;
 			}
@@ -660,7 +660,7 @@ rvalue		:	lvalue %prec '-'
 			root -> nodeType = RVALUE;
 			AST_addChild(root,LEFT_PARENTHESE,$1.ptr);
 			AST_addChild(root,RVALUE,$2);
-			AST_addChild(root,LEFT_PARENTHESE,$3.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$3.ptr);
 			$$ = root;
 			} 
 		|	'+' rvalue %prec UPLUS
@@ -726,7 +726,7 @@ rvalue		:	lvalue %prec '-'
 			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
 			AST_addChild(root,ARGUMENT_LIST,$3);
-			AST_addChild(root,LEFT_PARENTHESE,$4.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$4.ptr);
 			$$ = root;
 			} 
 		|	IDENT '(' ')'
@@ -735,7 +735,7 @@ rvalue		:	lvalue %prec '-'
 			root -> nodeType = RVALUE;
 			AST_addChild(root,IDENT_T,$1.ptr);
 			AST_addChild(root,LEFT_PARENTHESE,$2.ptr);
-			AST_addChild(root,LEFT_PARENTHESE,$3.ptr);
+			AST_addChild(root,RIGHT_PARENTHESE,$3.ptr);
 			$$ = root;
 			}
 		;
