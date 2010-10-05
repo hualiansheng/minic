@@ -21,4 +21,13 @@ void AST_addChild(AST_NODE* root, int child_nodeType, AST_NODE* child){
 	}
 	child -> nodeLevel = root -> nodeLevel + 1;
 	child -> nodeType = child_nodeType;
+	child -> father = root;
+}
+void tree_traversal(AST_NODE* root, int (*f[])(AST_NODE*))
+{
+	AST_NODE* p;
+	if (root == NULL) return;
+	f[root->nodeType-FUNC_OFFSET](root);			
+	for (p = root->leftChild; p != NULL; p = p->rightSibling)
+		tree_traversal(p,f);	
 }

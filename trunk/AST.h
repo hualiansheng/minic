@@ -1,6 +1,7 @@
 #ifndef _AST_H_
 #define _AST_H_
 //Node macro
+#define FUNC_OFFSET 1001
 #define PROGRAM 1001
 #define EXTERNAL_DECLS 1002
 #define DECLARATION 1003
@@ -68,6 +69,7 @@
 #define ADDRESS_SIGN 1065
 #define IDENT_T 1066
 #define EPSILON 1067
+#include "symtbl.h"
 union node_content
 {
 	char c_content;
@@ -78,11 +80,14 @@ typedef struct AST_NODE{
   	int nodeType;//The type of node, defined above
   	int nodeLevel;//Level of the node
 	union node_content content;
-  	struct AST_NODE * father;//Father node
-  	struct AST_NODE * leftChild;//Left child node
-  	struct AST_NODE * rightSibling;//Right sibling node
+  	AST_NODE * father;//Father node
+  	AST_NODE * leftChild;//Left child node
+  	AST_NODE * rightSibling;//Right sibling node
+
+	symtbl_hdr* symtbl;
 } AST_NODE;
 
 AST_NODE* AST_new_Node();
 void AST_addChild(AST_NODE* root, int child_nodeType, AST_NODE* child);
+void tree_traversal(AST_NODE* root, int (*f[])(AST_NODE*));
 #endif
