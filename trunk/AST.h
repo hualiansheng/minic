@@ -84,5 +84,5 @@ typedef struct AST_NODE{
 } AST_NODE;
 
 AST_NODE* AST_new_Node();
-void AST_addLeftChild(AST_NODE* root, int child_nodeType, AST_NODE* child);
+void AST_addChild(AST_NODE* root, int child_nodeType, AST_NODE* child);
 #endif
