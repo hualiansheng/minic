@@ -1,4 +1,4 @@
-OBJECT = minic.tab.o lex.yy.o AST_operation.o
+OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o print_AST.o
 ARGS = -g -Wall
 minic: $(OBJECT)
 	gcc -lm $(ARGS) -o minic $(OBJECT)
@@ -14,7 +14,10 @@ lex.yy.c: minic.l
 	flex minic.l
 AST_operation.o: AST.h AST_operation.c
 	gcc $(ARGS) -c AST_operation.c
-
+print_AST.o : print_AST.c AST.h
+	gcc $(ARGS) -c print_AST.c
+main.o : main.c validation_utils.h main.h
+	gcc $(ARGS) -c main.c
 
 clean:
 	rm *.o; rm minic; rm yy.lex.c; rm minic.tab.*
