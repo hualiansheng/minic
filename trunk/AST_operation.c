@@ -12,7 +12,7 @@ AST_NODE* AST_new_Node(){
 
 void AST_addChild(AST_NODE* root, int child_nodeType, AST_NODE* child){
 	AST_NODE* p = root -> leftChild;
-	if(p != NULL) root -> leftChild = child;
+	if(p == NULL) root -> leftChild = child;
 	else{
 		while(p -> rightSibling != NULL){
 			p = p -> rightSibling;
