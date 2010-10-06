@@ -1,3 +1,4 @@
+extern int p;
 int* fibonacci(int n)
 {
 	if (n == 1 || n == 0)
@@ -11,6 +12,7 @@ int main(int argc, char* argv)
 	b = *x * *y;
 	while (i++ < 10)
 	{
+		char c;
 		b = fibonacci(b);
 		a[k=i] = b++ + --i;
 		i = !(i && j);

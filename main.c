@@ -1,6 +1,7 @@
 #include "validation_utils.h"
 #include "main.h"
 #include <assert.h>
+
 int main(int argc, char** argv)
 {	
 	//symtable support: scope number
@@ -14,7 +15,9 @@ int main(int argc, char** argv)
 	fprintf(stderr,"sdf\n");
 	yyin = source_file;
 	yyparse();
-	print_AST(tree_root, 0);
 	fclose(source_file);
+	//print_AST(tree_root, 0);
+	gen_symtbl(tree_root);
+	print_symtbl(tree_root);
 	return 0;
 }

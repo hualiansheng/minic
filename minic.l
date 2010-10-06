@@ -28,8 +28,11 @@ return 			yylval.string_attr.ptr = AST_new_Node(); return RETURN;
 {id}			{
 				yylval.string_attr.ptr = AST_new_Node();
 				yylval.string_attr.sval = (char*)malloc((yyleng+1)*sizeof(char));
+				yylval.string_attr.ptr -> content.s_content = (char*)malloc((yyleng+1)*sizeof(char));
 				strncpy(yylval.string_attr.sval, yytext, yyleng);
+				strncpy(yylval.string_attr.ptr -> content.s_content, yytext, yyleng);
 				yylval.string_attr.sval[yyleng] = '\0';
+				yylval.string_attr.ptr -> content.s_content[yyleng] = '\0';
 				return IDENT;
 			}
 {special}		yylval.char_attr.ptr = AST_new_Node(); return yytext[0];
@@ -46,14 +49,23 @@ return 			yylval.string_attr.ptr = AST_new_Node(); return RETURN;
 {iconstant}		{
 				yylval.int_attr.ptr = AST_new_Node(); 
 				yylval.int_attr.ival = atoi(yytext);
+				yylval.int_attr.ptr->content.i_content = yylval.int_attr.ival;
 				return ICONSTANT;
 			}
-{char_constant}		yylval.char_attr.ptr = AST_new_Node(); yylval.char_attr.cval = yytext[1]; return CHAR_CONSTANT;
+{char_constant}		{
+				yylval.char_attr.ptr = AST_new_Node();
+				yylval.char_attr.cval = yytext[1];
+				yylval.char_attr.ptr->content.c_content = yylval.char_attr.cval;
+				return CHAR_CONSTANT;
+			}
 {string_constant}	{
 				yylval.string_attr.ptr = AST_new_Node(); 
 				yylval.string_attr.sval = (char*)malloc((yyleng-1)*sizeof(char));
+				yylval.string_attr.ptr -> content.s_content = (char*)malloc((yyleng+1)*sizeof(char));
 				strncpy(yylval.string_attr.sval, yytext+1, yyleng-1);
+				strncpy(yylval.string_attr.ptr -> content.s_content, yytext+1, yyleng-1);
 				yylval.string_attr.sval[yyleng-2] = '\0';
+				yylval.string_attr.ptr -> content.s_content[yyleng-2] = '\0';
 				return STRING_CONSTANT;
 			}
 \n			{}

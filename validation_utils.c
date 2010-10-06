@@ -21,4 +21,27 @@ void print_AST(AST_NODE* ptr, int level)
 		print_AST(p, level+1);
 }
 
+void print_symtbl(AST_NODE* p)
+{
+	int i;
+	AST_NODE* ptr;
+	if (p == NULL)
+		return;
+	if (p->nodeType == PROGRAM || p->nodeType == FUNCTION_DEF || p->nodeType == COMPOUNDSTMT)
+	{
+		printf("=======================================\n");
+		printf("%s\n", name[p->nodeType-FUNC_OFFSET]);
+		printf("ret_type: %s\n", name[p->symtbl->ret_type-FUNC_OFFSET]);
+		printf("ret_star: %d\n", p->symtbl->ret_star);
+		printf("para_num: %d\n", p->symtbl->para_num);
+		printf("item_num: %d\n", p->symtbl->item_num);
+		printf("maxSize: %d\n", p->symtbl->maxSize);
+		for (i = 0; i < p->symtbl->item_num; i++)
+			printf("%s  %d  %d  %s  %d\n", name[p->symtbl->item[i].type-FUNC_OFFSET], p->symtbl->item[i].star_num, p->symtbl->item[i].writable, p->symtbl->item[i].name, p->symtbl->item[i].size);
+		printf("\n");
+	}
+	for (ptr = p->leftChild; ptr != NULL; ptr = ptr->rightSibling)
+		print_symtbl(ptr);
+}
+
 

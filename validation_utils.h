@@ -7,4 +7,5 @@
 #define VALIDATION_UTILS_H_
 #include "AST.h"
 void print_AST(AST_NODE* ptr, int level);
+void print_symtbl(AST_NODE* p);
 #endif
