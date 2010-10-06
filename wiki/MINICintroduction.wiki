@@ -1,11 +1,17 @@
-= Introduction =
+= 简介 =
 
-MINIC是一个C语言子集的编译器，目标代码面向北京大学设计的UNICORE(*SB*)架构。
+MiniC是一个C语言子集的编译器，目标代码面向北京大学设计的UNICORE架构。
 
+= 编译器结构 =
 
-= Details =
+MiniC编译器将按顺序对输入文件做如下处理：
+* 词法分析（由flex辅助完成）
+* 语法分析 - 生成抽象语法树AST（由bison辅助完成）
+* 符号表生成
+* 类型检查
+* 运行时内存分配
+* 中间代码生成
+* 中间代码优化
+* 目标代码生成
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+本Wiki将随着工程的开发进度，提供每一个处理阶段的设计和部分实现细节。
