@@ -69,7 +69,7 @@
 #define ADDRESS_SIGN 1065
 #define IDENT_T 1066
 #define EPSILON 1067
-#include "symtbl.h"
+
 union node_content
 {
 	char c_content;
@@ -77,6 +77,7 @@ union node_content
 	int i_content;
 };
 typedef struct AST_NODE AST_NODE;
+struct symtbl_hdr;
 struct AST_NODE{
   	int nodeType;//The type of node, defined above
   	int nodeLevel;//Level of the node
@@ -85,8 +86,10 @@ struct AST_NODE{
   	AST_NODE * leftChild;//Left child node
   	AST_NODE * rightSibling;//Right sibling node
 
-	symtbl_hdr* symtbl;
+	struct symtbl_hdr* symtbl;
 };
+
+#include "symtbl.h"
 
 AST_NODE* AST_new_Node();
 void AST_addChild(AST_NODE* root, int child_nodeType, AST_NODE* child);
