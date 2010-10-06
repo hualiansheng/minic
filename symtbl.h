@@ -1,12 +1,12 @@
 #ifndef _SYMTBL_H
 #define _SYMTBL_H
+#include "AST.h"
 char* name_pool;
 int name_off;
 int name_size;
 typedef struct symtbl_hdr symtbl_hdr;
 typedef struct symtbl_item symtbl_item;
 typedef struct symtbl_func_para symtbl_func_para;
-
 struct symtbl_hdr
 {
 	symtbl_hdr* parent_tbl;
@@ -25,6 +25,7 @@ struct symtbl_item
 	char* name;
 	int size;
 };
+
 /*struct symtbl_func_para
 {
 	int type;
@@ -34,4 +35,19 @@ struct symtbl_item
 	int size;
 	symtbl_func_para* next;
 };*/
+
+//functions in gen_symtbl.c
+int do_nothing(AST_NODE* p);
+int fill_symtbl(AST_NODE* p, symtbl_hdr* p_tbl);
+int program_symtbl(AST_NODE *p);
+int function_symtbl(AST_NODE* p);
+int compound_symtbl(AST_NODE* p);
+//functions in symtbl_operation.c: 
+symtbl_hdr* init_tbl();
+int adjustSize(void* p_old, int* max);
+int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type);
+int add_func_item(AST_NODE* p, symtbl_hdr* p_tbl);
+int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl);
+int add_para_list(AST_NODE* p, symtbl_hdr* p_tbl);
+char* name_address(char* ident_name);
 #endif

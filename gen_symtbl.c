@@ -1,7 +1,8 @@
-#include "AST.h"
 #include "symtbl.h"
-#include <assert.h>
+#define NULL 0
+//#include <stdio.h>
 int (*create_symtbl[67])(AST_NODE*);
+
 void gen_symtbl(AST_NODE* root)
 {
 	int i;
@@ -10,7 +11,7 @@ void gen_symtbl(AST_NODE* root)
 	create_symtbl[0] = program_symtbl;
 	create_symtbl[9] = function_symtbl;
 	create_symtbl[18] = compound_symtbl;	
-	tree_traverse(root,create_symtbl);
+	tree_traversal(root,create_symtbl);
 }
 int do_nothing(AST_NODE* p)
 {

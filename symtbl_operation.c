@@ -1,5 +1,6 @@
 #include "symtbl.h"
-#include "AST.h"
+
+#include <assert.h>
 
 symtbl_hdr* init_tbl()
 {
