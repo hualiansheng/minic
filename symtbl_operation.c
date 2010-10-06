@@ -52,6 +52,12 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 	p = p->leftChild;
 	if (p->nodeType == ARRAY_VAR)
 	{
+		// check dupulicate defs
+		if (symtbl_query(p_tbl, (p->leftChild->content).s_content, 1)!=NULL)
+		{	//error report here!
+			fprintf(stderr,"symtbl_gen: dupulicate definition, halt!\n");
+			return -1;
+		}
 		(p_tbl->item[p_tbl->item_num]).type = type;
 		(p_tbl->item[p_tbl->item_num]).star_num = 0;
 		(p_tbl->item[p_tbl->item_num]).writable = 0;
@@ -71,11 +77,18 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 		p = p->leftChild;
 		if (p->rightSibling == NULL)
 		{
+			if (symtbl_query(p_tbl, (p->content).s_content, 1)!=NULL)
+			{	//error report here!
+				fprintf(stderr,"symtbl_gen: dupulicate definition, halt!\n");
+				return -1;
+			}
 			(p_tbl->item[p_tbl->item_num]).type = type;
 			(p_tbl->item[p_tbl->item_num]).writable = 1;
 			(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
 			(p_tbl->item[p_tbl->item_num]).size = -1;
 		}
+		else
+			p_tbl -> item_num--;
 	}
 	p_tbl->item_num++;
 	return 0;
@@ -83,6 +96,12 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 
 int add_func_item(AST_NODE* p, symtbl_hdr* p_tbl)
 {
+	if (symtbl_query(p_tbl, (p->content).s_content, 1)!=NULL)
+	{	//error report here!
+		fprintf(stderr,"symtbl_gen: dupulicate definition, halt!\n");
+		return -1;
+	}
+
 	if ((p_tbl->item_num+1)*sizeof(symtbl_item) >= p_tbl->maxSize)
 		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize));
 	(p_tbl->item[p_tbl->item_num]).type = FUNCTION_DEF;
@@ -96,6 +115,7 @@ int add_func_item(AST_NODE* p, symtbl_hdr* p_tbl)
 
 int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl)
 {
+
 	if ((p_tbl->item_num+1)*sizeof(symtbl_item) >= p_tbl->maxSize)
 		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize));
 	p = p->leftChild;
@@ -108,6 +128,14 @@ int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl)
 	}
 	else
 		(p_tbl->item[p_tbl->item_num]).star_num = 0;
+	
+	//check dupulicate params:
+	if (symtbl_query(p_tbl, (p->content).s_content, 1)!=NULL)
+	{	//error report here!
+		fprintf(stderr,"symtbl_gen: dupulicate definition, halt!\n");
+		return -1;
+	}
+
 	(p_tbl->item[p_tbl->item_num]).writable = 1;
 	(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
 	(p_tbl->item[p_tbl->item_num]).size = -1;	
@@ -139,3 +167,34 @@ char* name_address(char* ident_name)
 	name_pool[name_off-1] = '\0';
 	return name_pool+off;
 }
+
+/**
+ * query the symbol table
+ * return value:
+ * 		symtbl_item* is the table item matching 'target'
+ * params:
+ * 		is_local = 0 : query in 'h' and its predecessors
+ * 		is_local != 0 : query only in 'h'
+ */
+symtbl_item* symtbl_query(symtbl_hdr* h, const char* target, int is_local)
+{
+	
+	int i;
+	for( i = 0 ; i < h -> item_num ; i++ )
+		if ( ! strcmp( (h -> item)[i].name, target ) )
+			return &((h -> item)[i]);
+	//falied: not found in table 'h'
+	if ( is_local )
+		return NULL;
+	//search in predecessors
+	for( h = h -> parent_tbl ; h != NULL ; h = h -> parent_tbl )
+	{
+		for( i = 0 ; i < h -> item_num ; i++ )
+			if ( ! strcmp( (h -> item)[i].name, target ) )
+				return &((h -> item)[i]);
+	}
+	return NULL;
+	
+	//return NULL;
+}
+
