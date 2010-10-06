@@ -1,0 +1,11 @@
+= Introduction =
+
+MINIC是一个C语言子集的编译器，目标代码面向北京大学设计的UNICORE(*SB*)架构。
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
