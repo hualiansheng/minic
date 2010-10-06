@@ -1,2 +1,2 @@
-  * [MINICintroduction]
-  * [lex]
+  * [MINICintroduction 项目简介]
+  * [lex 词法分析]
