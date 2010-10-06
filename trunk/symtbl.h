@@ -48,4 +48,5 @@ int add_func_item(AST_NODE* p, symtbl_hdr* p_tbl);
 int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl);
 int add_para_list(AST_NODE* p, symtbl_hdr* p_tbl);
 char* name_address(char* ident_name);
+symtbl_item* symtbl_query(symtbl_hdr* h, const char* target, int is_local);
 #endif
