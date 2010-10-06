@@ -11,7 +11,7 @@
 == 实现 ==
 采用flex自动生成词法分析器，利用flex与bison的接口：
   * `yylex()`：由bison生成的语法分析器调用，负责扫描token，返回终结符类型
-  * `yylval`：由bison生成的语法分析器提供，这是一个描述终结符文法属性的变量，类型由'YYSTYPE'指定，本项目中是自定的一个'union'（参见minic.y）
+  * `yylval`：由bison生成的语法分析器提供，这是一个描述终结符文法属性的变量，类型由'YYSTYPE'指定，本项目中是自定的一个`union`（参见minic.y）
 
 == 相关代码 ==
 || minic.l || flex源文件||
