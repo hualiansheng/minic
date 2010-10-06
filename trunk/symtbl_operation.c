@@ -1,7 +1,11 @@
 #include "symtbl.h"
-
 #include <assert.h>
-
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+char* name_pool;
+int name_off;
+int name_size;
 symtbl_hdr* init_tbl()
 {
 	symtbl_hdr* p = (symtbl_hdr*)malloc(sizeof(symtbl_hdr));
@@ -29,47 +33,48 @@ symtbl_hdr* init_tbl()
 	return 0;
 }*/
 
-int adjustSize(void* p_old, int* max)
+int adjustSize(void** p_old, int* max)
 {
 	void* p_new = (void*)malloc((*max)*2+1);
 	assert(p_new != NULL);
-	strncpy(p_new, p_old, *max);
+	memcpy(p_new, *p_old, *max);
+	//fprintf(stderr,"guabile\n");
 	*max = *max * 2 + 1;
-	free(p_old);
-	p_old = p_new;
+	free(*p_old);
+	*p_old = p_new;
 	return 0;
 }
 
 int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 {
-	if ((p_tbl->item_num+1)*sizeof(syntbl_item) >= p_tbl->maxSize)
-		adjustSize((void*)(p_tbl->item), &(p_tbl->maxSize));
+	if ((p_tbl->item_num+1)*sizeof(symtbl_item) >= p_tbl->maxSize)
+		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize));
 	p = p->leftChild;
 	if (p->nodeType == ARRAY_VAR)
 	{
-		p_tbl->(item+p_tbl->item_num)->type = type;
-		p_tbl->(item+p_tbl->item_num)->star_num = 0;
-		p_tbl->(item+p_tbl->item_num)->writable = 0;
+		(p_tbl->item[p_tbl->item_num]).type = type;
+		(p_tbl->item[p_tbl->item_num]).star_num = 0;
+		(p_tbl->item[p_tbl->item_num]).writable = 0;
 		p = p->leftChild;
-		p_tbl->(item+p_tbl->item_num)->name = name_address((p->content).s_content);
-		p_tbl->(item+p_tbl->item_num)->size = (p->rightSibling->rightSibling->content).i_content;
+		(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
+		(p_tbl->item[p_tbl->item_num]).size = (p->rightSibling->rightSibling->content).i_content;
 	}
 	else
 	{
 		if (p->nodeType == STAR)
 		{
-			p_tbl->(item+p_tbl->item_num)->star_num = 1;
+			(p_tbl->item[p_tbl->item_num]).star_num = 1;
 			p = p->rightSibling;
 		}
 		else
-			p_tbl->(item+p_tbl->item_num)->star_num = 0;
+			(p_tbl->item[p_tbl->item_num]).star_num = 0;
 		p = p->leftChild;
 		if (p->rightSibling == NULL)
 		{
-			p_tbl->(item+p_tbl->item_num)->type = type;
-			p_tbl->(item+p_tbl->item_num)->writable = 1;
-			p_tbl->(item+p_tbl->item_num)->name = name_address((p->content).s_content);
-			p_tbl->(item+p_tbl->item_num)->size = -1;
+			(p_tbl->item[p_tbl->item_num]).type = type;
+			(p_tbl->item[p_tbl->item_num]).writable = 1;
+			(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
+			(p_tbl->item[p_tbl->item_num]).size = -1;
 		}
 	}
 	p_tbl->item_num++;
@@ -78,34 +83,34 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 
 int add_func_item(AST_NODE* p, symtbl_hdr* p_tbl)
 {
-	if ((p_tbl->item_num+1)*sizeof(syntbl_item) >= p_tbl->maxSize)
-		adjustSize((void*)(p_tbl->item), &(p_tbl->maxSize));
-	p_tbl->(item+p_tbl->item_num)->type = FUNCTION_DEF;
-	p_tbl->(item+p_tbl->item_num)->star_num = 0;
-	p_tbl->(item+p_tbl->item_num)->writable = 0;
-	p_tbl->(item+p_tbl->item_num)->name = name_address((p->content).s_content);
-	p_tbl->(item+p_tbl->item_num)->size = -1;
+	if ((p_tbl->item_num+1)*sizeof(symtbl_item) >= p_tbl->maxSize)
+		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize));
+	(p_tbl->item[p_tbl->item_num]).type = FUNCTION_DEF;
+	(p_tbl->item[p_tbl->item_num]).star_num = 0;
+	(p_tbl->item[p_tbl->item_num]).writable = 0;
+	(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
+	(p_tbl->item[p_tbl->item_num]).size = -1;
 	p_tbl->item_num++;
 	return 0;
 }
 
 int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl)
 {
-	if ((p_tbl->item_num+1)*sizeof(syntbl_item) >= p_tbl->maxSize)
-		adjustSize((void*)(p_tbl->item), &(p_tbl->maxSize));
+	if ((p_tbl->item_num+1)*sizeof(symtbl_item) >= p_tbl->maxSize)
+		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize));
 	p = p->leftChild;
-	p_tbl->(item+p_tbl->item_num)->type = p->leftChild->nodeType;
+	(p_tbl->item[p_tbl->item_num]).type = p->leftChild->nodeType;
 	p = p->rightSibling;
 	if (p->nodeType == STAR)
 	{
-		p_tbl->(item+p_tbl->item_num)->star_num = 1;
+		(p_tbl->item[p_tbl->item_num]).star_num = 1;
 		p = p->rightSibling;
 	}
 	else
-		p_tbl->(item+p_tbl->item_num)->star_num = 0;
-	p_tbl->(item+p_tbl->item_num)->writable = 1;
-	p_tbl->(item+p_tbl->item_num)->name = name_address((p->content).s_content);
-	p_tbl->(item+p_tbl->item_num)->size = -1;	
+		(p_tbl->item[p_tbl->item_num]).star_num = 0;
+	(p_tbl->item[p_tbl->item_num]).writable = 1;
+	(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
+	(p_tbl->item[p_tbl->item_num]).size = -1;	
 	p_tbl->item_num++;
 	p_tbl->para_num++;	
 	return 0;
@@ -114,7 +119,7 @@ int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl)
 int add_para_list(AST_NODE* p, symtbl_hdr* p_tbl)
 {
 	AST_NODE* ptr;
-	for (ptr = p->leftChild; ptr != NULL; ptr = ptr->leftChild)
+	for (ptr = p->leftChild; ptr->nodeType != TYPE_NAME; ptr = ptr->leftChild)
 	{
 		if (ptr->rightSibling == NULL)
 			add_para_item(ptr, p_tbl);
@@ -126,10 +131,11 @@ int add_para_list(AST_NODE* p, symtbl_hdr* p_tbl)
 
 char* name_address(char* ident_name)
 {
-	if (name_off+strlen(ident_name) >= name_size)
-		adjustSize((void*)name_pool, &name_size);
+	int off = name_off;
+	while (name_off+strlen(ident_name) >= name_size)
+		adjustSize((void**)&name_pool, &name_size);
 	strncpy(name_pool+name_off, ident_name, strlen(ident_name));
 	name_off += strlen(ident_name)+1;
 	name_pool[name_off-1] = '\0';
-	return name_pool+name_off;
+	return name_pool+off;
 }

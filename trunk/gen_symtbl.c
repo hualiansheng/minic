@@ -1,16 +1,28 @@
 #include "symtbl.h"
-#define NULL 0
-//#include <stdio.h>
-int (*create_symtbl[67])(AST_NODE*);
+#include <assert.h>
+#include <stdlib.h>
 
+#include <stdio.h>
+int (*create_symtbl[67])(AST_NODE*);
+extern char* name_pool;
+extern int name_off;
+extern int name_size;
+extern char name[][30];
 void gen_symtbl(AST_NODE* root)
-{
+{	
 	int i;
+	// init create_symtbl[]
+	//create_symtbl = (int (*)(AST_NODE*))malloc(67*sizeof(int(*)(AST_NODE*)));
+	name_size = 64;
+	name_off = 0;
+	name_pool = (char*)malloc(name_size);
+	assert(name_pool != NULL);
 	for (i = 0; i < 67; i++)
 		create_symtbl[i] = do_nothing;
 	create_symtbl[0] = program_symtbl;
 	create_symtbl[9] = function_symtbl;
 	create_symtbl[18] = compound_symtbl;	
+	fprintf(stderr,"create_symtbl[] created!\n");
 	tree_traversal(root,create_symtbl);
 }
 int do_nothing(AST_NODE* p)
@@ -24,9 +36,14 @@ int fill_symtbl(AST_NODE* p, symtbl_hdr* p_tbl)
 	int type;
 	for (ptr = p->leftChild; ptr->nodeType != FUNCTION_LIST && ptr->nodeType != EPSILON; ptr = ptr->rightSibling->leftChild)
 	{
-		type = ptr->leftChild->rightSibling->leftChild->nodeType;
-		for (cur = ptr->leftChild->rightSibling->rightSibling->leftChild; cur != NULL; cur = cur->leftChild)
+		//printf("%s\n", name[ptr->nodeType-FUNC_OFFSET]);
+		cur = ptr->leftChild;
+		if (cur->nodeType != TYPE_NAME)
+			cur = cur->rightSibling;
+		type = cur->leftChild->nodeType;
+		for (cur = cur->rightSibling->leftChild ; cur->father->nodeType != VAR_ITEM; cur = cur->leftChild)
 		{
+			//printf("%s\n", name[cur->nodeType-FUNC_OFFSET]);
 			if (cur->nodeType == VAR_ITEM)
 				add_var_item(cur, p_tbl, type);
 			else
@@ -44,7 +61,7 @@ int fill_symtbl(AST_NODE* p, symtbl_hdr* p_tbl)
 			add_func_item(temp, p->symtbl);
 		}
 	}*/
-	return symb_num;
+	return 0;
 }
 int program_symtbl(AST_NODE *p)
 {
@@ -56,7 +73,7 @@ int program_symtbl(AST_NODE *p)
 int function_symtbl(AST_NODE* p)
 {
 	AST_NODE* temp;
-	int type;
+	//printf("%s\n", name[p->nodeType-FUNC_OFFSET]);
 	p->symtbl = init_tbl();
 	p->symtbl->parent_tbl = p->father->symtbl;
 	p->symtbl->ret_type = INT_T;
@@ -73,8 +90,9 @@ int function_symtbl(AST_NODE* p)
 	}
 	add_func_item(temp, p->symtbl->parent_tbl);
 	temp = temp->rightSibling->rightSibling->leftChild;
-	if ( temp != NULL)
+	if ( temp != NULL && temp->nodeType != VOID_T)
 		add_para_list(temp, p->symtbl);
+	//printf("%s\n", name[p->leftChild->rightSibling->rightSibling->leftChild->nodeType-FUNC_OFFSET]);
 	fill_symtbl(p->leftChild->rightSibling->rightSibling->leftChild, p->symtbl);
 	return 0;
 }

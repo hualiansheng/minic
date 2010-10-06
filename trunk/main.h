@@ -7,4 +7,5 @@ extern int yydebug;
 extern int scope_number;
 extern FILE* yyin;
 int yyparse();
+void gen_symtbl(AST_NODE*);
 #endif
