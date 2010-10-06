@@ -22,7 +22,6 @@ void gen_symtbl(AST_NODE* root)
 	create_symtbl[0] = program_symtbl;
 	create_symtbl[9] = function_symtbl;
 	create_symtbl[18] = compound_symtbl;	
-	fprintf(stderr,"create_symtbl[] created!\n");
 	tree_traversal(root,create_symtbl);
 }
 int do_nothing(AST_NODE* p)
