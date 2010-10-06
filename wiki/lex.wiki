@@ -1,5 +1,5 @@
 #summary 词法分析
-#sidebar TableOfContents
+
 = 词法分析 =
 
 == 目的 ==
