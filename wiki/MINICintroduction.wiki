@@ -18,3 +18,14 @@ MiniC编译器将按顺序对输入文件做如下处理：
   * 目标代码生成
 
 本Wiki将随着工程的开发进度，提供每一个处理阶段的设计和部分实现细节。
+
+= 使用方法 =
+*注意：以下说明仅适合r84之后的版本，且仅在Linux下编译通过。*
+{{{
+minic [option] source_file
+options:
+	-d Bison parser debug output
+	-t Print AST
+	-s Print symbol tables
+	-a All of above = -tds
+}}}
