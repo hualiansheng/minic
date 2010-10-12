@@ -62,5 +62,4 @@ argument_list	->	argument_list , expression | expression
      ...
  }}}
 
-参见：bison手册：Operator_Precedence
-http://www.gnu.org/software/bison/manual/bison.html#Precedence
+参见：[http://www.gnu.org/software/bison/manual/bison.html#Precedence bison手册：Operator_Precedence]
