@@ -41,3 +41,26 @@ op		->	BOOLEAN_OP | REL_OP
 constant	->	ICONSTANT | CHAR_CONSTANT | STRING_CONSTANT
 argument_list	->	argument_list , expression | expression
 }}}
+
+文法说明：
+  # 表达式文法是二义性文法，然而bison支持指定特定规则的规约/移入优先级，因此能够正确识别表达式
+  {{{
+      ...
+      //设定优先级和结合律
+      %right '='
+      %left '+' '-'
+      %left '*'
+      ...
+}}}
+  # `if-else if-else` 结构是二义性文法，然而bison支持特定规则的规约移入优先级，因此能够正确处理这一结构，minic认为else总跟最近的if匹配。
+ {{{
+     ...
+     %nonassoc UIF
+     %nonassoc ELSE
+     ...
+     ifstmt		:	IF '(' expression ')' statement %prec UIF
+     ...
+ }}}
+
+参见：bison手册：Operator_Precedence
+http://www.gnu.org/software/bison/manual/bison.html#Precedence
