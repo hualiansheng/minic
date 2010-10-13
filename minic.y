@@ -105,7 +105,6 @@ program		:	external_decls {root = AST_new_Node();
 					root -> nodeLevel = 0;
 					AST_addChild(root,EXTERNAL_DECLS,$1);
 					tree_root = root;
-					printf("-------------------OK---------------------------\n");
 					}
 		;
 external_decls	:	declaration external_decls

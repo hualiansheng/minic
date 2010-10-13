@@ -11,10 +11,11 @@
 void usage()
 {
 	printf("MiniC compiler:\n\
-Usage: minic [option] source_file\n\
+Usage: minic [options] source_file\n\
 Options:\n\
 	-d Bison parser debug output\n\
-	-t Print AST\n\
+	-o Print AST in a DOT file\n\
+	-t Print ASCII AST tree\n\
 	-s Print symbol tables\n\
 	-a All of above = -tds\n");
 }
@@ -24,19 +25,23 @@ int main(int argc, char** argv)
 	int oc,
 		dbg_print_tree = 0,
 		dbg_print_symtbl = 0,
-		dbg_type_check = 0;
+		dbg_type_check = 0,
+		dbg_print_tree_dot = 0;
 	FILE* source_file;
 	//symtable support: scope number
 	scope_number = 0;
 	//yydebug = 1;
-	while((oc = getopt(argc, argv, "dtsca")) != -1)
+	while((oc = getopt(argc, argv, "dotsca")) != -1)
 	{
 		switch(oc)
 		{
 			case 'd': // debug on
 				yydebug = 1;
 				break;
-			case 't': //output AST
+			case 'o': //output AST
+				dbg_print_tree_dot = 1;
+				break;
+			case 't':
 				dbg_print_tree = 1;
 				break;
 			case 's':
@@ -78,6 +83,8 @@ int main(int argc, char** argv)
 	 */
 	if(dbg_print_tree)
 		print_AST(tree_root,0);
+	if(dbg_print_tree_dot)
+		print_AST_dot(tree_root);
 	if(dbg_print_symtbl)
 		print_symtbl(tree_root);
 	if(dbg_type_check)
