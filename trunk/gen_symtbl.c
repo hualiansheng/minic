@@ -89,7 +89,7 @@ int function_symtbl(AST_NODE* p)
 	}
 	add_func_item(temp, p->symtbl->parent_tbl);
 	temp = temp->rightSibling->rightSibling->leftChild;
-	if ( temp != NULL && temp->nodeType != VOID_T)
+	if ( temp -> nodeType != EPSILON && temp->nodeType != VOID_T)
 		add_para_list(temp, p->symtbl);
 	//printf("%s\n", name[p->leftChild->rightSibling->rightSibling->leftChild->nodeType-FUNC_OFFSET]);
 	fill_symtbl(p->leftChild->rightSibling->rightSibling->leftChild, p->symtbl);

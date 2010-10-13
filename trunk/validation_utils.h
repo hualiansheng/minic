@@ -8,4 +8,5 @@
 #include "AST.h"
 void print_AST(AST_NODE* ptr, int level);
 void print_symtbl(AST_NODE* p);
+void print_AST_dot(AST_NODE*ptr);
 #endif
