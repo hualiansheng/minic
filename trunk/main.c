@@ -75,7 +75,8 @@ int main(int argc, char** argv)
 	}
 	yyin = source_file;
 	//call bison parser
-	yyparse();
+	if (yyparse())
+		return -1;
 	//generate symbol table
 	gen_symtbl(tree_root);
 	/*

@@ -812,4 +812,5 @@ argument_list	:	argument_list ',' expression
 void yyerror(char const * s)
 {
 	fprintf(stderr, "%s\n",s);
+	return;
 }

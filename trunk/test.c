@@ -10,6 +10,8 @@ int main(int argc, char* argv)
 	int i, k, a[10], b;
 	i = + - - + 0;
 	b = *x * *y;
+	fibonacci(fibonacci(k));
+	for(;;);
 	while (i++ < 10)
 	{
 		char c;
