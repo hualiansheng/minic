@@ -8,6 +8,7 @@
 #include "main.h"
 #include <assert.h>
 #include <unistd.h> //getopt() support
+int error_number;
 void usage()
 {
 	printf("MiniC compiler:\n\
@@ -28,6 +29,8 @@ int main(int argc, char** argv)
 		dbg_type_check = 0,
 		dbg_print_tree_dot = 0;
 	FILE* source_file;
+	//error number, handled by bison
+	error_number = 0;
 	//symtable support: scope number
 	scope_number = 0;
 	//yydebug = 1;
@@ -75,8 +78,11 @@ int main(int argc, char** argv)
 	}
 	yyin = source_file;
 	//call bison parser
-	if (yyparse())
+	if (yyparse() || error_number)
+	{
+		fprintf(stderr, "Parser: terminated, %d error(s).\n",error_number);
 		return -1;
+	}
 	//generate symbol table
 	gen_symtbl(tree_root);
 	/*

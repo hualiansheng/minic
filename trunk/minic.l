@@ -5,6 +5,7 @@
 #include "attr.h"
 #include "minic.tab.h"
 extern YYSTYPE yylval;
+extern YYLTYPE yylloc;
 %}
 
 id			[_a-zA-Z][_a-zA-Z0-9]*
@@ -14,7 +15,7 @@ char_constant		\'(.|\\n)\'
 string_constant		\"(.|\\n)*\"
 
 %%
-
+.				yylloc.first_column=yylloc.last_column; yylloc.last_column++; REJECT;
 extern			yylval.string_attr.ptr = AST_new_Node(); return EXTERN;
 register		yylval.string_attr.ptr = AST_new_Node(); return REGISTER;
 void			yylval.string_attr.ptr = AST_new_Node(); return VOID;
@@ -68,8 +69,12 @@ return 			yylval.string_attr.ptr = AST_new_Node(); return RETURN;
 				yylval.string_attr.ptr -> content.s_content[yyleng-2] = '\0';
 				return STRING_CONSTANT;
 			}
-\n			{}
-.			{}
+\n			{
+				++yylloc.last_line;
+				yylloc.last_column = 0;
+			}
+.			{
+			}
 		
 %%
 int yywrap()

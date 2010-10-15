@@ -11,7 +11,7 @@ int main(int argc, char* argv)
 	i = + - - + 0;
 	b = *x * *y;
 	fibonacci(fibonacci(k));
-	for(;;);
+	for(i;i;i);
 	while (i++ < 10)
 	{
 		char c;
