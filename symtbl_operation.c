@@ -10,6 +10,8 @@ symtbl_hdr* init_tbl()
 {
 	symtbl_hdr* p = (symtbl_hdr*)malloc(sizeof(symtbl_hdr));
 	assert(p != NULL);
+	p->leftChild_tbl = NULL;
+	p->rightSibling_tbl = NULL;
 	p->ret_type = VOID_T;
 	p->ret_star = 0;
 	p->para_num = 0;

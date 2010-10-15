@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include <stdio.h>
-int (*create_symtbl[67])(AST_NODE*);
+int (*create_symtbl[67])(AST_NODE*);	//function pointer
 extern char* name_pool;
 extern int name_off;
 extern int name_size;
@@ -72,8 +72,17 @@ int program_symtbl(AST_NODE *p)
 int function_symtbl(AST_NODE* p)
 {
 	AST_NODE* temp;
+	symtbl_hdr* tmp;
 	//printf("%s\n", name[p->nodeType-FUNC_OFFSET]);
 	p->symtbl = init_tbl();
+	if (p->father->symtbl->leftChild_tbl == NULL)
+		p->father->symtbl->leftChild_tbl = p->symtbl;
+	else
+	{
+		for (tmp = p->father->symtbl->leftChild_tbl; tmp->rightSibling_tbl != NULL; tmp = tmp->rightSibling_tbl)
+			;
+		tmp->rightSibling_tbl = p->symtbl;
+	}
 	p->symtbl->parent_tbl = p->father->symtbl;
 	p->symtbl->ret_type = INT_T;
 	temp = p->leftChild->leftChild;
@@ -98,6 +107,14 @@ int function_symtbl(AST_NODE* p)
 int compound_symtbl(AST_NODE* p)
 {
 	p->symtbl = init_tbl();
+	if (p->father->symtbl->leftChild_tbl == NULL)
+		p->father->symtbl->leftChild_tbl = p->symtbl;
+	else
+	{
+		for (tmp = p->father->symtbl->leftChild_tbl; tmp->rightSibling_tbl != NULL; tmp = tmp->rightSibling_tbl)
+			;
+		tmp->rightSibling_tbl = p->symtbl;
+	}
 	p->symtbl->parent_tbl = p->father->symtbl;
 	fill_symtbl(p->leftChild->rightSibling ,p->symtbl);
 	return 0;
