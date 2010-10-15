@@ -14,7 +14,6 @@
 #define REL_SME 8
 #define REL_DAD 9
 #define REL_DSU 0
-
 //symtable support: scope number
 int scope_number;
 
@@ -23,6 +22,8 @@ void yyerror (char const*);
 AST_NODE* tree_root;
 AST_NODE* root;
 extern FILE* yyin;
+//error number, decleared in main.c; handled by yyerror();
+extern int error_number;
 %}
 
 %union {
@@ -640,7 +641,12 @@ rvalue		:	lvalue %prec '-'
 			AST_addChild(root,PLUS_SIGN,$2.ptr);
 			AST_addChild(root,RVALUE,$3);
 			$$ = root;
-			} 
+			}
+		|	error
+			{
+				fprintf(stderr,"line %d:%d: parsing error: bad expression\n",@1.last_line,@1.last_column);
+				error_number++;
+			}
 		|	rvalue '-' rvalue
 			{
 			root = AST_new_Node();
@@ -811,6 +817,6 @@ argument_list	:	argument_list ',' expression
 %%
 void yyerror(char const * s)
 {
-	fprintf(stderr, "%s\n",s);
+	//fprintf(stderr, "%s\n",s);
 	return;
 }
