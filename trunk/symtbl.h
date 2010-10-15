@@ -8,6 +8,8 @@ typedef struct symtbl_func_para symtbl_func_para;
 struct symtbl_hdr
 {
 	symtbl_hdr* parent_tbl;
+	symtbl_hdr* leftChild_tbl;
+	symtbl_hdr* rightSibling_tbl;
 	int ret_type;
 	int ret_star;
 	int para_num;
