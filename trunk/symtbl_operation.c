@@ -200,3 +200,23 @@ symtbl_item* symtbl_query(symtbl_hdr* h, const char* target, int is_local)
 	//return NULL;
 }
 
+symtbl_hdr* func_query(symtbl_hdr* h, const char* target)
+{
+	
+	int i, k;
+	symtbl_hdr* p;
+	for( i = 0, k = 0 ; i < h -> item_num ; i++ )
+	{
+		if ((h->item)[i].type == FUNCTION_DEF)
+		{
+			if ( ! strcmp( (h -> item)[i].name, target ) )
+			{
+				for (p = h->leftChild_tbl; k > 0; k--, p = p->rightSibling_tbl)
+					;
+				return p;
+			}
+			k++;
+		}
+	}
+	return NULL;
+}
