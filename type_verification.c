@@ -1,5 +1,4 @@
 #include "type_verification.h"
-
 #include <stdio.h>
 data_type (*check_type[67])(AST_NODE*);	//function pointer
 void check_initial()
@@ -8,20 +7,20 @@ void check_initial()
 	for(i = 0 ; i < 67 ;i++){
 		check_type[i] = check_type_SIGN;
 	}
-	check_type[EXPRESSION] = check_type_exp;
-	check_type[ASSIGNMENT_EXPRESSION] = check_type_assignment;
-	check_type[LVALUE] = check_type_lvalue;
-	check_type[RVALUE] = check_type_rvalue;
-	check_type[OP] = check_type_op;
-	check_type[CONSTANT] = check_type_constant;
-	check_type[IDENT_T] = check_type_ID;
+	check_type[EXPRESSION-FUNC_OFFSET] = check_type_exp;
+	check_type[ASSIGNMENT_EXPRESSION-FUNC_OFFSET] = check_type_assignment;
+	check_type[LVALUE-FUNC_OFFSET] = check_type_lvalue;
+	check_type[RVALUE-FUNC_OFFSET] = check_type_rvalue;
+	check_type[OP-FUNC_OFFSET] = check_type_op;
+	check_type[CONSTANT-FUNC_OFFSET] = check_type_constant;
+	check_type[IDENT_T-FUNC_OFFSET] = check_type_ID;
 }
 void dfs_type_verification(AST_NODE* root)
 {
 	AST_NODE* p = root;
 	check_initial();
 	if(p->nodeType == EXPRESSION){
-		check_type[p->nodeType](p);
+		check_type[p->nodeType-FUNC_OFFSET](p);
 		return;
 	}
 	if(p->leftChild == NULL) return;
@@ -35,7 +34,7 @@ data_type check_type_exp(AST_NODE* exp_node)
 	data_type child_type[1];
 	for( p = p->leftChild; p!=NULL; p=p->rightSibling)
 	{
-		child_type[i++] = check_type[p->nodeType](p);
+		child_type[i++] = check_type[p->nodeType-FUNC_OFFSET](p);
 	}
 	if(child_type[0].type == -1) return check_wrong();
 	return child_type[0];
@@ -48,7 +47,7 @@ data_type check_type_assignment(AST_NODE* assignment_node)
 	i = 0;
 	for( p = p->leftChild; p!=NULL; p=p->rightSibling)
 	{
-		child_type[i++] = check_type[p->nodeType](p);
+		child_type[i++] = check_type[p->nodeType-FUNC_OFFSET](p);
 	}
 	for(j = 0 ;j < i ; j ++)
 	{
@@ -68,7 +67,7 @@ data_type check_type_lvalue(AST_NODE* lvalue)
 	i = 0;
 	for( p = p->leftChild; p!=NULL; p=p->rightSibling)
 	{
-		child_type[i++] = check_type[p->nodeType](p);
+		child_type[i++] = check_type[p->nodeType-FUNC_OFFSET](p);
 	}
 	for(j = 0 ; j < i ; j++)
 	{
@@ -101,7 +100,7 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 	i = 0;
 	for( p = p->leftChild; p!=NULL; p=p->rightSibling)
 	{
-		child_type[i++] = check_type[p->nodeType](p);
+		child_type[i++] = check_type[p->nodeType-FUNC_OFFSET](p);
 	}
 	for(j = 0 ; j < i ; j++)
 	{
@@ -131,11 +130,11 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 		while(1){
 			p = p->leftChild;
 			if(p->nodeType == EXPRESSION){
-				para_type[k++] = check_type[p->nodeType](p);
+				para_type[k++] = check_type[p->nodeType-FUNC_OFFSET](p);
 				break;
 			}
 			else{
-				para_type[k++] = check_type[p->rightSibling->rightSibling->nodeType](p->rightSibling->rightSibling);
+				para_type[k++] = check_type[p->rightSibling->rightSibling->nodeType-FUNC_OFFSET](p->rightSibling->rightSibling);
 			}		
 		}
 		if(k != h -> para_num){
@@ -180,7 +179,7 @@ data_type check_type_ID(AST_NODE *p)
 data_type check_type_op(AST_NODE *p)
 {
 	p = p -> leftChild;
-	return check_type[p->nodeType](p);	
+	return check_type[p->nodeType-FUNC_OFFSET](p);	
 }
 data_type check_type_constant(AST_NODE *p)
 {
