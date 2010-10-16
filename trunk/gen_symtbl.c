@@ -105,6 +105,7 @@ int function_symtbl(AST_NODE* p)
 int compound_symtbl(AST_NODE* p)
 {
 	p->symtbl = init_tbl();
+	symtbl_hdr* tmp;
 	if (p->father->symtbl->leftChild_tbl == NULL)
 		p->father->symtbl->leftChild_tbl = p->symtbl;
 	else

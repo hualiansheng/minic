@@ -1,4 +1,6 @@
+#include "type_verification.h"
 
+#include <stdio.h>
 data_type (*check_type[67])(AST_NODE*);	//function pointer
 void check_initial()
 {
@@ -30,7 +32,6 @@ data_type check_type_exp(AST_NODE* exp_node)
 {
 	AST_NODE* p = exp_node;
 	int i = 0 ;
-	int j;
 	data_type child_type[1];
 	for( p = p->leftChild; p!=NULL; p=p->rightSibling)
 	{
@@ -53,10 +54,11 @@ data_type check_type_assignment(AST_NODE* assignment_node)
 	{
 		if(child_type[j].type == -1 )return check_wrong();
 	}
-	if(check_double(child_type[1].type,child_type[0],child_type[2]) == 0){
+	/*if(check_double(child_type[1].type,child_type[0],child_type[2]) == 0){
 		return check_wrong();
 	}
-	else return child_type[0];
+	else return child_type[0];*/
+	return check_double(child_type[1].type,child_type[0],child_type[2]);
 }
 data_type check_type_lvalue(AST_NODE* lvalue)
 {
@@ -87,6 +89,7 @@ data_type check_type_lvalue(AST_NODE* lvalue)
 		}
 		else return check_wrong();
 	}
+	return check_wrong();
 }
 data_type check_type_rvalue(AST_NODE* rvalue)
 {
@@ -147,6 +150,7 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 		}
 		return child_type[0];
 	}
+	else return check_wrong();
 }
 
 
@@ -201,6 +205,7 @@ data_type check_type_constant(AST_NODE *p)
 		temp.size = 1;	
 		break;
 	}
+	default: return check_wrong();
 	}
 	return temp;	
 }
@@ -213,7 +218,7 @@ data_type check_type_constant(AST_NODE *p)
 */
 data_type check_single(int op_type,data_type op_num)
 {
-	switch(child_type[0].type){
+	switch(op_num.type){
 	case POSITIVE_SIGN:
 	{
 		if((op_num.type == INT_T || op_num.type == CHAR_T) && op_num.star_num == 0) return op_num;
@@ -287,7 +292,7 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 			return op1;	
 		}
 		else if(op1.star_num == op2.star_num){
-			if(op1.type == CHAR_T && op2.TYPE == INT_T){
+			if(op1.type == CHAR_T && op2.type == INT_T){
 				printf("warning!");
 				return op1;			
 			}
@@ -382,6 +387,7 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 		break;
 	}
 	}
+	return check_wrong();
 
 }
 /*

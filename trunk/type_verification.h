@@ -1,8 +1,8 @@
 #ifndef _TYPE_VERIFICATION_H
 #define _TYPE_VERIFICATION_H
-#include <ASt.h>
+#include "AST.h"
 #include <stdio.h>
-#include <symtbl.h>
+#include "symtbl.h"
 typedef struct data_type
 {
 	int type;
