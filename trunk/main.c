@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	//symtable support: scope number
 	scope_number = 0;
 	//yydebug = 1;
-	while((oc = getopt(argc, argv, "dotsca")) != -1)
+	while((oc = getopt(argc, argv, "dotsva")) != -1)
 	{
 		switch(oc)
 		{
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 			case 's':
 				dbg_print_symtbl = 1;
 				break;
-			case 'c':
+			case 'v':
 				dbg_type_check = 1;
 				break;
 			case 'a':
@@ -95,6 +95,7 @@ int main(int argc, char** argv)
 	if(dbg_print_symtbl)
 		print_symtbl(tree_root);
 	if(dbg_type_check)
+		dfs_type_verification(tree_root);
 		/*
 		 * TODO: type checking debug output.
 		 */
