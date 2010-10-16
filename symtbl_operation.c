@@ -61,7 +61,7 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 			return -1;
 		}
 		(p_tbl->item[p_tbl->item_num]).type = type;
-		(p_tbl->item[p_tbl->item_num]).star_num = 0;
+		(p_tbl->item[p_tbl->item_num]).star_num = 1;
 		(p_tbl->item[p_tbl->item_num]).writable = 0;
 		p = p->leftChild;
 		(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
