@@ -275,7 +275,7 @@ data_type check_single(int op_type,data_type op_num)
 /*
 	检查双目运算符
 */
-int check_double(int op_type,data_type op1, data_type op2)
+data_type check_double(int op_type,data_type op1, data_type op2)
 {
 	switch(op_type){
 	case EQUALITY_SIGN:{
