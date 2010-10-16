@@ -9,15 +9,12 @@ int main(int argc, char* argv)
 {
 	int i, k, a[10], b;
 	i = + - - + 0;
-	b = *x * *y;
 	fibonacci(fibonacci(k));
-	for(i;i;i);
 	while (i++ < 10)
 	{
 		char c;
 		b = fibonacci(b);
 		a[k=i] = b++ + --i;
-		i = !(i && j);
 	}
 	return 0;
 }
