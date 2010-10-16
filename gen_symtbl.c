@@ -11,8 +11,6 @@ extern char name[][30];
 void gen_symtbl(AST_NODE* root)
 {	
 	int i;
-	// init create_symtbl[]
-	//create_symtbl = (int (*)(AST_NODE*))malloc(67*sizeof(int(*)(AST_NODE*)));
 	name_size = 64;
 	name_off = 0;
 	name_pool = (char*)malloc(name_size);
