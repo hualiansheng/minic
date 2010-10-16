@@ -80,13 +80,17 @@ data_type check_type_lvalue(AST_NODE* lvalue)
 		return child_type[1];
 	}
 	else if(i == 4){
+		//printf("%d %d %d ", child_type[0].star_num, child_type[2].type, child_type[2].star_num);
 		if(child_type[0].star_num == 1 /*&& child_type[0].size >= 0*/ && (child_type[2].type == INT_T || child_type[2].type == CHAR_T) 
 			&& child_type[2].star_num == 0){
 			child_type[0].star_num -= 1;
 			child_type[0].size = -1;
 			return child_type[0];
 		}
-		else return check_wrong();
+		else{
+			printf("array error!\n");
+			return check_wrong();
+		}
 	}
 	return check_wrong();
 }
@@ -115,8 +119,12 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 		if(child_type[0].type == LEFT_PARENTHESE) return child_type[1];
 		else if(child_type[1].type == LEFT_PARENTHESE){
 			h = func_query(rvalue->leftChild->symtbl, (rvalue->leftChild->content).s_content);
+			if(h == NULL){
+				printf("error!!!!!!!\n");
+				return check_wrong();			
+			}
 			if(h->para_num != 0){
-				printf("para error!");
+				printf("para error!\n");
 				return check_wrong();		
 			}
 			else return child_type[0];
@@ -138,13 +146,13 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 			}		
 		}
 		if(k != h -> para_num){
-			printf("para error");
+			printf("para error\n");
 			return check_wrong();		
 		}
 		else{
 			for(j = 0 ; j < k ; j ++){
 				if(para_type[k].star_num != h->item[k].star_num || para_type[k].type != h->item[k].type)
-					printf("warning");
+					printf("warning\n");
 			}		
 		}
 		return child_type[0];
@@ -163,9 +171,10 @@ data_type check_type_SIGN(AST_NODE *p)
 data_type check_type_ID(AST_NODE *p)
 {
 	data_type temp;
-	symtbl_item *id_item = symtbl_query(p->symtbl, (p->content).s_content, 1);
+	symtbl_item *id_item = symtbl_query(p->symtbl, (p->content).s_content, 0);
 	if(id_item == NULL){
-		printf("Not Found!");
+		printf("%s ",(p->content).s_content);
+		printf("Not Found!\n");
 		return check_wrong();	
 	}
 	else{
@@ -287,12 +296,12 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 			return check_wrong();		
 		}
 		if(op1.star_num != op2.star_num){
-			printf("warning!");
+			printf("warning!\n");
 			return op1;	
 		}
 		else if(op1.star_num == op2.star_num){
 			if(op1.type == CHAR_T && op2.type == INT_T){
-				printf("warning!");
+				printf("warning!\n");
 				return op1;			
 			}
 			else return op1;
@@ -301,14 +310,14 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 	}
 	case OP:{
 		if(op1.star_num != op2.star_num){
-			printf("warning!");
+			printf("warning!\n");
 			op1.type = INT_T;
 			op1.star_num = 0;
 			op1.size = -1;
 			return op1;
 		}
 		else if(op1.type != op2.type){
-			printf("warning!");
+			printf("warning!\n");
 			op1.type = INT_T;
 			op1.star_num = 0;
 			op1.size = -1;
@@ -325,7 +334,7 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 	case MINUS_SIGN:{
 		if(op1.star_num != op2.star_num){
 			if(op2.star_num > 0){
-				printf("error!");
+				printf("error!\n");
 				return check_wrong();
 			}
 			else{
@@ -334,7 +343,7 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 			}
 		}
 		else if(op1.type != op2.type && op1.star_num > 0){
-			printf("error!");
+			printf("error!\n");
 			return check_wrong();			
 		}
 		else {
@@ -356,12 +365,12 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 				return op2;			
 			}
 			else{
-				printf("error!");
+				printf("error!\n");
 				return check_wrong();			
 			}
 		}
 		else if(op1.star_num > 0){
-			printf("error!");
+			printf("error!\n");
 			return check_wrong();			
 		}
 		else {
@@ -374,7 +383,7 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 	}
 	case MULTIPLY_SIGN:{
 		if(op1.star_num >0 ||  op2.star_num > 0){
-			printf("error!");
+			printf("error!\n");
 			return check_wrong();			
 		}
 		else {

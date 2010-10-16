@@ -1,5 +1,12 @@
+int f();
 int main(void)
 {
-	int a;
-	a;
+	int a, b;
+	char c;
+	int *p;
+	f();
+}
+int f()
+{
+	return a;
 }
