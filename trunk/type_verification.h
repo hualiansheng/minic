@@ -6,3 +6,5 @@ typedef struct data_type
 	int star_num;
 	int size;
 }data_type;
+
+

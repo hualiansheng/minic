@@ -1,10 +1,28 @@
+
+data_type (*check_type[67])(AST_NODE*);	//function pointer
+void check_initial()
+{
+	int i;
+	for(i = 0 ; i < 67 ;i++){
+		check_type[i] = check_type_SIGN;
+	}
+	check_type[EXPRESSION] = check_type_exp;
+	check_type[ASSIGNMENT_EXPRESSION] = check_type_assignment;
+	check_type[LVALUE] = check_type_lvalue;
+	check_type[RVALUE] = check_type_rvalue;
+	check_type[OP] = check_type_op;
+	check_type[CONSTANT] = check_type_constant;
+	check_type[IDENT_T] = check_type_ID;
+}
 void dfs_type_verification(AST_NODE* root)
 {
 	AST_NODE* p = root;
+	check_initial();
 	if(p->nodeType == EXPRESSION){
 		check_type[p->nodeType](p);
 		return;
 	}
+	if(p->leftChild == NULL) return;
 	for(p = p->leftChild ; p != NULL ; p = p->rightSibling)
 		dfs_type_verification(p);
 }
@@ -73,10 +91,11 @@ data_type check_type_lvalue(AST_NODE* lvalue)
 data_type check_type_rvalue(AST_NODE* rvalue)
 {
 	AST_NODE* p = rvalue;
-	int i, j;
+	int i, j, k;
 	data_type child_type[4];
-	i = 0;
+	data_type para_type[20];
 	symtbl_hdr* h;
+	i = 0;
 	for( p = p->leftChild; p!=NULL; p=p->rightSibling)
 	{
 		child_type[i++] = check_type[p->nodeType](p);
@@ -103,13 +122,32 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 		else return check_double(child_type[1].type, child_type[0], child_type[2]);			
 	}
 	else if(i == 4){
+		k = 0;
 		h = func_query(rvalue->leftChild->symtbl, (rvalue->leftChild->content).s_content);
-		 
+		p = rvalue -> leftChild -> rightSibling -> rightSibling;
+		while(1){
+			p = p->leftChild;
+			if(p->nodeType == EXPRESSION){
+				para_type[k++] = check_type[p->nodeType](p);
+				break;
+			}
+			else{
+				para_type[k++] = check_type[p->rightSibling->rightSibling->nodeType](p->rightSibling->rightSibling);
+			}		
+		}
+		if(k != h -> para_num){
+			printf("para error");
+			return check_wrong();		
+		}
+		else{
+			for(j = 0 ; j < k ; j ++){
+				if(para_type[k].star_num != h->item[k].star_num || para_type[k].type != h->item[k].type)
+					printf("warning");
+			}		
+		}
+		return child_type[0];
 	}
-
-
 }
-
 
 
 data_type check_type_SIGN(AST_NODE *p)
@@ -124,8 +162,8 @@ data_type check_type_ID(AST_NODE *p)
 	data_type temp;
 	symtbl_item *id_item = symtbl_query(p->symtbl, (p->content).s_content, 1);
 	if(id_item == NULL){
-		temp.type = -1;
-		return temp;	
+		printf("Not Found!");
+		return check_wrong();	
 	}
 	else{
 		temp.type = id_item->type;
