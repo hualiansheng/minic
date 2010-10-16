@@ -76,6 +76,7 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 	int i, j;
 	data_type child_type[4];
 	i = 0;
+	symtbl_hdr* h;
 	for( p = p->leftChild; p!=NULL; p=p->rightSibling)
 	{
 		child_type[i++] = check_type[p->nodeType](p);
@@ -91,10 +92,19 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 	}
 	else if(i == 3){
 		if(child_type[0].type == LEFT_PARENTHESE) return child_type[1];
-		else if(child_type[1].type == LEFT_PARENTHESE) return child_type[0];
+		else if(child_type[1].type == LEFT_PARENTHESE){
+			h = func_query(rvalue->leftChild->symtbl, (rvalue->leftChild->content).s_content);
+			if(h->para_num != 0){
+				printf("para error!");
+				return check_wrong();		
+			}
+			else return child_type[0];
+		}
 		else return check_double(child_type[1].type, child_type[0], child_type[2]);			
 	}
 	else if(i == 4){
+		h = func_query(rvalue->leftChild->symtbl, (rvalue->leftChild->content).s_content);
+		 
 	}
 
 
