@@ -118,7 +118,7 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 	else if(i == 3){
 		if(child_type[0].type == LEFT_PARENTHESE) return child_type[1];
 		else if(child_type[1].type == LEFT_PARENTHESE){
-			h = func_query(rvalue->leftChild->symtbl, (rvalue->leftChild->content).s_content);
+			h = func_query(tree_root->symtbl, (rvalue->leftChild->content).s_content);
 			if(h == NULL){
 				printf("error!!!!!!!\n");
 				return check_wrong();			
@@ -133,7 +133,7 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 	}
 	else if(i == 4){
 		k = 0;
-		h = func_query(rvalue->leftChild->symtbl, (rvalue->leftChild->content).s_content);
+		h = func_query(tree_root->symtbl, (rvalue->leftChild->content).s_content);
 		p = rvalue -> leftChild -> rightSibling -> rightSibling;
 		while(1){
 			p = p->leftChild;
@@ -151,7 +151,7 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 		}
 		else{
 			for(j = 0 ; j < k ; j ++){
-				if(para_type[k].star_num != h->item[k].star_num || para_type[k].type != h->item[k].type)
+				if(para_type[j].star_num != h->item[j].star_num || para_type[j].type != h->item[j].type)
 					printf("warning\n");
 			}		
 		}
