@@ -9,7 +9,7 @@ int main(int argc, char* argv)
 {
 	int i, k, a[10], b;
 	i = + - - + 0;
-	fibonacci(fibonacci(k));
+	fibonacci(k);
 	while (i++ < 10)
 	{
 		char c;

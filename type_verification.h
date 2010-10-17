@@ -23,4 +23,5 @@ data_type check_type_constant(AST_NODE *p);
 data_type check_single(int op_type,data_type op_num);
 data_type check_double(int op_type,data_type op1, data_type op2);
 data_type check_wrong();
+extern AST_NODE* tree_root;
 #endif
