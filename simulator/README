@@ -1,0 +1,23 @@
+Unicore-II Simulator
+***********************
+
+Author:
+Peng Zhuo	(brillsp@gmail.com)
+Wang Kan	(kerrywang881122@gmail.com)
+Hua Liansheng	(hualiansheng@gmail.com)
+Li Chunqi	(yzt356@gmail.com)
+
+***********************
+Unicore-II Simulator is a application level simulator of the architecture of Unicore-II, which is based on MIPs. The simulator contains the simulation of the followings:
+a. A CPU with five(or seven)-level pipeline.
+b. An I-cache and a D-cache.
+c. Simple memory management, a stack is at least involved.
+d. Simple I/O support.
+
+Then, the following function is involved:
+a. Statistical functions, including CPU occupancy rate, total running time, cache missing rate, branch prediction missing and so on (to be added)
+b. A debugger is supported. That is, a program can be run in trap mode.
+c. The execuation file fomart is Executable and Linkable Format (ELF), which follows the strict decipline published by UNIX System Laboratories (USL) as part of the Application Binary Interface (ABI).
+d. File operation is supported.
+
+All rights reserved.
