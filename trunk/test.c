@@ -14,7 +14,7 @@ int main(int argc, char* argv)
 	while (i++ < 10)
 	{
 		char c;
-		c=&p;
+		c = &i;
 		b = fibonacci(b);
 		a[k=i] = b++ + --i;
 	}
