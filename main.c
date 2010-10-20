@@ -18,7 +18,8 @@ Options:\n\
 	-o Print AST in a DOT file\n\
 	-t Print ASCII AST tree\n\
 	-s Print symbol tables\n\
-	-a All of above = -tds\n");
+	-v Print type verification debug output\n\
+	-a All of above = -tdsv\n");
 }
 int main(int argc, char** argv)
 {	
@@ -96,9 +97,5 @@ int main(int argc, char** argv)
 		print_symtbl(tree_root);
 	if(dbg_type_check)
 		dfs_type_verification(tree_root);
-		/*
-		 * TODO: type checking debug output.
-		 */
-		;
 	return 0;
 }

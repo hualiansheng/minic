@@ -1,5 +1,6 @@
 #include "type_verification.h"
 #include <stdio.h>
+extern char name[][30];
 data_type (*check_type[67])(AST_NODE*);	//function pointer
 void check_initial()
 {
@@ -18,6 +19,9 @@ void check_initial()
 void dfs_type_verification(AST_NODE* root)
 {
 	AST_NODE* p = root;
+//	int type = root -> nodeType;
+//	fprintf(stdout,"scanning %d%s...\n",type,name[p->nodeType-1001]);
+//	fflush(stdout);
 	check_initial();
 	if(p->nodeType == EXPRESSION){
 		check_type[p->nodeType-FUNC_OFFSET](p);
