@@ -8,11 +8,13 @@ int* fibonacci(int n)
 int main(int argc, char* argv)
 {
 	int i, k, a[10], b;
+	int *p;
 	i = + - - + 0;
 	fibonacci(k);
 	while (i++ < 10)
 	{
 		char c;
+		c=&p;
 		b = fibonacci(b);
 		a[k=i] = b++ + --i;
 	}
