@@ -116,7 +116,9 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 	}
 	if(i == 1) return child_type[0];
 	else if(i == 2){
-		if(child_type[1].type == DOUBLE_OP_T) return check_single(child_type[1].type, child_type[0]);
+		if(child_type[1].type == DOUBLE_OP_T){
+			return check_single(child_type[1].type, child_type[0]);
+		}
 		else{
 			return check_single(child_type[0].type, child_type[1]);
 		}
@@ -274,8 +276,6 @@ data_type check_single(int op_type,data_type op_num)
 	}
 	case DOUBLE_OP_T:{
 		if(!(op_num.star_num >= 1 && op_num.size != -1)){
-			op_num.star_num += 1;
-			op_num.size = -1;
 			return op_num;		
 		}
 		else{
