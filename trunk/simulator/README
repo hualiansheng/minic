@@ -20,4 +20,6 @@ b. A debugger is supported. That is, a program can be run in trap mode.
 c. The execuation file fomart is Executable and Linkable Format (ELF), which follows the strict decipline published by UNIX System Laboratories (USL) as part of the Application Binary Interface (ABI).
 d. File operation is supported.
 
+Besides, a simulator for compilation file is also implemented for test of validation.
+
 All rights reserved.
