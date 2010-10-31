@@ -7,6 +7,6 @@ extern int yydebug;
 extern int scope_number;
 extern FILE* yyin;
 int yyparse();
-void gen_symtbl(AST_NODE*);
+int gen_symtbl(AST_NODE*);
 void dfs_type_verification(AST_NODE* root);
 #endif

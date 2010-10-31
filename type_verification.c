@@ -1,5 +1,6 @@
 #include "type_verification.h"
 #include <stdio.h>
+#include "validation_utils.h"
 extern char name[][30];
 data_type (*check_type[67])(AST_NODE*);	//function pointer
 void check_initial()
@@ -77,7 +78,14 @@ data_type check_type_lvalue(AST_NODE* lvalue)
 	{
 		if(child_type[j].type == -1) return check_wrong();
 	}
-	if( i == 1) return child_type[0];
+	if( i == 1){
+		symtbl_item *temp_item = symtbl_query(lvalue->leftChild->symtbl, (lvalue->leftChild->content).s_content, 0);
+		if(temp_item->type == FUNCTION_DEF){
+			printf("%s is not a variable\n",(lvalue->leftChild->content).s_content);
+			return check_wrong();		
+		}
+		return child_type[0];
+	}
 	else if(i == 2){
 		if(child_type[1].star_num <= 0) return check_wrong();
 		child_type[1].star_num -= 1;
@@ -142,6 +150,9 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 	else if(i == 4){
 		k = 0;
 		h = func_query(tree_root->symtbl, (rvalue->leftChild->content).s_content);
+		child_type[0].type = h->ret_type;
+		child_type[0].star_num = h->ret_star;
+		child_type[0].size = -1;
 		p = rvalue -> leftChild -> rightSibling -> rightSibling;
 		while(1){
 			p = p->leftChild;
@@ -159,8 +170,9 @@ data_type check_type_rvalue(AST_NODE* rvalue)
 		}
 		else{
 			for(j = 0 ; j < k ; j ++){
+				//printf("%d %d %d %d", para_type[j].star_num,para_type[j].type,h->item[j].star_num,h->item[j].type);
 				if(para_type[j].star_num != h->item[j].star_num || para_type[j].type != h->item[j].type)
-					printf("warning\n");
+					printf("param warning\n");
 			}		
 		}
 		return child_type[0];

@@ -29,6 +29,7 @@ int main(int argc, char** argv)
 		dbg_print_symtbl = 0,
 		dbg_type_check = 0,
 		dbg_print_tree_dot = 0;
+	int gen_symtbl_result ;
 	FILE* source_file;
 	//error number, handled by bison
 	error_number = 0;
@@ -84,8 +85,14 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Parser: terminated, %d error(s).\n",error_number);
 		return -1;
 	}
+	fprintf(stderr,"Generating symbol table...\n");
 	//generate symbol table
-	gen_symtbl(tree_root);
+	gen_symtbl_result = gen_symtbl(tree_root);
+	if(gen_symtbl_result)
+	{
+		fprintf(stderr,"Error generating symbol tables!\n");
+		return -1;
+	}
 	/*
 	 * TODO: next compilation step
 	 */
@@ -94,7 +101,7 @@ int main(int argc, char** argv)
 	if(dbg_print_tree_dot)
 		print_AST_dot(tree_root);
 	if(dbg_print_symtbl)
-		print_symtbl(tree_root);
+		print_symtbl(tree_root->symtbl);
 	if(dbg_type_check)
 		dfs_type_verification(tree_root);
 	return 0;

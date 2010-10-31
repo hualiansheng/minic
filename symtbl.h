@@ -13,10 +13,11 @@ struct symtbl_hdr
 	symtbl_hdr* leftChild_tbl;	//leftChild symtbl
 	symtbl_hdr* rightSibling_tbl;	//rightSibling symtbl
 
-	//ret_type, ret_star, para_num are useful only for function's symtbl
+	//ret_type, ret_star, para_num, func are useful only for function's symtbl
 	int ret_type;			//return value's type of a function; default is VOID_T
 	int ret_star;			//indicate whether the return value is a pointer; default is 0
 	int para_num;			//the number of function's parameters
+	int func_def;			//record whether the function body is defined
 	
 	int item_num;			//the number of items in the symtbl
 	int maxSize;			//the max memory size for symtbl items currently, noticing that it's calculated by byte!
@@ -54,10 +55,12 @@ int compound_symtbl(AST_NODE* p);	//the actions when visiting COMPOUNDSTMT, crea
 symtbl_hdr* init_tbl();			//initialize the symtbl
 int adjustSize(void** p_old, int* max);		//adjust the size of the item list when not enough
 int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type);	//add a new variable item
-int add_func_item(AST_NODE* p, symtbl_hdr* p_tbl);		//add a new function item
+int add_func_item(AST_NODE* p, int type, int star);		//add a new function item
 int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl);		//add a new parameter of function into the function's symtbl
 int add_para_list(AST_NODE* p, symtbl_hdr* p_tbl);		//add the whole parameter list into the function's symtbl
+int add_para_name(AST_NODE* p, symtbl_hdr* p_tbl, int i);
 char* name_address(char* ident_name);		//get the address of given name in the namepool
+int func_check(AST_NODE* p, symtbl_hdr* q, int type, int star);
 symtbl_item* symtbl_query(symtbl_hdr* h, const char* target, int is_local);	//query a variable in the symtbl; return the item in the symtbl
 symtbl_hdr* func_query(symtbl_hdr* h, const char* target);			//query a function in the symtbl; return the pointer to that function's symtbl
 #endif
