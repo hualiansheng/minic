@@ -8,7 +8,9 @@ extern char* name_pool;
 extern int name_off;
 extern int name_size;
 extern char name[][30];
-void gen_symtbl(AST_NODE* root)
+extern AST_NODE* tree_root;
+int err_num;
+int gen_symtbl(AST_NODE* root)
 {	
 	int i;
 	name_size = 64;
@@ -20,7 +22,11 @@ void gen_symtbl(AST_NODE* root)
 	create_symtbl[0] = program_symtbl;
 	create_symtbl[9] = function_symtbl;
 	create_symtbl[18] = compound_symtbl;	
+	err_num = 0;	
 	tree_traversal(root,create_symtbl);
+	if (err_num)
+		return -1;
+	return 0;
 }
 int do_nothing(AST_NODE* p)
 {
@@ -47,17 +53,6 @@ int fill_symtbl(AST_NODE* p, symtbl_hdr* p_tbl)
 				add_var_item(cur->rightSibling->rightSibling, p_tbl, type);
 		}
 	}
-	/*if (ptr->nodeType == FUNCTION_LIST)
-	{
-		for (cur = ptr->leftChild; cur != NULL; cur = cur->leftChild)
-		{
-			if (cur->nodeType == FUNCTION_DEF)
-				temp = cur->leftChild->leftChild;
-			else
-				temp = cur->rightSibling->rightSibling->leftChild->leftChild;
-			add_func_item(temp, p->symtbl);
-		}
-	}*/
 	return 0;
 }
 int program_symtbl(AST_NODE *p)
@@ -71,34 +66,43 @@ int function_symtbl(AST_NODE* p)
 {
 	AST_NODE* temp;
 	symtbl_hdr* tmp;
-	//printf("%s\n", name[p->nodeType-FUNC_OFFSET]);
-	p->symtbl = init_tbl();
-	if (p->father->symtbl->leftChild_tbl == NULL)
-		p->father->symtbl->leftChild_tbl = p->symtbl;
-	else
-	{
-		for (tmp = p->father->symtbl->leftChild_tbl; tmp->rightSibling_tbl != NULL; tmp = tmp->rightSibling_tbl)
-			;
-		tmp->rightSibling_tbl = p->symtbl;
-	}
-	p->symtbl->parent_tbl = p->father->symtbl;
-	p->symtbl->ret_type = INT_T;
+	int type, star, i;
+	type = INT_T;
+	star = 0;
 	temp = p->leftChild->leftChild;
 	if (temp->nodeType == TYPE_NAME)
 	{
-		p->symtbl->ret_type = temp->leftChild->nodeType;
+		type = temp->leftChild->nodeType;
 		temp = temp->rightSibling;
 	}
 	if (temp->nodeType == STAR)
 	{
-		p->symtbl->ret_star = 1;
+		star = 1;
 		temp = temp->rightSibling;
 	}
-	add_func_item(temp, p->symtbl->parent_tbl);
+	if ((tmp=func_query(tree_root->symtbl, (temp->content).s_content)) == NULL)
+	{
+		add_func_item(temp, type, star);
+		p->symtbl = temp->symtbl;
+	}
+	else
+	{
+		if (tmp->func_def == 1 || func_check(temp, tmp, type, star) == 0)
+		{
+			fprintf(stderr,"Function defination error!\n");
+			err_num++;
+			return -1;
+		}
+		p->symtbl = tmp;
+	}	
+	p->symtbl->func_def = 1;
 	temp = temp->rightSibling->rightSibling->leftChild;
-	if ( temp -> nodeType != EPSILON && temp->nodeType != VOID_T)
-		add_para_list(temp, p->symtbl);
-	//printf("%s\n", name[p->leftChild->rightSibling->rightSibling->leftChild->nodeType-FUNC_OFFSET]);
+	if (temp->nodeType != EPSILON && temp->nodeType != VOID_T)
+	{
+		for (temp = temp->leftChild, i = 0; temp->nodeType != PARM_DECL; temp = temp->leftChild, i++)
+			add_para_name(temp->rightSibling->rightSibling, p->symtbl, i);
+		add_para_name(temp, p->symtbl, i);
+	}
 	fill_symtbl(p->leftChild->rightSibling->rightSibling->leftChild, p->symtbl);
 	return 0;
 }
