@@ -99,10 +99,7 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 		else
 		{
 			if ((tmp=func_query(tree_root->symtbl, (p->content).s_content)) == NULL)
-			{
 				add_func_item(p, type, (p_tbl->item[p_tbl->item_num]).star_num);
-				p_tbl->item_num--;
-			}
 			else
 			{
 				if (func_check(p, tmp, type, (p_tbl->item[p_tbl->item_num]).star_num) == 0)
@@ -112,6 +109,7 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 					return -1;
 				}
 			}
+			p_tbl->item_num--;
 		}
 	}
 	p_tbl->item_num++;
