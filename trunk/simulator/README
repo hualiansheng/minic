@@ -8,7 +8,7 @@ Hua Liansheng	(hualiansheng@gmail.com)
 Li Chunqi	(yzt356@gmail.com)
 
 ***********************
-Unicore-II Simulator is a application level simulator of the architecture of Unicore-II, which is based on MIPs. The simulator contains the simulation of the followings:
+Unicore-II Simulator is a application level simulator of the architecture of Unicore-II. The simulator contains the simulation of the followings:
 a. A CPU with five(or seven)-level pipeline.
 b. An I-cache and a D-cache.
 c. Simple memory management, a stack is at least involved.
