@@ -3,6 +3,7 @@
 #include "validation_utils.h"
 extern char name[][30];
 data_type (*check_type[67])(AST_NODE*);	//function pointer
+extern int error_number; //error number, handled by main.c 
 void check_initial()
 {
 	int i;

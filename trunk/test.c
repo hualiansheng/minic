@@ -28,6 +28,11 @@ int main(int argc, char* argv)
 		
 		b = fibonacci(b);
 		a[i] = b++ + --i;
+		f(i,c);
 	}
 	return 0;
+}
+int f(int a,char b, char* c)
+{
+	return 1;
 }
