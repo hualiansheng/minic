@@ -83,7 +83,8 @@ void print_intermediate_code()
 {
 	int i;
 	for(i = 0 ; i < triple_list_index ; i ++)
-	{
+	{	
+		printf("%d : ", i);
 		printf("%s ",operator_name[triple_list[i].op - 3000]);
 		if(triple_list[i].arg1_type == 0 || triple_list[i].arg1_type == 3) printf("%s ", triple_list[i].arg1.var_name);
 		else printf("%d ", triple_list[i].arg1.temp_index);
