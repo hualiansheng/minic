@@ -29,7 +29,8 @@ int main(int argc, char** argv)
 		dbg_print_tree = 0,
 		dbg_print_symtbl = 0,
 		dbg_type_check = 0,
-		dbg_print_tree_dot = 0;
+		dbg_print_tree_dot = 0,
+		dbg_no_intermediate = 0;
 	int gen_symtbl_result ;
 	FILE* source_file;
 	//error number, handled by bison
@@ -37,7 +38,7 @@ int main(int argc, char** argv)
 	//symtable support: scope number
 	scope_number = 0;
 	//yydebug = 1;
-	while((oc = getopt(argc, argv, "dotsva")) != -1)
+	while((oc = getopt(argc, argv, "dotsvax")) != -1)
 	{
 		switch(oc)
 		{
@@ -61,6 +62,9 @@ int main(int argc, char** argv)
 					= dbg_print_symtbl 
 					= dbg_type_check 
 					= 1;
+				break;
+			case 'x':
+				dbg_no_intermediate = 1;
 				break;
 			default:
 				usage();
@@ -113,6 +117,11 @@ int main(int argc, char** argv)
 		fprintf(stderr,"Error type verification!\n");
 		return -1;
 	};
+	if(dbg_no_intermediate)
+	{
+		fprintf(stderr,"No intermediate mode: i am quiting...\n");
+		return 0;
+	}
 	intermediate_code(tree_root);
 	print_intermediate_code();
 	/*
