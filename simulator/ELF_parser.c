@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <gelf.h>
 
@@ -46,8 +47,9 @@ int Elf_initial(char *input_file){
 }
 
 int Elf_close(){
-  elf_end(e);
-  close(fd);
+  (void) elf_end(e);
+  (void) close(fd);
+  return 1;
 }
 
 //get next loadable program header
