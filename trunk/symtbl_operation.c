@@ -228,6 +228,7 @@ symtbl_item* symtbl_query(symtbl_hdr* h, const char* target, int is_local)
 {
 	
 	int i;
+	assert(target != NULL);
 	for( i = 0 ; i < h -> item_num ; i++ )
 		if ( (h->item)[i].name != NULL && ! strcmp( (h -> item)[i].name, target ) )
 			return &((h -> item)[i]);

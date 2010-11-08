@@ -9,7 +9,7 @@ int counter[100];
 extern triple* triple_list;
 extern int triple_list_size;
 extern int triple_list_index;
-char *operator_name[]={"if","if_not","goto","-","!","&","!*","+","=","*=","+","-","*","char to int","==","<",">",">=","<=","!=","||","&&","get rb","set rb","call", "param", "enter", "leave", "return"};
+char *operator_name[]={"if,goto","if_not,goto","goto","-","!","&","!*","+","=","*=","+","-","*","char to int","==","<",">",">=","<=","!=","||","&&","get rb","set rb","call", "param", "enter", "leave", "return"};
 void print_AST_dot_core(AST_NODE* ptr);
 void print_AST(AST_NODE* ptr, int level)
 {
@@ -78,14 +78,32 @@ void print_symtbl(symtbl_hdr* p)
 	for (ptr = p->leftChild_tbl; ptr != NULL; ptr = ptr->rightSibling_tbl)
 		print_symtbl(ptr);
 }
-
+void print_intermediate_arg(int arg_type,union arg a)
+{
+	switch(arg_type)
+	{
+		case 0:
+			printf("%s ",a.var_name);
+			break;
+		case 1:
+			printf("(%d) ",a.temp_index);
+			break;
+		case 2:
+			printf("%d ",a.imm_value);
+			break;
+		case 3:
+			printf("%s ",a.var_name);
+	}
+}
 void print_intermediate_code()
 {
 	int i;
 	for(i = 0 ; i < triple_list_index ; i ++)
 	{	
-		printf("%d : ", i);
+		printf("(%d) : ", i);
 		printf("%s ",operator_name[triple_list[i].op - 3000]);
+		//print_intermediate_arg(triple_list[i].arg1_type,triple_list[i].arg1);
+		//print_intermediate_arg(triple_list[i].arg2_type,triple_list[i].arg2);
 		if(triple_list[i].arg1_type == 0 || triple_list[i].arg1_type == 3) printf("%s ", triple_list[i].arg1.var_name);
 		else printf("%d ", triple_list[i].arg1.temp_index);
 		if(triple_list[i].arg2_type == 0 || triple_list[i].arg2_type == 3) printf("%s ", triple_list[i].arg2.var_name);
