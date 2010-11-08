@@ -114,6 +114,7 @@ int main(int argc, char** argv)
 		return -1;
 	};
 	intermediate_code(tree_root);
+	print_intermediate_code();
 	/*
 	 * TODO: next compilation step
 	 */

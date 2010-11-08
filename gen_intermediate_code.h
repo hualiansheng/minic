@@ -4,10 +4,11 @@
 //define
 
 enum operator{
-	if_op, if_not_op, goto_op,negative_op,not_op,address_op,star_op,positive_op,assign_op,star_assign_op,add_op,minus_op,multiply_op, char_to_int_op,
+	if_op = 3000, if_not_op, goto_op,negative_op,not_op,address_op,star_op,positive_op,assign_op,star_assign_op,add_op,minus_op,multiply_op, char_to_int_op,
 	equal_op, less_op, larger_op, eqlarger_op, eqless_op, noteq_op, or_op, and_op, get_rb, set_rb, call, param, enter, leave,return_op
 
 };
+
 union arg
 {
 	char* var_name;

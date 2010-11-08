@@ -132,18 +132,18 @@ int statement_code(AST_NODE *p)
 	if(stack_top!=0){
 		temp_item = pop();
 		if(temp_item.item_type == 0){
-			temp_symtbl = symtbl_query(ptr->symtbl,temp_item.item.var_name, 0);
+			temp_symtbl = symtbl_query(p->symtbl,temp_item.item.var_name, 0);
 			if(temp_symtbl->type == CHAR_T) {
 				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 0, 0, 2);
 				else add_triple(minus_op, temp_item.item.var_name, 1, 0, 0, 2);
-				temp_index = triple_list_index-1;
-				add_triple(assign_op, ptr->content.s_content, temp_index, 0, 0, 1);
+				a_index = triple_list_index-1;
+				add_triple(assign_op, temp_item.item.var_name, a_index, 0, 0, 1);
 			}
 			else {
 				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 1, 0, 2);
 				else add_triple(minus_op, temp_item.item.var_name, 1, 1, 0, 2);
-				temp_index = triple_list_index-1;
-				add_triple(assign_op, ptr->content.s_content, temp_index, 1, 0, 1);
+				a_index = triple_list_index-1;
+				add_triple(assign_op, temp_item.item.var_name, a_index, 1, 0, 1);
 			}		
 		}
 		else{
@@ -652,6 +652,7 @@ int assignment_expression_code(AST_NODE *p)
 	AST_NODE *ptr;
 	int temp_rvalue = 0;
 	int temp_lvalue = 0;
+	temp_lvalue = gen_triple_code[p->leftChild->nodeType - FUNC_OFFSET](p->leftChild);
 	if(temp_lvalue == -1) add_triple_double_op(temp_lvalue, temp_rvalue, assign_op, p->leftChild, p->leftChild->rightSibling->rightSibling);
 	else add_triple_double_op(temp_lvalue, temp_rvalue, star_assign_op, p->leftChild, p->leftChild->rightSibling->rightSibling);
 	return triple_list_index - 1;
