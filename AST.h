@@ -70,6 +70,17 @@
 #define IDENT_T 1066
 #define EPSILON 1067
 
+#define ANDAND 2001
+#define OROR 2002
+#define EQEQ 2003
+#define NOTEQ 2004
+#define LARGERTHAN 2005
+#define SMALLERTHAN 2006
+#define LTEQ 2007
+#define STEQ 2008
+#define PLUSPLUS 2009
+#define MINUSMINUS 2010
+
 union node_content
 {
 	char c_content;
@@ -87,6 +98,7 @@ struct AST_NODE{
   	AST_NODE * rightSibling;//Right sibling node
 
 	struct symtbl_hdr* symtbl;
+	AST_NODE* double_list;
 };
 
 #include "symtbl.h"

@@ -87,7 +87,10 @@ data_type check_type_lvalue(AST_NODE* lvalue)
 		return child_type[0];
 	}
 	else if(i == 2){
-		if(child_type[1].star_num <= 0) return check_wrong();
+		if(child_type[1].star_num <= 0){
+			printf("star error\n");
+			return check_wrong();
+		}
 		child_type[1].star_num -= 1;
 		return child_type[1];
 	}
