@@ -1,9 +1,15 @@
 #include "AST.h"
+#include "gen_intermediate_code.h"
 #include <stdio.h>
 #include <memory.h>
 char name[][30] = {"PROGRAM","EXTERNAL_DECLS","DECLARATION","FUNCTION_LIST","TYPE_NAME","VAR_LIST","VAR_ITEM","ARRAY_VAR","SCALAR_VAR","FUNCTION_DEF","FUNCTION_HDR","PARM_TYPE_LIST","PARM_LIST","PARM_DECL","FUNCTION_BODY","INTERNAL_DECLS","STATEMENT_LIST","STATEMENT","COMPOUNDSTMT","NULLSTMT","EXPRESSION_STMT","IFSTMT","FOR_STMT","WHILE_STMT","RETURN_STMT","EXPRESSION","ASSIGNMENT_EXPRESSION","LVALUE","RVALUE","OP","CONSTANT","ARGUMENT_LIST","EXTERN_T","REGISTER_T","VOID_T","INT_T","CHAR_T","IF_T","ELSE_T","FOR_T","WHILE_T","RETURN_T","BOOLEAN_OP_T","REL_OP_T","DOUBLE_OP_T","ICONSTANT_T","CHAR_CONSTANT_T","STRING_CONSTANT_T","SEMICOLON","COMMA","STAR","LEFT_SQUARE_BRACKET","RIGHT_SQUARE_BRACKET","LEFT_PARENTHESE","RIGHT_PARENTHESE","LEFT_BRACE","RIGHT_BRACE","EQUALITY_SIGN","MINUS_SIGN","PLUS_SIGN","MULTIPLY_SIGN","POSITIVE_SIGN","NEGATIVE_SIGN","NOT_SIGN","ADDRESS_SIGN","IDENT_T","EPSILON"};
 // use this function to print the AST tree (with terminal/non-terminal names)
 int counter[100];
+
+extern triple* triple_list;
+extern int triple_list_size;
+extern int triple_list_index;
+char *operator_name[]={"if","if_not","goto","-","!","&","!*","+","=","*=","+","-","*","char to int","==","<",">",">=","<=","!=","||","&&","get rb","set rb","call", "param", "enter", "leave", "return"};
 void print_AST_dot_core(AST_NODE* ptr);
 void print_AST(AST_NODE* ptr, int level)
 {
@@ -73,4 +79,16 @@ void print_symtbl(symtbl_hdr* p)
 		print_symtbl(ptr);
 }
 
-
+void print_intermediate_code()
+{
+	int i;
+	for(i = 0 ; i < triple_list_index ; i ++)
+	{
+		printf("%s ",operator_name[triple_list[i].op - 3000]);
+		if(triple_list[i].arg1_type == 0 || triple_list[i].arg1_type == 3) printf("%s ", triple_list[i].arg1.var_name);
+		else printf("%d ", triple_list[i].arg1.temp_index);
+		if(triple_list[i].arg2_type == 0 || triple_list[i].arg2_type == 3) printf("%s ", triple_list[i].arg2.var_name);
+		else printf("%d ", triple_list[i].arg2.temp_index);
+		printf("\t%d %d %d\n", triple_list[i].result_type, triple_list[i].arg1_type, triple_list[i].arg2_type);	
+	}
+}
