@@ -1,6 +1,7 @@
-int main(int b)
+int main()
 {
-	int a;
-	*(a);
+	int a,c;
+	a = 0;
+	c= a + 1;
 }
 
