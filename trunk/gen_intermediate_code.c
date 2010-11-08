@@ -1,7 +1,9 @@
 #include "gen_intermediate_code.h"
 #include "symtbl.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
+extern char name[][30];
 int adjustSize(void** p_old, int* max);
 
 int rb;//全局变量，布尔表达式的专用寄存器
@@ -97,11 +99,18 @@ void initialize()
 	scope_size = initsize;
 }
 
-void gen_intermediate_code(AST_NODE *root)
+void intermediate_code(AST_NODE* root)
 {
 	gen_code_initial();
-	AST_NODE* p = root;
 	initialize();
+	gen_intermediate_code(root);
+}
+void gen_intermediate_code(AST_NODE *root)
+{
+	//gen_code_initial();
+	AST_NODE* p = root;
+	fprintf(stderr,"processing: %d %s\n",root->nodeType,name[root->nodeType-FUNC_OFFSET]);
+	//initialize();
 	if(p->nodeType == STATEMENT){
 		//do something
 		gen_triple_code[p->nodeType-FUNC_OFFSET](p);		
@@ -759,7 +768,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	}
 	}
 //var2
-	temp_rvalue2 = gen_triple_code[ptr1->nodeType-FUNC_OFFSET](ptr2);
+	temp_rvalue2 = gen_triple_code[ptr2->nodeType-FUNC_OFFSET](ptr2);
 	switch(temp_rvalue2){
 	case -1:{
 		var2 = temp_ID;

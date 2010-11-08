@@ -86,7 +86,13 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Parser: terminated, %d error(s).\n",error_number);
 		return -1;
 	}
-	fprintf(stderr,"Generating symbol table...\n");
+	
+	if(dbg_print_tree)
+		print_AST(tree_root,0);
+	if(dbg_print_tree_dot)
+		print_AST_dot(tree_root);
+	
+	fprintf(stderr,"Generating symbol table...");
 	//generate symbol table
 	gen_symtbl_result = gen_symtbl(tree_root);
 	if(gen_symtbl_result)
@@ -94,20 +100,22 @@ int main(int argc, char** argv)
 		fprintf(stderr,"Error generating symbol tables!\n");
 		return -1;
 	}
-	if(!error_number)
+	
+	if(dbg_print_symtbl)
+		print_symtbl(tree_root->symtbl);
+	
+	fprintf(stderr,"Done.\n");
+	fprintf(stderr,"Doing type verification...");
+	dfs_type_verification(tree_root);
+	fprintf(stderr,"Done.\n");
+	if(error_number)
 	{
 		fprintf(stderr,"Error type verification!\n");
 		return -1;
 	};
-	gen_intermediate_code(tree_root);
+	intermediate_code(tree_root);
 	/*
 	 * TODO: next compilation step
 	 */
-	if(dbg_print_tree)
-		print_AST(tree_root,0);
-	if(dbg_print_tree_dot)
-		print_AST_dot(tree_root);
-	if(dbg_print_symtbl)
-		print_symtbl(tree_root->symtbl);
 	return 0;
 }
