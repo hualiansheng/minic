@@ -731,6 +731,7 @@ rvalue		:	lvalue %prec '-'
 			root = AST_new_Node();
 			root -> nodeType = RVALUE;
 			AST_addChild(root,DOUBLE_OP_T,$1.ptr);
+			root -> leftChild -> content.i_content = $1.ival;
 			AST_addChild(root,LVALUE,$2);
 			$$ = root;
 			} 
@@ -740,6 +741,7 @@ rvalue		:	lvalue %prec '-'
 			root -> nodeType = RVALUE;
 			AST_addChild(root,LVALUE,$1);
 			AST_addChild(root,DOUBLE_OP_T,$2.ptr);
+			root -> leftChild -> rightSibling -> content.i_content = $2.ival;
 			$$ = root;
 			} 
 		|	constant
@@ -775,6 +777,7 @@ op		:	BOOLEAN_OP
 			root = AST_new_Node();
 			root -> nodeType = OP;
 			AST_addChild(root,BOOLEAN_OP_T,$1.ptr);
+			root -> leftChild -> content.i_content = $1.ival;
 			$$ = root;
 			}
 		| 	REL_OP
@@ -782,6 +785,7 @@ op		:	BOOLEAN_OP
 			root = AST_new_Node();
 			root -> nodeType = OP;
 			AST_addChild(root,REL_OP_T,$1.ptr);
+			root -> leftChild -> content.i_content = $1.ival;
 			$$ = root;
 			}
 		;
@@ -789,6 +793,7 @@ constant	:	ICONSTANT
 			{
 			root = AST_new_Node();
 			root -> nodeType = CONSTANT;
+
 			AST_addChild(root,ICONSTANT_T,$1.ptr);
 			$$ = root;
 			}
