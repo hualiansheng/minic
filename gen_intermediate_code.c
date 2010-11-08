@@ -175,7 +175,7 @@ int if_code(AST_NODE *p)
 		case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 2);break;
 		case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 2);break;
 		case -4:add_triple(if_op, const_string, triple_list_index + 2, 0, 3, 2);break;
-		default: add_triple(if_op, temp_ID, triple_list_index + 2, 0, 1, 2);
+		default: add_triple(if_op, exp, triple_list_index + 2, 0, 1, 2);
 		}
 		backpatch = triple_list_index;
 		add_triple(goto_op, -1, -1, 0, 2, -1); //goto 第二个操作数是一个整型常数
