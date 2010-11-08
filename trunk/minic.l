@@ -37,16 +37,16 @@ return 			yylval.string_attr.ptr = AST_new_Node(); return RETURN;
 				return IDENT;
 			}
 {special}		yylval.char_attr.ptr = AST_new_Node(); return yytext[0];
-"&&"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 1; return BOOLEAN_OP;
-"||"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 2; return BOOLEAN_OP;
-"=="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 3; return REL_OP;
-"!="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 4; return REL_OP;
-">"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 5; return REL_OP;
-"<"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 6; return REL_OP;
-">="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 7; return REL_OP;
-"<="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 8; return REL_OP;
-"++"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 9; return DOUBLE_OP;
-"--"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 0; return DOUBLE_OP;
+"&&"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = ANDAND; return BOOLEAN_OP;
+"||"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = OROR; return BOOLEAN_OP;
+"=="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = EQEQ; return REL_OP;
+"!="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = NOTEQ; return REL_OP;
+">"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = LARGERTHAN; return REL_OP;
+"<"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = SMALLERTHAN; return REL_OP;
+">="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = LTEQ; return REL_OP;
+"<="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = STEQ; return REL_OP;
+"++"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = PLUSPLUS; return DOUBLE_OP;
+"--"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = MINUSMINUS; return DOUBLE_OP;
 {iconstant}		{
 				yylval.int_attr.ptr = AST_new_Node(); 
 				yylval.int_attr.ival = atoi(yytext);
