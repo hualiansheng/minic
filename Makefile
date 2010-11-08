@@ -1,4 +1,5 @@
 OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o
+CSCOPE = *.c *.h *.l *.y
 ARGS = -g -Wall
 minic: $(OBJECT)
 	gcc -lm $(ARGS) -o minic $(OBJECT)
@@ -27,7 +28,8 @@ gen_intermediate_code.o: gen_intermediate_code.c gen_intermediate_code.h
 main.o : main.c validation_utils.h main.h
 	gcc $(ARGS) -c main.c
 
-
+cscope: $(CSCOPE)
+	cscope -Rbq
 clean:
 	rm *.o; rm minic; rm lex.yy.c; rm minic.tab.*
 cleanw:
