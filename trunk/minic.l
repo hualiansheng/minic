@@ -41,16 +41,16 @@ return 			yylval.string_attr.ptr = AST_new_Node(); change_yylloc(); return RETUR
 				return IDENT;
 			}
 {special}		yylval.char_attr.ptr = AST_new_Node(); change_yylloc(); return yytext[0];
-"&&"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 1; change_yylloc(); return BOOLEAN_OP;
-"||"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 2; change_yylloc(); return BOOLEAN_OP;
-"=="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 3; change_yylloc(); return REL_OP;
-"!="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 4; change_yylloc(); return REL_OP;
-">"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 5; change_yylloc(); return REL_OP;
-"<"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 6; change_yylloc(); return REL_OP;
-">="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 7; change_yylloc(); return REL_OP;
-"<="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 8; change_yylloc(); return REL_OP;
-"++"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 9; change_yylloc(); return DOUBLE_OP;
-"--"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = 0; change_yylloc(); return DOUBLE_OP;
+"&&"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = ANDAND; change_yylloc(); return BOOLEAN_OP;
+"||"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = OROR; change_yylloc(); return BOOLEAN_OP;
+"=="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = EQEQ; change_yylloc(); return REL_OP;
+"!="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = NOTEQ; change_yylloc(); return REL_OP;
+">"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = LARGERTHAN; change_yylloc(); return REL_OP;
+"<"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = SMALLERTHAN; change_yylloc(); return REL_OP;
+">="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = LTEQ; change_yylloc(); return REL_OP;
+"<="			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = STEQ; change_yylloc(); return REL_OP;
+"++"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = PLUSPLUS; change_yylloc(); return DOUBLE_OP;
+"--"			yylval.int_attr.ptr = AST_new_Node(); yylval.int_attr.ival = MINUSMINUS; change_yylloc(); return DOUBLE_OP;
 {iconstant}		{
 				yylval.int_attr.ptr = AST_new_Node(); 
 				yylval.int_attr.ival = atoi(yytext);

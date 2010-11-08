@@ -126,6 +126,34 @@ void gen_intermediate_code(AST_NODE *root)
 
 int statement_code(AST_NODE *p)
 {
+	stack_item temp_item;
+	symtbl_item *temp_symtbl;
+	int a_index;
+	if(stack_top!=0){
+		temp_item = pop();
+		if(temp_item.item_type == 0){
+			temp_symtbl = symtbl_query(ptr->symtbl,temp_item.item.var_name, 0);
+			if(temp_symtbl->type == CHAR_T) {
+				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 0, 0, 2);
+				else add_triple(minus_op, temp_item.item.var_name, 1, 0, 0, 2);
+				temp_index = triple_list_index-1;
+				add_triple(assign_op, ptr->content.s_content, temp_index, 0, 0, 1);
+			}
+			else {
+				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 1, 0, 2);
+				else add_triple(minus_op, temp_item.item.var_name, 1, 1, 0, 2);
+				temp_index = triple_list_index-1;
+				add_triple(assign_op, ptr->content.s_content, temp_index, 1, 0, 1);
+			}		
+		}
+		else{
+			add_triple(star_op,temp_item.item.temp_index,-1,triple_list[temp_item.item.temp_index].result_type,1,0);
+			a_index = triple_list_index-1;
+			add_triple(add_op,a_index,1,triple_list[a_index].result_type,1,2);
+			a_index = triple_list_index-1;
+			add_triple(star_assign_op, temp_item.item.temp_index, a_index, triple_list[a_index].result_type, 1, 1);	
+		}
+	}
 	return gen_triple_code[p->leftChild->nodeType-FUNC_OFFSET](p->leftChild);	
 }
 
