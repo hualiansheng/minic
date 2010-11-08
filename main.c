@@ -7,6 +7,7 @@
 #include "validation_utils.h"
 #include "main.h"
 #include <assert.h>
+
 #include <unistd.h> //getopt() support
 int error_number;
 void usage()
@@ -93,6 +94,12 @@ int main(int argc, char** argv)
 		fprintf(stderr,"Error generating symbol tables!\n");
 		return -1;
 	}
+	if(!error_number)
+	{
+		fprintf(stderr,"Error type verification!\n");
+		return -1;
+	};
+	gen_intermediate_code(tree_root);
 	/*
 	 * TODO: next compilation step
 	 */
@@ -102,7 +109,5 @@ int main(int argc, char** argv)
 		print_AST_dot(tree_root);
 	if(dbg_print_symtbl)
 		print_symtbl(tree_root->symtbl);
-	if(dbg_type_check)
-		dfs_type_verification(tree_root);
 	return 0;
 }

@@ -16,7 +16,7 @@
 #define REL_DSU 0
 //symtable support: scope number
 int scope_number;
-
+void make_error(AST_NODE* root,char* err_msg, int first_line, int first_column, int last_line, int last_column);
 int yylex (void);
 void yyerror (char const*);
 AST_NODE* tree_root;
@@ -107,6 +107,7 @@ program		:	external_decls {root = AST_new_Node();
 					AST_addChild(root,EXTERNAL_DECLS,$1);
 					tree_root = root;
 					}
+
 		;
 external_decls	:	declaration external_decls
 			{
@@ -122,6 +123,14 @@ external_decls	:	declaration external_decls
 			root -> nodeType = EXTERNAL_DECLS;
 			AST_addChild(root,FUNCTION_LIST,$1);
 			$$ = root;			
+			}
+		|	error external_decls
+			{
+				root = AST_new_Node();
+				root -> nodeType = RVALUE;
+				make_error(root,"bad declaration",@1.first_line,@1.first_column,@1.last_line,@1.last_column);
+				AST_addChild(root,EXTERNAL_DECLS,$2);
+				$$ = root;
 			}
 		;
 declaration	:	EXTERN type_name var_list ';'
@@ -625,6 +634,13 @@ lvalue		:	'*' rvalue
 			AST_addChild(root,RIGHT_SQUARE_BRACKET,$4.ptr);
 			$$ = root;
 			} 
+		|	error
+			{
+				root = AST_new_Node();
+				root -> nodeType = RVALUE;
+				make_error(root,"bad lvalue",@1.first_line,@1.first_column,@1.last_line,@1.last_column);
+				$$ = root;
+			}
 		;
 rvalue		:	lvalue %prec '-'
 			{
@@ -641,11 +657,6 @@ rvalue		:	lvalue %prec '-'
 			AST_addChild(root,PLUS_SIGN,$2.ptr);
 			AST_addChild(root,RVALUE,$3);
 			$$ = root;
-			}
-		|	error
-			{
-				fprintf(stderr,"line %d:%d: parsing error: bad expression\n",@1.last_line,@1.last_column);
-				error_number++;
 			}
 		|	rvalue '-' rvalue
 			{
@@ -817,6 +828,13 @@ argument_list	:	argument_list ',' expression
 %%
 void yyerror(char const * s)
 {
-	//fprintf(stderr, "%s\n",s);
+	fprintf(stderr, "%s\n",s);
 	return;
+}
+
+void make_error(AST_NODE* root,char* err_msg, int first_line, int first_column, int last_line, int last_column)
+{
+	AST_addChild(root,ERROR,AST_new_Node());
+	fprintf(stderr, "Parsing error: line %d.%d-%d.%d: %s\n ",first_line,first_column,last_line,last_column,err_msg);
+	error_number++;
 }

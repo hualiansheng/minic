@@ -69,7 +69,7 @@
 #define ADDRESS_SIGN 1065
 #define IDENT_T 1066
 #define EPSILON 1067
-
+#define ERROR 1068
 #define ANDAND 2001
 #define OROR 2002
 #define EQEQ 2003
