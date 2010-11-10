@@ -51,7 +51,12 @@ void gen_code_initial()
 //scope stack
 void push_scope(symtbl_hdr *scope)
 {
-	if(scope_top == scope_size) adjustSize((void**)&scope_stack, &scope_size);
+	int i;
+	if(scope_top == scope_size){
+		i = scope_size * sizeof(int);
+		adjustSize((void**)&scope_stack, &i);
+		scope_size = i /sizeof(int);
+	}
 	scope_stack[scope_top++] = scope;
 	add_triple(enter, -1, -1, -1, -1, -1);
 }
@@ -64,7 +69,12 @@ void pop_scope()
 //++ -- stack
 void push(stack_item a)
 {
-	if(stack_top == stack_size) adjustSize((void**)&stack, &stack_size);
+	int i;
+	if(stack_top == stack_size){
+		i = stack_size * sizeof(stack_item);
+		adjustSize((void**)&stack, &i);
+		stack_size = i / sizeof(stack_item);
+	}
 	stack[stack_top++] = a;	
 }
 stack_item pop()
@@ -75,8 +85,11 @@ stack_item pop()
 //add a triple item
 void add_triple(enum operator op, int arg1, int arg2, int result_type, int arg1_type, int arg2_type)
 {
-	if(triple_list_index == triple_list_size){	
-		adjustSize((void**)&triple_list, &triple_list_size);
+	int i;
+	if(triple_list_index == triple_list_size){
+		i = triple_list_size * sizeof(triple);
+		adjustSize((void**)&triple_list, &i);
+		triple_list_size = triple_list_size/sizeof(triple);
 	}
 	triple_list[triple_list_index].op = op;
 	triple_list[triple_list_index].arg1 = (union arg)arg1;
@@ -116,7 +129,8 @@ void gen_intermediate_code(AST_NODE *root)
 		gen_triple_code[p->nodeType-FUNC_OFFSET](p);		
 		return;
 	}
-	if(root->nodeType == FUNCTION_BODY) push_scope(root->symtbl);
+	if(root->nodeType == FUNCTION_BODY)
+		push_scope(root->symtbl);
 	for(p = p->leftChild ; p != NULL; p = p->rightSibling)
 		gen_intermediate_code(p);
 	if(root->nodeType == FUNCTION_BODY) pop_scope();
@@ -126,35 +140,9 @@ void gen_intermediate_code(AST_NODE *root)
 
 int statement_code(AST_NODE *p)
 {
-	stack_item temp_item;
-	symtbl_item *temp_symtbl;
-	int a_index;
 	gen_triple_code[p->leftChild->nodeType-FUNC_OFFSET](p->leftChild);
-	while(stack_top!=0){
-		temp_item = pop();
-		if(temp_item.item_type == 0){
-			temp_symtbl = symtbl_query(p->symtbl,temp_item.item.var_name, 0);
-			if(temp_symtbl->type == CHAR_T) {
-				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 0, 0, 2);
-				else add_triple(minus_op, temp_item.item.var_name, 1, 0, 0, 2);
-				a_index = triple_list_index-1;
-				add_triple(assign_op, temp_item.item.var_name, a_index, 0, 0, 1);
-			}
-			else {
-				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 1, 0, 2);
-				else add_triple(minus_op, temp_item.item.var_name, 1, 1, 0, 2);
-				a_index = triple_list_index-1;
-				add_triple(assign_op, temp_item.item.var_name, a_index, 1, 0, 1);
-			}		
-		}
-		else{
-			add_triple(star_op,temp_item.item.temp_index,-1,triple_list[temp_item.item.temp_index].result_type,1,0);
-			a_index = triple_list_index-1;
-			add_triple(add_op,a_index,1,triple_list[a_index].result_type,1,2);
-			a_index = triple_list_index-1;
-			add_triple(star_assign_op, temp_item.item.temp_index, a_index, triple_list[a_index].result_type, 1, 1);	
-		}
-	}
+	if(p->leftChild->nodeType == IFSTMT || p->leftChild->nodeType == FOR_STMT || p->leftChild->nodeType == WHILE_STMT) ;
+	else resume_doubleop(p);
 	return triple_list_index - 1;	
 }
 
@@ -183,8 +171,10 @@ int if_code(AST_NODE *p)
 		}
 		backpatch = triple_list_index;
 		add_triple(goto_op, -1, -1, 0, 1, -1); //goto 第二个操作数是一个整型常数
+		resume_doubleop(p);
 		ptr = ptr->rightSibling->rightSibling;
-		last = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+		gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+		last = triple_list_index - 1;
 		triple_list[backpatch].arg1 = (union arg)(last + 1);
 		return triple_list_index - 1;
 	}
@@ -205,13 +195,16 @@ int if_code(AST_NODE *p)
 		}
 		backpatch = triple_list_index;
 		add_triple(goto_op, -1, -1, 0, 1, -1);
+		resume_doubleop(p);
 		ptr = ptr->rightSibling->rightSibling;
-		last = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+		gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+		last = triple_list_index - 1;
 		triple_list[backpatch].arg1 = (union arg)(last + 2);
 		backpatch = triple_list_index;
 		add_triple(goto_op, -1, -1, 0, 1, -1);
 		ptr = ptr->rightSibling->rightSibling;
-		last = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+		gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+		last = triple_list_index - 1;
 		triple_list[backpatch].arg1 = (union arg)(last + 1);
 		return triple_list_index - 1;
 	}		
@@ -260,15 +253,18 @@ int for_code(AST_NODE *p)
 	case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
 	case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
 	case -4:add_triple(if_op, const_string, triple_list_index + 2, 0, 3, 1);break;
-	default: add_triple(if_op, temp_ID, triple_list_index + 2, 0, 1, 1);
+	default: add_triple(if_op, exp, triple_list_index + 2, 0, 1, 1);
 	}
 	add_triple(goto_op, -1, -1, 0, 1, -1);
 	backpatch = triple_list_index - 1;
 	ptr = ptr->rightSibling->rightSibling->rightSibling->rightSibling;
 	gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 	ptr = p->leftChild->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling;
-	last = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+	gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+	//printf("%d\n", last);
+	last = triple_list_index-1;
 	triple_list[backpatch].arg1 = (union arg)(last+2);
+	resume_doubleop(p);
 	add_triple(goto_op, begin, -1, 0, 1, -1);
 	return triple_list_index -1;
 }
@@ -279,6 +275,7 @@ int while_code(AST_NODE *p)
 	int exp;
 	int backpatch;
 	int last;
+
 	AST_NODE *ptr;
 	ptr = p->leftChild->rightSibling->rightSibling;
 	exp = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
@@ -297,7 +294,9 @@ int while_code(AST_NODE *p)
 	add_triple(goto_op, -1, -1, 0, 1, -1);
 
 	ptr = ptr->rightSibling->rightSibling;
-	last = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+	resume_doubleop(p);
+	gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+	last = triple_list_index - 1;
 	triple_list[backpatch].arg1 = (union arg)(last+2);
 	add_triple(goto_op, begin, -1, 0, 1, -1);
 	return triple_list_index -1;
@@ -333,7 +332,7 @@ int rvalue_code(AST_NODE *p)
 		if(p->leftChild->nodeType == LVALUE){
 			temp_rvalue = gen_triple_code[p->leftChild->nodeType-FUNC_OFFSET](p->leftChild);
 			if(temp_rvalue != -1){
-				add_triple(star_op, temp_rvalue, -1, triple_list[temp_rvalue].result_type, 1, 0);
+				add_triple(star_op, temp_rvalue, -1, triple_list[temp_rvalue].result_type, 1, -1);
 				return triple_list_index-1;
 			}
 			else{
@@ -358,7 +357,7 @@ int rvalue_code(AST_NODE *p)
 	case 2: {
 		if(p->leftChild->rightSibling->nodeType != DOUBLE_OP_T && p->leftChild->nodeType != DOUBLE_OP_T){
 			ptr = p->leftChild->rightSibling;
-			//temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+			temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 			switch(p->leftChild->nodeType){
 			case POSITIVE_SIGN:
 			{
@@ -462,7 +461,7 @@ int rvalue_code(AST_NODE *p)
 		}
 		else if(p->leftChild->rightSibling->nodeType == LEFT_PARENTHESE){
 			//函数
-			add_triple(call,p->leftChild->content.s_content, -1,  func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, 0);
+			add_triple(call,p->leftChild->content.s_content, -1,  func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, -1);
 			return triple_list_index - 1;
 		}
 		else{
@@ -592,7 +591,7 @@ int rvalue_code(AST_NODE *p)
 		for(i = 0 ; i < arg_num ; i++){
 			add_triple(param,arg_list[i],-1,1,arg_type_list[i],-1);
 		}
-		add_triple(call,p->leftChild->content.s_content,-1,func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, 0);
+		add_triple(call,p->leftChild->content.s_content,-1,func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, -1);
 		return triple_list_index - 1;
 	}//end case 4
 	}
@@ -604,7 +603,7 @@ int lvalue_code(AST_NODE *p)
 	symtbl_item *temp_symtbl;
 	AST_NODE *ptr;
 	int temp_const;
-	if(p->leftChild->nodeType == IDENT_T)
+	if(p->leftChild->nodeType == IDENT_T && p->leftChild->rightSibling == NULL)
 	{
 		temp_ID = p->leftChild->content.s_content;
 		return -1;
@@ -689,7 +688,7 @@ int assignment_expression_code(AST_NODE *p)
 	AST_NODE *ptr;
 	int temp_rvalue = 0;
 	int temp_lvalue = 0;
-	temp_lvalue = gen_triple_code[p->leftChild->nodeType - FUNC_OFFSET](p->leftChild);
+	if(p->leftChild->leftChild == IDENT_T && p->leftChild->leftChild->rightSibling == NULL) temp_lvalue = -1;
 	if(temp_lvalue == -1) add_triple_double_op(temp_lvalue, temp_rvalue, assign_op, p->leftChild, p->leftChild->rightSibling->rightSibling);
 	else add_triple_double_op(temp_lvalue, temp_rvalue, star_assign_op, p->leftChild, p->leftChild->rightSibling->rightSibling);
 	return triple_list_index - 1;
@@ -708,25 +707,25 @@ int return_code(AST_NODE *p)
 	case -1:{
 		temp_symtbl = symtbl_query(p->symtbl,temp_ID,  0);
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T)	add_triple(return_op,temp_ID, -1, 0, 0,0);
-		else add_triple(return_op,temp_ID, -1, 1, 0,0);
+		if(temp_symtbl->type == CHAR_T)	add_triple(return_op,temp_ID, -1, 0, 0,-1);
+		else add_triple(return_op,temp_ID, -1, 1, 0,-1);
 		break;
 	}
 	case -2:{
-		add_triple(return_op, const_value, -1, 1, 2, 0);
+		add_triple(return_op, const_value, -1, 1, 2, -1);
 		break;
 
 	}
 	case -3:{
-		add_triple(return_op, const_value, -1, 0, 2, 0);
+		add_triple(return_op, const_value, -1, 0, 2, -1);
 		break;
 	}
 	case -4:{
-		add_triple(return_op, const_string, -1, 1, 3, 0);
+		add_triple(return_op, const_string, -1, 1, 3, -1);
 		break;
 	}
 	default:{
-		add_triple(return_op, temp_rvalue, -1, triple_list[temp_rvalue].result_type, 1, 0);
+		add_triple(return_op, temp_rvalue, -1, triple_list[temp_rvalue].result_type, 1, -1);
 		break;
 	}
 	}
@@ -743,25 +742,25 @@ void add_triple_single_op(int temp_rvalue, enum operator op, AST_NODE *ptr)
 	case -1:{
 		temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T)	add_triple(op,temp_ID, -1, 0, 0,0);
-		else add_triple(op,temp_ID, -1, 1, 0,0);
+		if(temp_symtbl->type == CHAR_T)	add_triple(op,temp_ID, -1, 0, 0,-1);
+		else add_triple(op,temp_ID, -1, 1, 0,-1);
 		break;
 	}
 	case -2:{
-		add_triple(op, const_value, -1, 1, 2, 0);
+		add_triple(op, const_value, -1, 1, 2, -1);
 		break;
 
 	}
 	case -3:{
-		add_triple(op, const_value, -1, 0, 2, 0);
+		add_triple(op, const_value, -1, 0, 2, -1);
 		break;
 	}
 	case -4:{
-		add_triple(op, const_string, -1, 1, 3, 0);
+		add_triple(op, const_string, -1, 1, 3, -1);
 		break;
 	}
 	default:{
-		add_triple(op, temp_rvalue, -1, triple_list[temp_rvalue].result_type, 1, 0);
+		add_triple(op, temp_rvalue, -1, triple_list[temp_rvalue].result_type, 1, -1);
 		break;
 	}
 	}
@@ -967,6 +966,38 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		add_triple(set_rb,1,-1,1,2,-1);
 		add_triple(get_rb,-1,-1,1,-1,-1);
 		//return triple_list_index - 1;
+	}
+}
+void resume_doubleop(AST_NODE *p)
+{
+	stack_item temp_item;
+	symtbl_item *temp_symtbl;
+	int a_index;
+	
+	while(stack_top!=0){
+		temp_item = pop();
+		if(temp_item.item_type == 0){
+			temp_symtbl = symtbl_query(p->symtbl,temp_item.item.var_name, 0);
+			if(temp_symtbl->type == CHAR_T) {
+				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 0, 0, 2);
+				else add_triple(minus_op, temp_item.item.var_name, 1, 0, 0, 2);
+				a_index = triple_list_index-1;
+				add_triple(assign_op, temp_item.item.var_name, a_index, 0, 0, 1);
+			}
+			else {
+				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 1, 0, 2);
+				else add_triple(minus_op, temp_item.item.var_name, 1, 1, 0, 2);
+				a_index = triple_list_index-1;
+				add_triple(assign_op, temp_item.item.var_name, a_index, 1, 0, 1);
+			}		
+		}
+		else{
+			add_triple(star_op,temp_item.item.temp_index,-1,triple_list[temp_item.item.temp_index].result_type,1,0);
+			a_index = triple_list_index-1;
+			add_triple(add_op,a_index,1,triple_list[a_index].result_type,1,2);
+			a_index = triple_list_index-1;
+			add_triple(star_assign_op, temp_item.item.temp_index, a_index, triple_list[a_index].result_type, 1, 1);	
+		}
 	}
 }
 

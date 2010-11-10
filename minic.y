@@ -723,7 +723,7 @@ rvalue		:	lvalue %prec '-'
 			root = AST_new_Node();
 			root -> nodeType = RVALUE;
 			AST_addChild(root,ADDRESS_SIGN,$1.ptr);
-			AST_addChild(root,RVALUE,$2);
+			AST_addChild(root,LVALUE,$2);
 			$$ = root;
 			} 
 		|	DOUBLE_OP lvalue %prec DOUBLE
