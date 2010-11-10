@@ -1,21 +1,22 @@
 #include <unistd.h>
+#include <malloc.h>
 #include "register.h"
 
-#include <stdio.h>
 
 //initial function
-int reg_initial(REGISTERS *regs){
-  if(regs == NULL)
-    return 0;
+REGISTERS * reg_initial(){
+  REGISTERS* regs = malloc(sizeof(REGISTERS));
   int i;
   for(i=0; i<32; i++){
     regs->r[i] = 0;
     regs->flag = 0;
   }
-  return 1;
+  return regs;
 }
 
-
+void reg_destroy(REGISTERS *regs){
+  free(regs);
+}
 
 
 //flag operations

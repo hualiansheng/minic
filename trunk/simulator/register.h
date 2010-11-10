@@ -10,7 +10,8 @@ typedef struct{
   int flag;
 }REGISTERS;
 
-extern int reg_initial(REGISTERS *regs);
+extern REGISTERS* reg_initial();
+extern void reg_destroy(REGISTERS *regs);
 extern int reg_setN(REGISTERS *regs, int N);
 extern int reg_getN(REGISTERS *regs);
 extern int reg_setZ(REGISTERS *regs, int Z);
