@@ -1,8 +1,9 @@
 int main()
 {
-	int a,b,c;
-	a = 1;
-	a = b ++;
-	return a;
+	int a[100];
+	int i, j;
+	int max;
+	a[i] = j;
 }
+
 
