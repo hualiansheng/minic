@@ -69,7 +69,7 @@ void push(stack_item a)
 }
 stack_item pop()
 {
-	return stack[stack_top--];
+	return stack[--stack_top];
 }
 
 //add a triple item
@@ -698,7 +698,7 @@ int return_code(AST_NODE *p)
 {
 	int temp_rvalue;
 	symtbl_item* temp_symtbl;
-	if(p->leftChild->rightSibling == NULL){
+	if(p->leftChild->rightSibling->nodeType == SEMICOLON){
 		add_triple(return_op,-1,-1,-1,-1,-1);
 		return triple_list_index-1;
 	}		
