@@ -129,7 +129,8 @@ int statement_code(AST_NODE *p)
 	stack_item temp_item;
 	symtbl_item *temp_symtbl;
 	int a_index;
-	if(stack_top!=0){
+	gen_triple_code[p->leftChild->nodeType-FUNC_OFFSET](p->leftChild);
+	while(stack_top!=0){
 		temp_item = pop();
 		if(temp_item.item_type == 0){
 			temp_symtbl = symtbl_query(p->symtbl,temp_item.item.var_name, 0);
@@ -154,7 +155,7 @@ int statement_code(AST_NODE *p)
 			add_triple(star_assign_op, temp_item.item.temp_index, a_index, triple_list[a_index].result_type, 1, 1);	
 		}
 	}
-	return gen_triple_code[p->leftChild->nodeType-FUNC_OFFSET](p->leftChild);	
+	return triple_list_index - 1;	
 }
 
 int if_code(AST_NODE *p)
@@ -402,14 +403,16 @@ int rvalue_code(AST_NODE *p)
 				 * what is the difference between CHAR_T and INT_T here??
 				 */
 				//if(temp_symtbl->type == CHAR_T){
-				if(temp_symtbl->type == CHAR_T || temp_symtbl->type == INT_T){
-					if(p->content.i_content == PLUSPLUS) add_triple(add_op, ptr->leftChild->content.s_content, 1, 0, 0, 2);
+				if(temp_symtbl->type == CHAR_T){
+					if(p->leftChild->content.i_content == PLUSPLUS) add_triple(add_op, ptr->leftChild->content.s_content, 1, 0, 0, 2);
 					else add_triple(minus_op, ptr->leftChild->content.s_content, 1, 0, 0, 2);
 					temp_index = triple_list_index-1;
 					add_triple(assign_op, ptr->leftChild->content.s_content, temp_index, 0, 0, 1);
 				}
-				else{
-					add_triple(add_op, ptr->leftChild->content.s_content, 1, 1, 0, 2);
+				else{					
+					if(p->leftChild->content.i_content == PLUSPLUS) add_triple(add_op, ptr->leftChild->content.s_content, 1, 1, 0, 2);
+					else add_triple(minus_op, ptr->leftChild->content.s_content, 1, 1, 0, 2);
+					//add_triple(add_op, ptr->leftChild->content.s_content, 1, 1, 0, 2);
 					temp_index = triple_list_index-1;
 					add_triple(assign_op, ptr->leftChild->content.s_content, temp_index, 1, 0, 1);
 				}					
@@ -427,9 +430,11 @@ int rvalue_code(AST_NODE *p)
 			ptr = p ->leftChild;
 			temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 			if(temp_rvalue == -1){
-				temp_symtbl = symtbl_query(ptr->symtbl,ptr->content.s_content,  0);
+				fprintf(stderr,"%s\n",ptr->leftChild->content.s_content);
+				temp_symtbl = symtbl_query(ptr->symtbl,ptr->leftChild->content.s_content,  0);
 				assert(temp_symtbl != NULL);
-				temp_item.item = (union arg)ptr->content.s_content;
+				temp_item.item = (union arg)(ptr->leftChild->content.s_content);
+				fprintf(stderr,"%s\n",temp_item.item.var_name);
 				if(ptr->rightSibling->content.i_content == PLUSPLUS) temp_item.flag = 1;
 				else temp_item.flag = 0;
 				temp_item.item_type = 0;
@@ -725,7 +730,7 @@ int return_code(AST_NODE *p)
 		break;
 	}
 	}
-	return triple_list_index;	
+	return triple_list_index - 1;	
 }
 
 
