@@ -11,6 +11,7 @@
 
 typedef struct{
   int status;
+  unsigned int entry;
   PROC_STACK* stack;
   PROC_MEM* mem;
 }PROCESS;

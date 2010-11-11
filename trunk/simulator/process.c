@@ -31,7 +31,12 @@ PROCESS* proc_load(char* filename){
     segment_load(proc->mem, i, phdr->p_flags, phdr->p_vaddr,
     		 phdr->p_memsz, (void *)data, phdr->p_filesz);
   }
+
+  proc->status = PROC_READY;
+  proc->entry = ELF_entry_point();
+
   ELF_close();
+  /*
   uint8_t d;
   for(i=0x020085b0; i<0x020086c0; i++){
     if(mem_fetch(proc->mem, i, &d, sizeof(d), DATA_RD) == 0){
@@ -41,11 +46,13 @@ PROCESS* proc_load(char* filename){
   for(i=0; i<0x110; i++){
     printf("addr=%x\tvalue=%x\n", i, proc->mem->segments[1].base[i]);
     }
+  */
   //printf("%x\n", proc->mem->segments[1].size);
   return proc;
 }
 
 int proc_destroy(PROCESS* proc){
+  proc->status = PROC_DEAD;
   if(proc->mem != NULL)
     mem_destroy(proc->mem);
   if(proc->stack != NULL)
