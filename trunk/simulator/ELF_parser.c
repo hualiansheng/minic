@@ -1,9 +1,5 @@
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <gelf.h>
-
+#include "ELF_parser.h"
+#include <malloc.h>
 
 int fd;
 Elf *e;  
@@ -11,7 +7,7 @@ GElf_Ehdr ehdr;
 int phdr_index;
 
 
-int Elf_initial(char *input_file){
+int ELF_initial(char *input_file){
   if(elf_version(EV_CURRENT) == EV_NONE){
     fprintf(stderr, "ELF library initialization failed: %s.\n",
 	    elf_errmsg(-1));
@@ -46,29 +42,50 @@ int Elf_initial(char *input_file){
   return 0;
 }
 
-int Elf_close(){
+int ELF_close(){
   (void) elf_end(e);
   (void) close(fd);
   return 1;
 }
 
+//get loadable segment num
+int ELF_loadable_seg_num(){
+  GElf_Phdr phdr;
+  int result = 0;
+  int phdr_num = ehdr.e_phnum;
+  while(phdr_index < phdr_num){
+    if(gelf_getphdr(e, phdr_index, &phdr) != &phdr){
+      fprintf(stderr, "getphdr() failed: %s.", elf_errmsg(-1));
+      phdr_index = 0;
+      return -1;
+    }
+    phdr_index ++;
+    if(phdr.p_type == PT_LOAD)
+      result++;
+  }
+  phdr_index = 0;
+  return result;
+}
+
 //get next loadable program header
-int Elf_next_loadable_phdr(GElf_Phdr *phdr){
+GElf_Phdr* ELF_next_loadable_phdr(){
+  GElf_Phdr *phdr = malloc(sizeof(GElf_Phdr));
   int phdr_num = ehdr.e_phnum;
   while(phdr_index < phdr_num){
     if(gelf_getphdr(e, phdr_index, phdr) != phdr){
+      phdr_index = 0;
       fprintf(stderr, "getphdr() failed: %s.", elf_errmsg(-1));
-      return 0;
+      return NULL;
     }
     phdr_index ++;
     if(phdr->p_type == PT_LOAD)
-      return 1;
+      return phdr;
   }
   phdr_index = 0;
-  return 0;
+  return NULL;
 }
 
 //get elf file entry address
-uint32_t Elf_entry_point(){
+uint32_t ELF_entry_point(){
   return ehdr.e_entry;
 }
