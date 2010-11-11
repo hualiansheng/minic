@@ -14,4 +14,4 @@ process.o:process.h process.c
 	gcc $(ARGS) -c process.c
 
 clean:
-	rm -f *.o
+	rm -f *.o simulator

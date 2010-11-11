@@ -7,8 +7,10 @@
 
 int main(int argc, char **argv){
   PROCESS* proc;
-  if(argc !=2)
-    fprintf(stderr, "usage: %s file-name", argv[0]);
+  if(argc !=2){
+    fprintf(stderr, "usage: %s file-name\n", argv[0]);
+    return 1;
+  }
   proc = proc_load(argv[1]);
   if(proc!=NULL)
     proc_destroy(proc);
