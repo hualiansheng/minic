@@ -67,7 +67,7 @@ void mem_destroy(PROC_MEM* mem){
 //Load segment
 //size is the size of the segment, based on Byte
 //vaddr_offset is the offset of virtual address
-int segment_load(PROC_MEM* mem, unsigned int seg_index,
+int segment_load(PROC_MEM* mem, unsigned int seg_index, int flag,
 		 unsigned int vaddr_offset, unsigned int seg_size,
 		 void* data, unsigned int data_size){
   if(mem == NULL){
@@ -78,6 +78,7 @@ int segment_load(PROC_MEM* mem, unsigned int seg_index,
     fprintf(stderr, "seg_index is out of range.\n");
     return 2;
   }
+  (mem->segments[seg_index]).flag = flag;
   (mem->segments[seg_index]).size = seg_size;
   (mem->segments[seg_index]).vaddr_offset = vaddr_offset;
   (mem->segments[seg_index]).base = malloc(seg_size);
@@ -86,27 +87,31 @@ int segment_load(PROC_MEM* mem, unsigned int seg_index,
 }
 
 //Fetch data from mem
+//data_type is defined in memory.h
 int mem_fetch(PROC_MEM* mem, unsigned int addr,
-	      void *data, unsigned int data_size){
+	      void *data, unsigned int data_size,
+	      int data_type){
   if(mem == NULL){
     fprintf(stderr, "Uninitialization of memory.\n");
     return 1;
   }
   int i;
   for(i=0; i<mem->seg_num; i++)
-    if((mem->segments[i]).vaddr_offset <= addr
+    if(((mem->segments[i]).flag & data_type) != 0
+       && (mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset +
-       (mem->segments[i]).size*8){
+       (mem->segments[i]).size){
       //printf("segment %d : size=%d\n", i, (mem->segments[i]).size);
       uint8_t *src_addr = (mem->segments[i]).base;
       unsigned int offset;
-      offset = (addr-(unsigned int)(mem->segments[i]).vaddr_offset)/8;
+      offset = (addr-(unsigned int)(mem->segments[i]).vaddr_offset);
       //printf("offset=%d\n", offset);
       src_addr = src_addr + offset;
       memcpy(data, src_addr, data_size);
       return 0;
     }
   data = NULL;
+  fprintf(stderr, "Not an effective address\n");
   return 2;
 }
 
@@ -119,12 +124,13 @@ int mem_set(PROC_MEM* mem, unsigned int addr,
   }
   int i;
   for(i=0; i<mem->seg_num; i++)
-    if((mem->segments[i]).vaddr_offset <= addr
+    if(((mem->segments[i]).flag & SEG_WR) !=0
+       && (mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset + 
-       (mem->segments[i]).size*8){
+       (mem->segments[i]).size){
       uint8_t *dest_addr = (mem->segments[i]).base;
       unsigned int offset;
-      offset = (addr-(unsigned int)(mem->segments[i]).vaddr_offset)/8;
+      offset = (addr-(unsigned int)(mem->segments[i]).vaddr_offset);
       dest_addr = dest_addr + offset;
       memcpy(dest_addr, data, data_size);
       return 0;
