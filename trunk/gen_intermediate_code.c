@@ -89,7 +89,7 @@ void add_triple(enum operator op, int arg1, int arg2, int result_type, int arg1_
 	if(triple_list_index == triple_list_size){
 		i = triple_list_size * sizeof(triple);
 		adjustSize((void**)&triple_list, &i);
-		triple_list_size = triple_list_size/sizeof(triple);
+		triple_list_size = i/sizeof(triple);
 	}
 	triple_list[triple_list_index].op = op;
 	triple_list[triple_list_index].arg1 = (union arg)arg1;
@@ -122,7 +122,7 @@ void gen_intermediate_code(AST_NODE *root)
 {
 	//gen_code_initial();
 	AST_NODE* p = root;
-	fprintf(stderr,"processing: %d %s\n",root->nodeType,name[root->nodeType-FUNC_OFFSET]);
+	//fprintf(stderr,"processing: %d %s\n",root->nodeType,name[root->nodeType-FUNC_OFFSET]);
 	//initialize();
 	if(p->nodeType == STATEMENT){
 		//do something
@@ -475,11 +475,11 @@ int rvalue_code(AST_NODE *p)
 				return triple_list_index -1;						
 			}
 			case MINUS_SIGN:{
-				add_triple_double_op(temp_rvalue, temp_rvalue2, add_op, ptr, ptr2);
+				add_triple_double_op(temp_rvalue, temp_rvalue2, minus_op, ptr, ptr2);
 				return triple_list_index -1;						
 			}
 			case MULTIPLY_SIGN:{
-				add_triple_double_op(temp_rvalue, temp_rvalue2, add_op, ptr, ptr2);
+				add_triple_double_op(temp_rvalue, temp_rvalue2, multiply_op, ptr, ptr2);
 				return triple_list_index -1;						
 			}
 			case OP:{
@@ -690,7 +690,7 @@ int assignment_expression_code(AST_NODE *p)
 	AST_NODE *ptr;
 	int temp_rvalue = 0;
 	int temp_lvalue = 0;
-	if(p->leftChild->leftChild == IDENT_T && p->leftChild->leftChild->rightSibling == NULL) temp_lvalue = -1;
+	if(p->leftChild->leftChild->nodeType == IDENT_T && p->leftChild->leftChild->rightSibling == NULL) temp_lvalue = -1;
 	if(temp_lvalue == -1) add_triple_double_op(temp_lvalue, temp_rvalue, assign_op, p->leftChild, p->leftChild->rightSibling->rightSibling);
 	else add_triple_double_op(temp_lvalue, temp_rvalue, star_assign_op, p->leftChild, p->leftChild->rightSibling->rightSibling);
 	return triple_list_index - 1;
