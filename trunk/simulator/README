@@ -23,3 +23,20 @@ d. File operation is supported.
 Besides, a simulator for compilation file is also implemented for test of validation.
 
 All rights reserved.
+
+==============================
+**Important reference**
+Usage:
+a.Install libelf library with following steps
+	1)cd Reference
+	2)tar xvf libelf-0.8.13.tar
+	3)cd libelf-0.8.13.tar
+	4)./configure
+	5)make
+	6)make install (need root privilege)
+b.Load libelf library into system, with the following command:
+	ldconfig (need root privilege)
+c.Run command: make
+d.Then the program can be run in the current directory.
+
+===============================
