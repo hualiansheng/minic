@@ -261,10 +261,10 @@ int for_code(AST_NODE *p)
 	gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 	ptr = p->leftChild->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling;
 	gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
-	//printf("%d\n", last);
-	last = triple_list_index-1;
-	triple_list[backpatch].arg1 = (union arg)(last+2);
+	//printf("%d\n", last);	
 	resume_doubleop(p);
+	last = triple_list_index-1;	
+	triple_list[backpatch].arg1 = (union arg)(last+2);
 	add_triple(goto_op, begin, -1, 0, 1, -1);
 	return triple_list_index -1;
 }
