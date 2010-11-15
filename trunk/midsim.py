@@ -9,16 +9,10 @@ def read_file(file_path):
 def func_call(argv):
     for i in range(0, len(argv)):
         exec(argv[i][0]+" = "+argv[i][1])
-    p=3
-    print p
 
 read_file(sys.argv[1])
 data = string.split(data,"\n")
-for i in range(0, len(data)):
-    data[i]=string.split(data[i])
+entry = string.atoi(data[0])
+for i in range(1, len(data)):
+    data[i-1]=string.split(data[i])
 
-a=[]
-p=1
-a.append(("p","2"))
-func_call(a)
-print p
