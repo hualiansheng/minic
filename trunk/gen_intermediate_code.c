@@ -559,7 +559,9 @@ int rvalue_code(AST_NODE *p)
 				break;
 			}
 			else{
-				temp_rvalue = gen_triple_code[ptr->leftChild->rightSibling->nodeType-FUNC_OFFSET](ptr->leftChild);
+
+				temp_rvalue = gen_triple_code[ptr->leftChild->rightSibling->rightSibling->nodeType-FUNC_OFFSET](ptr->leftChild->rightSibling->rightSibling);
+
 				if(temp_rvalue == -1){
 					arg_list[arg_num] = temp_ID;
 					arg_type_list[arg_num] = 0;
