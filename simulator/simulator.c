@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <gelf.h>
 
 #include "register.h"
@@ -52,5 +53,6 @@ int main(int argc, char **argv){
   printf("%d\n", result);
   destroy_mem(mem);
   */
+
   return 0;
 }

@@ -1,7 +1,7 @@
 OBJECT = simulator.o ELF_parser.o register.o memory.o process.o 
-ARGS = -g -Wall
+ARGS = -g -Wall -I. -L. -lelf
 simulator:$(OBJECT)
-	gcc $(ARGS) -o simulator -lelf $(OBJECT)
+	gcc $(ARGS) -o simulator $(OBJECT)
 simulator.o:simulator.c
 	gcc $(ARGS) -c simulator.c
 ELF_parser.o:ELF_parser.h ELF_parser.c
@@ -15,3 +15,5 @@ process.o:process.h process.c
 
 clean:
 	rm -f *.o simulator
+install:
+	cp libelf.so.0 /lib/libelf.so.0
