@@ -41,11 +41,11 @@ symtbl_hdr* init_tbl()
 
 int adjustSize(void** p_old, int* max)
 {
-	void* p_new = (void*)malloc((*max)*2+1);
+	void* p_new = (void*)malloc((*max)*2);
 	assert(p_new != NULL);
 	memcpy(p_new, *p_old, *max);
 	//fprintf(stderr,"guabile\n");
-	*max = *max * 2 + 1;
+	*max = *max * 2 ;
 	free(*p_old);
 	*p_old = p_new;
 	return 0;
