@@ -16,4 +16,4 @@ process.o:process.h process.c
 clean:
 	rm -f *.o simulator
 install:
-	cp libelf.so.0 /lib/libelf.so.0
+	cp libelf.so /lib/libelf.so.0
