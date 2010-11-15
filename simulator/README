@@ -28,7 +28,7 @@ All rights reserved.
 **Important reference**
 Usage:
 a.Install libelf library with following steps
-	1)cd Reference
+	1)cd lib
 	2)tar xvf libelf-0.8.13.tar
 	3)cd libelf-0.8.13.tar
 	4)./configure
