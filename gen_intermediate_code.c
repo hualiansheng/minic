@@ -122,8 +122,15 @@ void gen_intermediate_code(AST_NODE *root)
 {
 	//gen_code_initial();
 	AST_NODE* p = root;
+	AST_NODE* ptr;
+	symtbl_item* temp_symtbl;
 	//fprintf(stderr,"processing: %d %s\n",root->nodeType,name[root->nodeType-FUNC_OFFSET]);
 	//initialize();
+	if(root -> nodeType == FUNCTION_HDR){
+		ptr = root->leftChild->rightSibling;
+		temp_symtbl = symtbl_query(ptr->symtbl, ptr->content.s_content, 0);
+		temp_symtbl->addr_off = triple_list_index;
+	}
 	if(p->nodeType == STATEMENT){
 		//do something
 		gen_triple_code[p->nodeType-FUNC_OFFSET](p);		
@@ -461,7 +468,8 @@ int rvalue_code(AST_NODE *p)
 		}
 		else if(p->leftChild->rightSibling->nodeType == LEFT_PARENTHESE){
 			//函数
-			add_triple(call,p->leftChild->content.s_content, -1,  func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, -1);
+			temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
+			add_triple(call,temp_symtbl->addr_off, -1,  func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, -1);
 			return triple_list_index - 1;
 		}
 		else{
@@ -593,7 +601,9 @@ int rvalue_code(AST_NODE *p)
 		for(i = 0 ; i < arg_num ; i++){
 			add_triple(param,arg_list[i],-1,1,arg_type_list[i],-1);
 		}
-		add_triple(call,p->leftChild->content.s_content,-1,func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, -1);
+		
+		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
+		add_triple(call,temp_symtbl->addr_off,-1,func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, -1);
 		return triple_list_index - 1;
 	}//end case 4
 	}
