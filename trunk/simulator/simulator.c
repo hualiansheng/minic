@@ -5,6 +5,7 @@
 #include "register.h"
 #include "memory.h"
 #include "process.h"
+#include "instructions.h"
 
 int main(int argc, char **argv){
   PROCESS* proc;
@@ -53,6 +54,7 @@ int main(int argc, char **argv){
   printf("%d\n", result);
   destroy_mem(mem);
   */
-
+  REGISTERS *regs = malloc(sizeof(REGISTERS));
+  inst_inter(0xFF000000,regs);
   return 0;
 }
