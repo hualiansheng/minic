@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "register.h"
+#include "instructions.h"
 
 REGISTERS* inst_regs;
 uint32_t inst;
@@ -23,8 +24,24 @@ uint32_t get_bits(uint32_t num, int bit_num_high, int bit_num_low){
   return num;
 }
 
+uint32_t inst_data_op(uint32_t operand1, uint32_t operand2, 
+		      uint32_t op_type){
+  if(op_type > 15){
+    fprintf(stderr, "Error : op_type error.\n");
+    return 0;
+  }
+  switch(op_type){
+  case AND: return operand1 & operand2;
+  case XOR: return operand1 ^ operand2;
+
+  default: return 0;
+  }
+  return 0;
+}
+
 int inst_D_Imm_Shift(){
   printf("Inst Type : inst_D_Imm_Shift\n");
+  
   return 0;
 }
 
@@ -117,6 +134,6 @@ int inst_inter(uint32_t _inst, REGISTERS* regs){
     fprintf(stderr, "Error : Unrecognize instruction.\n");
     return -1;
   }
-
+  
   return cycles;
 }
