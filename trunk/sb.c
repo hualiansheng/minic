@@ -1,9 +1,20 @@
+int num[100000];
+int shai(int x)
+{
+	int k;
+	k = x * 2;
+	while (k < 100000)
+	{
+		num[k] = 1;
+		k = k + x;
+	}
+}
 int main()
 {
-	int i,j;
-	for(i = 0 ; i < 100 ; i++){
-		for( j = 0 ; j <  10 ; j++){
-			i+j;		
-		}
+	int i;	
+	for (i = 2; i < 100000; i++)
+	{
+		if (num[i] == 0)
+			shai(i);
 	}
 }

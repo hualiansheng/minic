@@ -13,7 +13,8 @@ extern AST_NODE* tree_root;
 int const_value;
 char* const_string;
 char* temp_ID;
-
+//brills modified here:
+int *alist1,*alist2;
 int (*gen_triple_code[67])(AST_NODE*);
 
 symtbl_hdr **scope_stack;
@@ -84,6 +85,8 @@ stack_item pop()
 //add a triple item
 void add_triple(enum operator op, int arg1, int arg2, int result_type, int arg1_type, int arg2_type)
 {
+	union arg tmp1 = (union arg)arg1;
+	union arg tmp2 = (union arg)arg2; 
 	int i;
 	if(triple_list_index == triple_list_size){
 		i = triple_list_size * sizeof(triple);
@@ -109,6 +112,8 @@ void initialize()
 	triple_list_size = initsize;
 	scope_stack = malloc(initsize*sizeof(symtbl_hdr*));
 	scope_size = initsize;
+	alist1 = malloc(100*sizeof(int));
+	alist2 = malloc(100*sizeof(int));
 }
 
 void intermediate_code(AST_NODE* root)
@@ -127,6 +132,8 @@ void gen_intermediate_code(AST_NODE *root)
 	//initialize();
 	if(root -> nodeType == FUNCTION_HDR){
 		ptr = root->leftChild->rightSibling;
+		if (ptr->nodeType == STAR)
+			ptr = ptr->rightSibling;
 		temp_symtbl = symtbl_query(ptr->symtbl, ptr->content.s_content, 0);
 		temp_symtbl->addr_off = triple_list_index;
 	}
@@ -535,8 +542,12 @@ int rvalue_code(AST_NODE *p)
 	}//end case 3;
 	case 4:{
 		arg_num = 0;
-		arg_list = malloc(100*sizeof(int));
-		arg_type_list = malloc(100*sizeof(int));
+		/**
+		 *Brills modified here: 
+		 *maybe memory leak?? you should free the malloced memory everytime...
+		 */
+		arg_list = alist1; //malloc(100*sizeof(int));
+		arg_type_list = alist2; //malloc(100*sizeof(int));
 		ptr = p -> leftChild -> rightSibling -> rightSibling;
 		while(1){
 			if(ptr->leftChild->nodeType == EXPRESSION){
@@ -948,12 +959,15 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 */
 	if(op == add_op || op == minus_op || op == multiply_op || op == assign_op || op == star_assign_op){
 		if(size_type1 == 1 && size_type2 == 0){
-			add_triple(char_to_int_op, var2,-1,1,var_type2,0);
+			/**Brills modified here: -1 for var_type2??*/
+			add_triple(char_to_int_op, var2,-1,1,var_type2,-1);
+			
 			temp_index = triple_list_index-1;
 			add_triple(op, var1, temp_index, 1, var_type1, 1);	
 		}
 		else if(size_type1 == 0 && size_type2 == 1){
-			add_triple(char_to_int_op, var1,-1,1,var_type1,0);
+			/**Brills modified here: -1 for var_type1??*/			
+			add_triple(char_to_int_op, var1,-1,1,var_type1,-1);
 			temp_index = triple_list_index-1;
 			add_triple(op, temp_index, var2, 1, 1, var_type2);	
 		}
