@@ -19,7 +19,7 @@ validation_utils.o : validation_utils.c AST.h validation_utils.h
 	gcc $(ARGS) -c validation_utils.c
 gen_symtbl.o: gen_symtbl.c symtbl.h
 	gcc $(ARGS) -c gen_symtbl.c
-symtbl_operation.o: symtbl_operation.c
+symtbl_operation.o: symtbl_operation.c symtbl.h
 	gcc $(ARGS) -c symtbl_operation.c
 type_verification.o: type_verification.c type_verification.h
 	gcc $(ARGS) -c type_verification.c

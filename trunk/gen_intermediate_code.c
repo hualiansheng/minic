@@ -16,7 +16,6 @@ char* temp_ID;
 
 int (*gen_triple_code[67])(AST_NODE*);
 
-
 symtbl_hdr **scope_stack;
 stack_item *stack;//记录statement中的++ --，statement完了之后弹栈到空
 triple *triple_list;
@@ -324,6 +323,7 @@ int rvalue_code(AST_NODE *p)
 	int temp_rvalue=0;
 	int temp_rvalue2=0;
 	symtbl_item* temp_symtbl;
+	symtbl_hdr* temp_hdr;
 	int temp_const;
 	int temp_index;
 	stack_item temp_item;
@@ -469,7 +469,9 @@ int rvalue_code(AST_NODE *p)
 		else if(p->leftChild->rightSibling->nodeType == LEFT_PARENTHESE){
 			//函数
 			temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
-			add_triple(call,temp_symtbl->addr_off, -1,  func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, -1);
+			temp_hdr = func_query(tree_root->symtbl, (p->leftChild->content).s_content);
+			if( temp_hdr->ret_type == CHAR_T && temp_hdr->ret_star ==0) add_triple(call,temp_symtbl->addr_off, -1, 0, 1, -1);
+			else add_triple(call,temp_symtbl->addr_off, -1, 1, 1, -1);
 			return triple_list_index - 1;
 		}
 		else{
@@ -601,9 +603,10 @@ int rvalue_code(AST_NODE *p)
 		for(i = 0 ; i < arg_num ; i++){
 			add_triple(param,arg_list[i],-1,1,arg_type_list[i],-1);
 		}
-		
 		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
-		add_triple(call,temp_symtbl->addr_off,-1,func_query(tree_root->symtbl, (p->leftChild->content).s_content)->ret_type, 0, -1);
+		temp_hdr = func_query(tree_root->symtbl, (p->leftChild->content).s_content);
+		if(temp_hdr -> ret_type == CHAR_T && temp_hdr ->ret_star ==0) add_triple(call,temp_symtbl->addr_off,-1,0, 1, -1);
+		else add_triple(call,temp_symtbl->addr_off,-1,1, 1, -1);
 		return triple_list_index - 1;
 	}//end case 4
 	}
