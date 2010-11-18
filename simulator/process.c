@@ -3,7 +3,7 @@
 #include "ELF_parser.h"
 #include "process.h"
 
-PROCESS* proc_load(char* filename){
+PROCESS* proc_initial(char* filename){
   PROCESS* proc;
   GElf_Phdr* phdr;
   int seg_num = 0;

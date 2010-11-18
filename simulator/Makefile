@@ -1,4 +1,4 @@
-OBJECT = simulator.o ELF_parser.o register.o memory.o process.o instructions.o
+OBJECT = simulator.o ELF_parser.o register.o memory.o process.o instructions.o cache.o
 ARGS = -g -Wall
 LIBS = -L/usr/local/lib -lelf
 simulator:$(OBJECT)
@@ -15,6 +15,8 @@ process.o:process.h process.c ELF_parser.h
 	gcc $(ARGS) -c process.c
 instructions.o:instructions.h instructions.c register.h
 	gcc $(ARGS) -c instructions.c
+cache.o:cache.h cache.c
+	gcc $(ARGS) -c cache.c
 
 clean:
 	rm -f *.o simulator

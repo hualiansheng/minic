@@ -7,6 +7,7 @@
 #define	PROC_RUN	1
 #define PROC_TRAP	2
 #define PROC_DEAD	3
+#define PROC_INITIAL	4
 #define STACK_SIZE	4096
 
 typedef struct{
@@ -16,7 +17,7 @@ typedef struct{
   PROC_MEM* mem;
 }PROCESS;
 
-extern PROCESS* proc_load(char* filename);
+extern PROCESS* proc_initial(char* filename);
 extern int proc_destroy(PROCESS* proc);
 
 #endif
