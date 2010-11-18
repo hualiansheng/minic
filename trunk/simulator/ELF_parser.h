@@ -12,5 +12,6 @@ extern int ELF_close();
 extern int ELF_loadable_seg_num();
 extern GElf_Phdr* ELF_next_loadable_phdr();
 extern uint32_t ELF_entry_point();
+extern uint32_t ELF_main_entry();
 
 #endif
