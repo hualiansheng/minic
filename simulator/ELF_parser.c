@@ -1,10 +1,14 @@
 #include "ELF_parser.h"
 #include <malloc.h>
+#include <string.h>
 
 int fd;
 Elf *e;  
 GElf_Ehdr ehdr;
 int phdr_index;
+GElf_Shdr shdr;
+Elf_Scn *scn;
+Elf_Data* data;
 
 
 int ELF_initial(char *input_file){
@@ -89,3 +93,45 @@ GElf_Phdr* ELF_next_loadable_phdr(){
 uint32_t ELF_entry_point(){
   return ehdr.e_entry;
 }
+
+uint32_t ELF_main_entry(){
+  uint32_t result = 0;
+  uint32_t sym_num;
+  Elf32_Sym * sym;
+  int strtab_index = 0;
+  scn = NULL;
+  while((scn = elf_nextscn(e, scn)) != NULL){
+    if(gelf_getshdr(scn, &shdr) != &shdr){
+      fprintf(stderr, "getshdr() failed.\n");
+      return 0;
+    }
+    strtab_index ++;
+    char* name = elf_strptr(e, ehdr.e_shstrndx, shdr.sh_name);
+    if(strcmp(name, ".strtab")==0)
+      break;
+  }
+
+  scn = NULL;
+  while((scn = elf_nextscn(e, scn)) != NULL){
+    if(gelf_getshdr(scn, &shdr) != &shdr){
+      fprintf(stderr, "getshdr() failed.\n");
+      return 0;
+    }
+    char* name = elf_strptr(e, ehdr.e_shstrndx, shdr.sh_name);
+    if(strcmp(name, ".symtab")==0){
+      data = elf_getdata(scn, data);
+      sym_num = data->d_size/sizeof(Elf32_Sym);
+      sym = (Elf32_Sym*)data->d_buf;
+      int i;
+      for(i=0; i<sym_num; i++){
+	name = elf_strptr(e, strtab_index, sym[i].st_name);
+	if(strcmp(name, "main") == 0){
+	  result = sym[i].st_value;
+	  return result;
+	}
+      }
+    }
+  }
+  return result;
+}
+

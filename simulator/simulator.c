@@ -7,7 +7,10 @@
 #include "process.h"
 #include "instructions.h"
 
+#include "ELF_parser.h"
+
 int main(int argc, char **argv){
+/*
   PROCESS* proc;
   if(argc !=2){
     fprintf(stderr, "usage: %s file-name\n", argv[0]);
@@ -16,6 +19,11 @@ int main(int argc, char **argv){
   proc = proc_load(argv[1]);
   if(proc!=NULL)
     proc_destroy(proc);
+*/
+  ELF_initial(argv[1]);
+  printf("main entry:%x\n", ELF_main_entry());
+  ELF_close();
+
 
   /* REGISTER module
   REGISTERS* regs;
@@ -54,7 +62,10 @@ int main(int argc, char **argv){
   printf("%d\n", result);
   destroy_mem(mem);
   */
+
+  /*
   REGISTERS *regs = malloc(sizeof(REGISTERS));
   inst_inter(0xFF000000,regs);
+  */
   return 0;
 }
