@@ -96,7 +96,10 @@ int mem_fetch(PROC_MEM* mem, unsigned int addr,
     return 1;
   }
   int i;
-  for(i=0; i<mem->seg_num; i++)
+  for(i=0; i<mem->seg_num; i++){
+    //printf("segment offset : %x\n", (mem->segments[i]).vaddr_offset);
+    //printf("segment flag : %x\n", (mem->segments[i]).vaddr_offset);
+    //printf("%x\n",addr);
     if(((mem->segments[i]).flag & data_type) != 0
        && (mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset +
@@ -110,8 +113,9 @@ int mem_fetch(PROC_MEM* mem, unsigned int addr,
       memcpy(data, src_addr, data_size);
       return 0;
     }
+  }
   data = NULL;
-  fprintf(stderr, "Not an effective address\n");
+  fprintf(stderr, "mem_fetch : Not an effective address\n");
   return 2;
 }
 
@@ -136,4 +140,34 @@ int mem_set(PROC_MEM* mem, unsigned int addr,
       return 0;
     }
   return 2;
+}
+
+int mem_type(PROC_MEM* mem, uint32_t addr){
+  if(mem == NULL){
+    fprintf(stderr, "Uninitialization of memory.\n");
+    return 1;
+  }
+  int i;
+  for(i=0; i<mem->seg_num; i++)
+    if((mem->segments[i]).vaddr_offset <= addr
+       && addr <= (mem->segments[i]).vaddr_offset +
+       (mem->segments[i]).size){
+      return (mem->segments[i]).flag;
+    }
+  fprintf(stderr, "mem_type : Not an effective address\n");
+  return -1;
+}
+
+int mem_invalid(PROC_MEM* mem, uint32_t addr){
+  if(mem == NULL){
+    fprintf(stderr, "Uninitialization of memory.\n");
+    return 1;
+  }
+  int i;
+  for(i=0; i<mem->seg_num; i++)
+    if((mem->segments[i]).vaddr_offset <= addr
+       && addr <= (mem->segments[i]).vaddr_offset +
+       (mem->segments[i]).size)
+      return 0;
+  return -1;
 }

@@ -39,10 +39,12 @@ extern void mem_destroy(PROC_MEM *mem);
 extern int segment_load(PROC_MEM* mem, unsigned int seg_index, int flag,
 		 unsigned int vaddr_offset, unsigned int seg_size,
 		 void* data, unsigned int data_size);
-extern int mem_fetch(PROC_MEM* mem, unsigned int addr,
+extern int mem_fetch(PROC_MEM* mem, uint32_t addr,
 		     void *data, unsigned int data_size,
 		     int data_type);
-extern int mem_set(PROC_MEM* mem, unsigned int addr,
+extern int mem_set(PROC_MEM* mem, uint32_t addr,
 	    void *data, unsigned int data_size);
+extern int mem_type(PROC_MEM* mem, uint32_t addr);
+extern int mem_invalid(PROC_MEM* mem, uint32_t addr);
 
 #endif

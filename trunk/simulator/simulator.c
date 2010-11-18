@@ -7,23 +7,28 @@
 #include "process.h"
 #include "instructions.h"
 
+#include "cache.h"
 #include "ELF_parser.h"
 
 int main(int argc, char **argv){
-/*
   PROCESS* proc;
+  CACHE* cache;
   if(argc !=2){
     fprintf(stderr, "usage: %s file-name\n", argv[0]);
     return 1;
   }
-  proc = proc_load(argv[1]);
+  proc = proc_initial(argv[1]);
+  
+  cache = cache_initial(proc->mem);
+
   if(proc!=NULL)
     proc_destroy(proc);
-*/
+
+/*
   ELF_initial(argv[1]);
   printf("main entry:%x\n", ELF_main_entry());
   ELF_close();
-
+*/
 
   /* REGISTER module
   REGISTERS* regs;
