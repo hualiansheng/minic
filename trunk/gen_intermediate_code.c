@@ -52,10 +52,11 @@ void gen_code_initial()
 void push_scope(symtbl_hdr *scope)
 {
 	int i;
+	printf("push_scope_dbg: %d\n", scope_size);
 	if(scope_top == scope_size){
-		i = scope_size * sizeof(int);
+		i = scope_size * sizeof(symtbl_hdr*);
 		adjustSize((void**)&scope_stack, &i);
-		scope_size = i /sizeof(int);
+		scope_size = i /sizeof(symtbl_hdr*);
 	}
 	scope_stack[scope_top++] = scope;
 	add_triple(enter, -1, -1, -1, -1, -1);
@@ -92,13 +93,19 @@ void add_triple(enum operator op, int arg1, int arg2, int result_type, int arg1_
 		i = triple_list_size * sizeof(triple);
 		adjustSize((void**)&triple_list, &i);
 		triple_list_size = i/sizeof(triple);
+		
+		i = triple_list_size * sizeof(int);
+		adjustSize((void**)&index_index,&i);
 	}
 	triple_list[triple_list_index].op = op;
 	triple_list[triple_list_index].arg1 = (union arg)arg1;
 	triple_list[triple_list_index].arg2 = (union arg)arg2;
 	triple_list[triple_list_index].result_type = result_type;
 	triple_list[triple_list_index].arg1_type = arg1_type;
-	triple_list[triple_list_index].arg2_type = arg2_type;	
+	triple_list[triple_list_index].arg2_type = arg2_type;
+	//Brills modified here:
+	//Bind triple with symtbl
+	triple_list[triple_list_index].symtbl = scope_stack[scope_top - 1];
 	index_index[triple_list_index] = triple_list_index;
 	triple_list_index ++;
 }
@@ -112,6 +119,7 @@ void initialize()
 	triple_list_size = initsize;
 	scope_stack = malloc(initsize*sizeof(symtbl_hdr*));
 	scope_size = initsize;
+	//temporary workround
 	alist1 = malloc(100*sizeof(int));
 	alist2 = malloc(100*sizeof(int));
 }
