@@ -1,6 +1,7 @@
 #ifndef GEN_INTERMEDIATE_CODE_H
 #define GEN_INTERMEDIATE_CODE_H
 #include "AST.h"
+#include "symtbl.h"
 //define
 
 enum operator{
@@ -24,6 +25,9 @@ typedef struct triple
 	int result_type;//0为char 1为int
 	int arg1_type;//0 var 1 临时变量 2 constant 3 string constant
 	int arg2_type;//0 var 1 临时变量 2 constant 3 string constant
+	//Brills modified here:
+	//Bind triple with symtbl
+	symtbl_hdr* symtbl;
 }triple;
 
 typedef struct stack_item//++ -- stack的item
