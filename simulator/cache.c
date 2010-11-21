@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <math.h>
 #include <memory.h>
+#include <stdlib.h>
 #include "cache.h"
 
 CACHE* cache_initial(PROC_MEM* _mem){
@@ -41,6 +42,7 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
   }
   if(in_block_count > 32){
     fprintf(stderr, "Address invalid.\n");
+    exit(1);
   }
   else if(mem_fetch(cache->mem, block_addr,
 		    &(cache->data)[block_index][in_block_count],

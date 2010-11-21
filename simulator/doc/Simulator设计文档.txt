@@ -1,0 +1,26 @@
+模拟器Simulator设计文档：
+一、模拟器架构：
+模拟器架构主要分为两个部分：进程模块和CPU模块
+1 进程模块：
+  a.进程模块的接口声明在文件process.h中，实现在process.c中；进程模块包含的子模块有：内存管理模块、ELF文件解析模块。
+  b.进程模块的功能描述：
+    进程模块的功能是建立一个进程，包括进程自己内存空间的初始化和维护、进程代码和数据的载入、程序入口点等。
+  c.进程模块的接口如下：
+    extern PROCESS* proc_initial(char* filename);
+    extern int proc_destroy(PROCESS* proc);
+    功能分别为建立进程和销毁进程，其中filename为进程的物理文件名（ELF可执行文件），proc为需要销毁的进程。
+
+  1.1 内存管理子模块（memory.h memory.c）
+    a.内存管理子模块分为两个部分：栈空间管理和内存空间管理
+    b.栈空间管理
+    c.内存空间管理
+
+  1.2 ELF文件解析模块（ELF_parser.h ELF_parser.c）
+    a.ELF文件解析模块主要是用来解析ELF文件。
+
+2 CPU模块
+  a.CPU模块的接口声明在文件CPU.h中，实现在CPU.c中；CPU模块包含的子模块有：寄存器堆模块、流水线模块、cache模块
+  b.流水线分为五级流水，具体请参考《流水线设计文档.txt》
+
+
+

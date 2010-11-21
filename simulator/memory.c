@@ -1,5 +1,6 @@
 #include <malloc.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "memory.h"
 
@@ -25,7 +26,7 @@ void stack_destroy(PROC_STACK * stack){
 int stack_push(PROC_STACK * stack, void * addr, unsigned int size){
   if(stack->used_size + size > stack->size){
     fprintf(stderr, "Stack high overflow.\n");
-    return 1;
+    exit(1);
   }
   memcpy(stack->sp, addr, size);
   stack->used_size = stack->used_size + size;
@@ -39,7 +40,7 @@ int stack_push(PROC_STACK * stack, void * addr, unsigned int size){
 int stack_pop(PROC_STACK *stack, void* addr, unsigned int size){
   if(stack->used_size < size){
     fprintf(stderr, "Stack low overflow.\n");
-    return 1;
+    exit(1);
   }
   stack->sp = stack->sp - size;
   memcpy(addr, stack->sp, size);
@@ -72,11 +73,11 @@ int segment_load(PROC_MEM* mem, unsigned int seg_index, int flag,
 		 void* data, unsigned int data_size){
   if(mem == NULL){
     fprintf(stderr, "Uninitialization of memory.\n");
-    return 1;
+    exit(1);
   }
   if(seg_index >= mem->seg_num){
     fprintf(stderr, "seg_index is out of range.\n");
-    return 2;
+    exit(1);
   }
   (mem->segments[seg_index]).flag = flag;
   (mem->segments[seg_index]).size = seg_size;
@@ -93,7 +94,7 @@ int mem_fetch(PROC_MEM* mem, unsigned int addr,
 	      int data_type){
   if(mem == NULL){
     fprintf(stderr, "Uninitialization of memory.\n");
-    return 1;
+    exit(1);
   }
   int i;
   for(i=0; i<mem->seg_num; i++){
@@ -116,7 +117,7 @@ int mem_fetch(PROC_MEM* mem, unsigned int addr,
   }
   data = NULL;
   fprintf(stderr, "mem_fetch : Not an effective address\n");
-  return 2;
+  exit(1);
 }
 
 //Set data from mem
@@ -124,7 +125,7 @@ int mem_set(PROC_MEM* mem, unsigned int addr,
 	    void *data, unsigned int data_size){
   if(mem == NULL){
     fprintf(stderr, "Uninitialization of memory.\n");
-    return 1;
+    exit(1);
   }
   int i;
   for(i=0; i<mem->seg_num; i++)
@@ -145,7 +146,7 @@ int mem_set(PROC_MEM* mem, unsigned int addr,
 int mem_type(PROC_MEM* mem, uint32_t addr){
   if(mem == NULL){
     fprintf(stderr, "Uninitialization of memory.\n");
-    return 1;
+    exit(1);
   }
   int i;
   for(i=0; i<mem->seg_num; i++)
@@ -155,13 +156,13 @@ int mem_type(PROC_MEM* mem, uint32_t addr){
       return (mem->segments[i]).flag;
     }
   fprintf(stderr, "mem_type : Not an effective address\n");
-  return -1;
+  exit(1);
 }
 
 int mem_invalid(PROC_MEM* mem, uint32_t addr){
   if(mem == NULL){
     fprintf(stderr, "Uninitialization of memory.\n");
-    return 1;
+    exit(1);
   }
   int i;
   for(i=0; i<mem->seg_num; i++)
