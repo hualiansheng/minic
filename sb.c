@@ -8,6 +8,7 @@ int shai(int x)
 		num[k] = 1;
 		k = k + x;
 	}
+	i++;
 }
 int main()
 {
