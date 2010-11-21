@@ -28,6 +28,7 @@ typedef struct triple
 	//Brills modified here:
 	//Bind triple with symtbl
 	symtbl_hdr* symtbl;
+	basic_block *block;
 }triple;
 
 typedef struct stack_item//++ -- stack的item
