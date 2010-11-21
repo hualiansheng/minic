@@ -1,13 +1,15 @@
 #ifndef _REGISTER_H_
 #define _REGISTER_H_
 
+#include <stdint.h>
+
 #define REG_BL r[30]
 #define REG_PC r[31]
 #define REG_CMSR flag
 
 typedef struct{
-  int r[32];
-  int flag;
+  int32_t r[32];
+  int32_t flag;
 }REGISTERS;
 
 extern REGISTERS* reg_initial();

@@ -42,6 +42,18 @@ Q1：cache命中和未命中会造成不同的时间延迟，这一点是如何�
 1、各模块在逻辑上是并行的，在实现上是从后向前调用，遇到需要插入气泡的情况直接阻塞前边的各级流水
 2、三中所述的结构：
 typedef struct{
-  uint32_t inst;
-  uint32_t 
-}PIPLINE_INST;
+  uint32_t inst_code;
+  uint32_t opcodes;
+  int inst_type;
+  uint32_t operand1, operant2;
+  int32_t *dest_reg;
+  int imm;
+  int shift;
+  int rotate;
+  int cond;
+  int high_offset, low_offset;
+  int S, A, P, U, B, W, L, H;
+}PIPLINE_DATA;
+
+
+

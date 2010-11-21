@@ -1,4 +1,5 @@
 #include <malloc.h>
+#include <stdlib.h>
 
 #include "ELF_parser.h"
 #include "process.h"
@@ -11,7 +12,7 @@ PROCESS* proc_initial(char* filename){
   FILE* fp;
   if((fp = fopen(filename, "r"))==NULL){
     fprintf(stderr, "File open error\n");
-    return NULL;
+    exit(1);
   }
 
   proc = malloc(sizeof(PROCESS));

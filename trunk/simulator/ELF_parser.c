@@ -1,6 +1,7 @@
 #include "ELF_parser.h"
 #include <malloc.h>
 #include <string.h>
+#include <stdlib.h>
 
 int fd;
 Elf *e;  
@@ -15,28 +16,28 @@ int ELF_initial(char *input_file){
   if(elf_version(EV_CURRENT) == EV_NONE){
     fprintf(stderr, "ELF library initialization failed: %s.\n",
 	    elf_errmsg(-1));
-    return 1;
+    exit(1);
   }
   if((fd = open(input_file, O_RDONLY, 0)) < 0){
     fprintf(stderr, "Open \"%s\" failed.\n", input_file);
-    return 2;
+    exit(1);
   }
   if((e = elf_begin(fd, ELF_C_READ, NULL)) == NULL){
     fprintf(stderr, "elf_begin() failed: %s.\n", elf_errmsg(-1));
-    return 3;
+    exit(1);
   }
   if(elf_kind(e) != ELF_K_ELF){
     fprintf(stderr, "\"%s\" is not an ELF object.\n", input_file);
-    return 4;
+    exit(1);
   }
   if(gelf_getehdr(e, &ehdr) == NULL){
     fprintf(stderr, "getehdr() failed: %s.\n",
 	    elf_errmsg(-1));
-    return 5;
+    exit(1);
   }
   if(ehdr.e_flags != 2){
     fprintf(stderr, "\"%s\" is not an execution file.\n", input_file);
-    return 6;
+    exit(1);
   }
 
   phdr_index = 0;
@@ -61,7 +62,7 @@ int ELF_loadable_seg_num(){
     if(gelf_getphdr(e, phdr_index, &phdr) != &phdr){
       fprintf(stderr, "getphdr() failed: %s.", elf_errmsg(-1));
       phdr_index = 0;
-      return -1;
+      exit(1);
     }
     phdr_index ++;
     if(phdr.p_type == PT_LOAD)
@@ -79,7 +80,7 @@ GElf_Phdr* ELF_next_loadable_phdr(){
     if(gelf_getphdr(e, phdr_index, phdr) != phdr){
       phdr_index = 0;
       fprintf(stderr, "getphdr() failed: %s.", elf_errmsg(-1));
-      return NULL;
+      exit(1);
     }
     phdr_index ++;
     if(phdr->p_type == PT_LOAD)
@@ -103,7 +104,7 @@ uint32_t ELF_main_entry(){
   while((scn = elf_nextscn(e, scn)) != NULL){
     if(gelf_getshdr(scn, &shdr) != &shdr){
       fprintf(stderr, "getshdr() failed.\n");
-      return 0;
+      exit(1);
     }
     strtab_index ++;
     char* name = elf_strptr(e, ehdr.e_shstrndx, shdr.sh_name);
@@ -115,7 +116,7 @@ uint32_t ELF_main_entry(){
   while((scn = elf_nextscn(e, scn)) != NULL){
     if(gelf_getshdr(scn, &shdr) != &shdr){
       fprintf(stderr, "getshdr() failed.\n");
-      return 0;
+      exit(1);
     }
     char* name = elf_strptr(e, ehdr.e_shstrndx, shdr.sh_name);
     if(strcmp(name, ".symtab")==0){

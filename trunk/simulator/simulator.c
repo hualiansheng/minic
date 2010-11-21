@@ -5,7 +5,7 @@
 #include "register.h"
 #include "memory.h"
 #include "process.h"
-#include "instructions.h"
+#include "decode.h"
 
 #include "cache.h"
 #include "ELF_parser.h"
@@ -15,7 +15,7 @@ int main(int argc, char **argv){
   CACHE* cache;
   if(argc !=2){
     fprintf(stderr, "usage: %s file-name\n", argv[0]);
-    return 1;
+    exit(1);
   }
   proc = proc_initial(argv[1]);
   
