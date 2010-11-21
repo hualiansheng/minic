@@ -1,7 +1,7 @@
 #include "basic_block.h"
 #include "gen_intermediate_code.h"
 #include <stdlib.h>
-
+#include <memory.h>
 extern triple *triple_list;
 extern int *index_index;
 extern int triple_list_index;

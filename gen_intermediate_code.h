@@ -2,6 +2,7 @@
 #define GEN_INTERMEDIATE_CODE_H
 #include "AST.h"
 #include "symtbl.h"
+#include "basic_block.h"
 //define
 
 enum operator{
