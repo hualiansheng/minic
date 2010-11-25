@@ -25,7 +25,6 @@ int main(int argc, char* argv)
 		char c, k(char a);
 		*a;
 		c = &i;
-		
 		b = fibonacci(b);
 		a[i] = b++ + --i;
 		f(i,c);
