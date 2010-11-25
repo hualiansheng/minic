@@ -30,6 +30,8 @@ typedef struct triple
 	//Bind triple with symtbl
 	symtbl_hdr* symtbl;
 	basic_block *block;
+	int arg1_uni;
+	int arg2_uni;
 }triple;
 
 typedef struct stack_item//++ -- stack的item

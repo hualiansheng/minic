@@ -1,20 +1,10 @@
-int num[100000];
-int shai(int x)
-{
-	int k;
-	k = x * 2;
-	while (k < 100000)
-	{
-		num[k] = 1;
-		k = k + x;
-	}
-}
+#include <stdio.h>
 int main()
 {
-	int i;	
-	for (i = 2; i < 100000; i++)
-	{
-		if (num[i] == 0)
-			shai(i);
-	}
+	char *a, *b;
+	a = "peng lao ban shi sb";
+	b = "peng lao ban shi sb";
+	a[0] = 'b';
+	printf("%p\n%p\n", a, b);
+	return 0;
 }
