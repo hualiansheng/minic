@@ -9,7 +9,7 @@ int counter[100];
 extern triple* triple_list;
 extern int triple_list_size;
 extern int triple_list_index;
-char *operator_name[]={"if,goto","if_not,goto","goto","-","!","&","!*","+","=","*=","+","-","*","char to int","==","<",">",">=","<=","!=","||","&&","get rb","set rb","call", "param", "enter", "leave", "return"};
+char *operator_name[]={"if,goto","if_not,goto","goto","-","!","&","!*","+","=","*=","+","-","*","char to int","==","<",">",">=","<=","!=","||","&&","get rb","set rb","call", "param", "enter function", "enter statements", "leave function", "leave statements","return"};
 void print_AST_dot_core(AST_NODE* ptr);
 void print_AST(AST_NODE* ptr, int level)
 {

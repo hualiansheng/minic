@@ -59,11 +59,11 @@ void push_scope(symtbl_hdr *scope)
 		scope_size = i /sizeof(symtbl_hdr*);
 	}
 	scope_stack[scope_top++] = scope;
-	add_triple(enter, -1, -1, -1, -1, -1);
+	//add_triple(enter, -1, -1, -1, -1, -1);
 }
 void pop_scope()
 {
-	add_triple(leave,-1,-1,-1,-1,-1);
+	//add_triple(leave,-1,-1,-1,-1,-1);
 	scope_top--;
 }
 
@@ -150,11 +150,16 @@ void gen_intermediate_code(AST_NODE *root)
 		gen_triple_code[p->nodeType-FUNC_OFFSET](p);		
 		return;
 	}
-	if(root->nodeType == FUNCTION_BODY)
+	if(root->nodeType == FUNCTION_BODY){
+		add_triple(enterF, -1, -1, -1, -1, -1);
 		push_scope(root->symtbl);
+	}
 	for(p = p->leftChild ; p != NULL; p = p->rightSibling)
 		gen_intermediate_code(p);
-	if(root->nodeType == FUNCTION_BODY) pop_scope();
+	if(root->nodeType == FUNCTION_BODY){
+		add_triple(leaveF, -1, -1, -1, -1, -1);
+		pop_scope();
+	}
 
 }
 
@@ -235,6 +240,7 @@ int compound_code(AST_NODE *p)
 {
 	AST_NODE *ptr;
 	int last;
+	add_triple(enterS, -1, -1, -1, -1, -1);
 	push_scope(p->symtbl);
 	ptr = p->leftChild->rightSibling->rightSibling;
 	/**
@@ -243,6 +249,7 @@ int compound_code(AST_NODE *p)
 	 */
 	//last = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 	gen_intermediate_code(ptr);
+	add_triple(leaveS, -1, -1, -1, -1, -1);
 	pop_scope();
 	//return last;
 	return triple_list_index - 1;
