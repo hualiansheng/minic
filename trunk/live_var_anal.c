@@ -2,10 +2,16 @@
 #include <stdlib.h>
 #include <memory.h>
 #define INIT_ITEM_NUM 64
+
 extern triple *triple_list;
 extern int *index_index;
 extern int triple_list_index;
-int live_var_anal(func_block *fb);
+extern basic_block *bblist;
+extern func_block *fblist;
+extern int block_num;
+
+int live_var_anal();
+int live_var_func(func_block *fb);
 int gen_uni_table(func_block *fb);
 int gen_tmp_item(func_block *fb, int i);
 int get_uni_item(func_block *fb, int i, char *var_name);
@@ -14,7 +20,17 @@ int solve_in_out(func_block *fb);
 int analyze_live(func_block *fb);
 int change_live(func_block *fb, int code_k, int def_or_use, int uni_k);
 
-int live_var_anal(func_block *fb)
+int live_var_anal()
+{
+	func_block *fb;
+	for (fb = fblist; fb != NULL; fb = fb->next)
+	{
+		live_var_func(fb);
+	}
+	return 0;
+}
+
+int live_var_func(func_block *fb)
 {
 	gen_uni_table(fb);
 	set_prepare(fb);
@@ -33,6 +49,8 @@ int gen_uni_table(func_block *fb)
 	fb->uni_item_num = 0;
 	fb->code_num = end - begin + 1;
 	fb->uni_table_size = INIT_ITEM_NUM*sizeof(symtbl_item);
+	fb->mapping = (map_table*)malloc(INIT_ITEM_NUM*sizeof(map_table));
+	fb->map_table_size = INIT_ITEM_NUM*sizeof(map_table);
 	for (i = begin; i <= end; i++)
 	{
 		tmp_op = triple_list[index_index[i]].op;
@@ -62,9 +80,16 @@ int gen_uni_table(func_block *fb)
 
 int gen_tmp_item(func_block *fb, int i)
 {
+	int size;
 	symtbl_item *new_tmp_item = (symtbl_item*)malloc(sizeof(symtbl_item));
 	if ((fb->uni_item_num+1)*sizeof(symtbl_item) > fb->uni_table_size)
+	{
 		adjustSize((void**)(&(fb->uni_table)), &(fb->uni_table_size));
+		adjustSize((void**)(&(fb->mapping)), &(fb->map_table_size));
+	}
+	fb->mapping[fb->uni_item_num].isTmp = 1;
+	fb->mapping[fb->uni_item_num].tmp_k = i;
+	fb->mapping[fb->uni_item_num].var_name = NULL;	
 	fb->uni_table[fb->uni_item_num++] = new_tmp_item;
 	return fb->uni_item_num - 1;
 }
@@ -82,7 +107,13 @@ int get_uni_item(func_block *fb, int i, char *var_name)
 	if (j == fb->uni_item_num)
 	{
 		if ((fb->uni_item_num+1)*sizeof(symtbl_item) > fb->uni_table_size)
+		{
 			adjustSize((void**)(&(fb->uni_table)), &(fb->uni_table_size));
+			adjustSize((void**)(&(fb->mapping)), &(fb->map_table_size));
+		}
+		fb->mapping[fb->uni_item_num].isTmp = 0;
+		fb->mapping[fb->uni_item_num].tmp_k = -1;
+		fb->mapping[fb->uni_item_num].var_name = var_name;	
 		fb->uni_table[fb->uni_item_num++] = new_uni_item;
 	}
 	return j;
@@ -197,29 +228,30 @@ int solve_in_out(func_block *fb)
 int analyze_live(func_block *fb)
 {
 	basic_block *bb;
-	int i, j, tmp, arg1, arg2;
+	int i, j, base, tmp, arg1, arg2;
+	base = fb->start->begin;
 	for (bb = fb->over; bb != fb->start; bb = bb->prev)
 	{
 		for (j = 0; j < fb->width; j++)
-			fb->live_status[bb->end][j] = fb->v_out[bb->m][j];
+			fb->live_status[bb->end-base][j] = fb->v_out[bb->m][j];
 		for (i = bb->end; i > bb->begin; i--)
 		{
 			for (j = 0; j < fb->width; j++)
-				fb->live_status[i-1][j] = fb->live_status[i][j];			
+				fb->live_status[i-1-base][j] = fb->live_status[i-base][j];			
 			tmp = triple_list[index_index[i]].tmp_uni;
 			arg1 = triple_list[index_index[i]].arg1_uni;
 			arg2 = triple_list[index_index[i]].arg2_uni;
 			if (tmp != -1)
-				change_live(fb, i, 1, tmp);
+				change_live(fb, i-base, 1, tmp);
 			if (arg1 != -1)
 			{
 				if (triple_list[index_index[i]].op == assign_op)
-					change_live(fb, i, 1, arg1);
+					change_live(fb, i-base, 1, arg1);
 				else
-					change_live(fb, i, 0, arg1);
+					change_live(fb, i-base, 0, arg1);
 			}
 			if (arg2 != -1)
-				change_live(fb, i, 0, arg2);
+				change_live(fb, i-base, 0, arg2);
 		}
 	}
 	return 0;

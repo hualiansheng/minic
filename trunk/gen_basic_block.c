@@ -50,10 +50,10 @@ int gen_basic_block()
 		}
 	}
 	fblist = (func_block*)malloc(sizeof(func_block));
-	bblist = (basic_block*)malloc(sizeof(basic_block));
+	bblist = triple_list[index_index[0]].block;
 	cur_func = fblist;
 	cur_func->prev = NULL;
-	cur_func->start = triple_list[index_index[0]].block;
+	cur_func->start = bblist;
 	m = 0;
 	cur_block = bblist;
 	cur_block->begin = 0;
@@ -99,6 +99,7 @@ int gen_basic_block()
 	cur_block->m = m++;
 	cur_block->next = NULL;
 	cur_block->follow = NULL;
+	cur_block->jump = NULL;
 	cur_func->next = NULL;
 	cur_func->over = cur_block;
 	cur_func->bb_num = m;
