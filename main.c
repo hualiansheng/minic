@@ -141,6 +141,8 @@ int main(int argc, char** argv)
 	gen_basic_block();
 	if(dbg_print_basic_block)
 		print_basic_block();
+	live_var_anal();
+	print_live_var();
 	/*
 	 * TODO: next compilation step
 	 */

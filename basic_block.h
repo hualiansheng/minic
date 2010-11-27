@@ -14,6 +14,12 @@ typedef struct basic_block {
 	struct basic_block* jump;
 }basic_block;
 
+typedef struct map_table {
+	int isTmp;
+	int tmp_k;
+	char* var_name;
+}map_table;
+
 typedef struct func_block {
 	basic_block* start;
 	basic_block* over;
@@ -30,6 +36,8 @@ typedef struct func_block {
 	unsigned int **v_in;
 	unsigned int **def;
 	unsigned int **use;
+	map_table* mapping;
+	int map_table_size;
 }func_block;
 
 #endif
