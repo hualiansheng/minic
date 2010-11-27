@@ -20,6 +20,6 @@
 #define CLB 	14
 #define MVN 	15
 
-extern int inst_decode(uint32_t _inst, PIPLINE_DATA* _pipline_data);
+extern int inst_decode(PIPLINE_DATA* _pipline_data);
 
 #endif

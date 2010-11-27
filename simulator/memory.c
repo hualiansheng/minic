@@ -7,6 +7,7 @@
 //Initialize stack, the stack_size is based on Byte
 PROC_STACK * stack_initial(unsigned int stack_size){
   PROC_STACK *stack = malloc(sizeof(PROC_STACK));
+  //printf("stack initial addr: %x\n", (unsigned int)stack);
   stack->size = stack_size;
   stack->base = malloc(stack_size);
   stack->used_size = 0;

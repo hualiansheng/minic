@@ -9,8 +9,8 @@
 #define CACHE_BLOCK_SIZE	32
 #define CACHE_NUM		1
 #define WORD_WIDTH		32
-#define CACHE_MISSED_CYCLE	4
-#define CACHE_HIT_CYCLE		0
+#define CACHE_MISSED_CYCLE	8
+#define CACHE_HIT_CYCLE		1
 
 typedef struct{
   int block_num;
@@ -27,6 +27,8 @@ typedef struct{
 }CACHE_RETURN;
 
 extern CACHE* cache_initial(PROC_MEM* _mem);
+extern int cache_mem_link(CACHE* cache, PROC_MEM* _mem);
 extern CACHE_RETURN cache_search(CACHE* cache,uint32_t addr);
+extern int cache_destroy(CACHE* cache);
 
 #endif

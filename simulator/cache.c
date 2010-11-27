@@ -119,6 +119,10 @@ CACHE_RETURN cache_search(CACHE* cache, uint32_t addr){
   //printf("block index : %x\n", block_index);
   //printf("mark_addr : %x\n", mark_addr);
   //printf("in block index : %x\n", in_block_index);
+  if(cache->mem == NULL){
+    fprintf(stderr, "No memory linked to cache!");
+    exit(1);
+  }
   if(cache->valid[block_index] == 0){
     cache->valid[block_index] = 1;
     return cache_miss(cache, addr);
@@ -134,4 +138,14 @@ CACHE_RETURN cache_search(CACHE* cache, uint32_t addr){
       c_r.cpu_cycles = -1;
   }
   return c_r;
+}
+
+int cache_destroy(CACHE* cache){
+  free(cache);
+  return 1;
+}
+
+int cache_mem_link(CACHE* cache, PROC_MEM* _mem){
+  cache->mem = _mem;
+  return 1;
 }
