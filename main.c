@@ -30,7 +30,9 @@ int main(int argc, char** argv)
 		dbg_print_symtbl = 0,
 		dbg_type_check = 0,
 		dbg_print_tree_dot = 0,
-		dbg_no_intermediate = 0;
+		dbg_no_intermediate = 0,
+		dbg_print_basic_block = 0,
+		dbg_print_intermediate_code = 0;
 	int gen_symtbl_result ;
 	FILE* source_file;
 	//error number, handled by bison
@@ -38,7 +40,7 @@ int main(int argc, char** argv)
 	//symtable support: scope number
 	scope_number = 0;
 	//yydebug = 1;
-	while((oc = getopt(argc, argv, "dotsvax")) != -1)
+	while((oc = getopt(argc, argv, "dotsvaxib")) != -1)
 	{
 		switch(oc)
 		{
@@ -47,9 +49,6 @@ int main(int argc, char** argv)
 				break;
 			case 'o': //output AST
 				dbg_print_tree_dot = 1;
-				break;
-			case 't':
-				dbg_print_tree = 1;
 				break;
 			case 's':
 				dbg_print_symtbl = 1;
@@ -65,6 +64,21 @@ int main(int argc, char** argv)
 				break;
 			case 'x':
 				dbg_no_intermediate = 1;
+				break;
+			case 't':
+				dbg_print_tree = 1;
+				dbg_print_intermediate_code = 0;
+				dbg_print_basic_block = 0;
+				break;
+			case 'i':
+				dbg_print_tree = 0;
+				dbg_print_basic_block = 0;
+				dbg_print_intermediate_code = 1;
+				break;
+			case 'b':
+				dbg_print_intermediate_code = 0;
+				dbg_print_tree = 0;
+				dbg_print_basic_block = 1;
 				break;
 			default:
 				usage();
@@ -105,10 +119,9 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	
+	fprintf(stderr,"Done.\n");
 	if(dbg_print_symtbl)
 		print_symtbl(tree_root->symtbl);
-	
-	fprintf(stderr,"Done.\n");
 	fprintf(stderr,"Doing type verification...");
 	dfs_type_verification(tree_root);
 	fprintf(stderr,"Done.\n");
@@ -123,8 +136,11 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	intermediate_code(tree_root);
-	print_intermediate_code();
+	if(dbg_print_intermediate_code)
+		print_intermediate_code();
 	gen_basic_block();
+	if(dbg_print_basic_block)
+		print_basic_block();
 	/*
 	 * TODO: next compilation step
 	 */
