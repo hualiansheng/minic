@@ -80,7 +80,8 @@ int inst_ST(){
   return 0;
 }
 
-int inst_decode(uint32_t inst, PIPLINE_DATA* _pipline_data){
+int inst_decode(PIPLINE_DATA* _pipline_data){
+  uint32_t inst = _pipline_data->inst_code;
   pipline_data = _pipline_data;
   pipline_data->inst_type = get_bits(inst, 31, 29);
   int inst_type = pipline_data->inst_type;

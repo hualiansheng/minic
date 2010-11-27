@@ -34,7 +34,8 @@ PROCESS* proc_initial(char* filename){
   }
 
   proc->status = PROC_READY;
-  proc->entry = ELF_entry_point();
+  //proc->entry = ELF_entry_point();
+  proc->entry = ELF_main_entry();
 
   ELF_close();
   /*

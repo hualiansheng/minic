@@ -2,6 +2,7 @@
 #define _PROCESS_H_
 
 #include "memory.h"
+#include <stdint.h>
 
 #define	PROC_READY	0
 #define	PROC_RUN	1
@@ -12,7 +13,7 @@
 
 typedef struct{
   int status;
-  unsigned int entry;
+  uint32_t entry;
   PROC_STACK* stack;
   PROC_MEM* mem;
 }PROCESS;

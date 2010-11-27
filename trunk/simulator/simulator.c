@@ -5,12 +5,25 @@
 #include "register.h"
 #include "memory.h"
 #include "process.h"
-#include "decode.h"
-
-#include "cache.h"
-#include "ELF_parser.h"
+#include "CPU.h"
 
 int main(int argc, char **argv){
+  if(argc !=2){
+    fprintf(stderr, "usage: %s file-name\n", argv[0]);
+    exit(1);
+  }
+  PROCESS* proc;
+  CPU_d* cpu;
+  proc = proc_initial(argv[1]);
+  cpu = CPU_initial(1, CPU_TRAP);
+  CPU_load_process(cpu, proc);
+
+  CPU_next_beat(cpu);
+
+  CPU_destroy(cpu);
+  proc_destroy(proc);
+
+  /*
   PROCESS* proc;
   CACHE* cache;
   if(argc !=2){
@@ -23,6 +36,8 @@ int main(int argc, char **argv){
 
   if(proc!=NULL)
     proc_destroy(proc);
+  */
+
 
 /*
   ELF_initial(argv[1]);
