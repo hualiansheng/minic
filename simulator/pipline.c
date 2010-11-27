@@ -3,6 +3,8 @@
 #include <malloc.h>
 #include <memory.h>
 
+#include "memory.h"
+
 int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info);
@@ -34,9 +36,8 @@ int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
   cpu_info->wr_mem_times += pipline_cpu_info->wr_mem_times;
   cpu_info->cache_visit += pipline_cpu_info->cache_visit;
   cpu_info->cache_miss += pipline_cpu_info->cache_miss;
-
   
-  printf("stack addr : %x\n", (unsigned int)pipline->stack);
+  printf("stack base addr : %x\n", (unsigned int)pipline->stack->base);
   printf("==============================\n");
 
   printf("PC : %x\n", pipline->regs->REG_PC);
