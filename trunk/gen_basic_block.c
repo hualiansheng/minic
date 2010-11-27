@@ -1,7 +1,9 @@
 #include "basic_block.h"
 #include <stdlib.h>
 #include <memory.h>
-
+extern triple *triple_list;
+extern int *index_index;
+extern int triple_list_index;
 basic_block *bblist;
 func_block *fblist;
 int block_num;
@@ -48,6 +50,7 @@ int gen_basic_block()
 		}
 	}
 	fblist = (func_block*)malloc(sizeof(func_block));
+	bblist = (basic_block*)malloc(sizeof(basic_block));
 	cur_func = fblist;
 	cur_func->prev = NULL;
 	cur_func->start = triple_list[index_index[0]].block;

@@ -110,5 +110,6 @@ void print_intermediate_code()
 		else printf("%d ", triple_list[i].arg2.temp_index);
 		printf("\t%d %d %d", triple_list[i].result_type, triple_list[i].arg1_type, triple_list[i].arg2_type);
 		printf("\t symtbl_dbg: %d \n", triple_list[i].symtbl->item_num);
+		printf("\n");
 	}
 }

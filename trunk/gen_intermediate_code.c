@@ -7,7 +7,7 @@ extern char name[][30];
 int adjustSize(void** p_old, int* max);
 
 int rb;//全局变量，布尔表达式的专用寄存器
-const int initsize = 16;
+const int initsize = 100;
 extern AST_NODE* tree_root;
 
 int const_value;

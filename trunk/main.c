@@ -124,6 +124,7 @@ int main(int argc, char** argv)
 	}
 	intermediate_code(tree_root);
 	print_intermediate_code();
+	gen_basic_block();
 	/*
 	 * TODO: next compilation step
 	 */

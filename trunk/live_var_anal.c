@@ -1,5 +1,18 @@
 #include "basic_block.h"
+#include <stdlib.h>
+#include <memory.h>
 #define INIT_ITEM_NUM 64
+extern triple *triple_list;
+extern int *index_index;
+extern int triple_list_index;
+int live_var_anal(func_block *fb);
+int gen_uni_table(func_block *fb);
+int gen_tmp_item(func_block *fb, int i);
+int get_uni_item(func_block *fb, int i, char *var_name);
+int set_prepare(func_block *fb);
+int solve_in_out(func_block *fb);
+int analyze_live(func_block *fb);
+int change_live(func_block *fb, int code_k, int def_or_use, int uni_k);
 
 int live_var_anal(func_block *fb)
 {
@@ -16,7 +29,7 @@ int gen_uni_table(func_block *fb)
 	enum operator tmp_op;
 	begin = fb->start->begin;
 	end = fb->over->end;
-	fb->uni_table = (symtbl_item*)malloc(INIT_ITEM_NUM*sizeof(symtbl_item));
+	fb->uni_table = (symtbl_item**)malloc(INIT_ITEM_NUM*sizeof(symtbl_item));
 	fb->uni_item_num = 0;
 	fb->code_num = end - begin + 1;
 	fb->uni_table_size = INIT_ITEM_NUM*sizeof(symtbl_item);
@@ -77,7 +90,7 @@ int get_uni_item(func_block *fb, int i, char *var_name)
 
 int set_prepare(func_block *fb)
 {
-	int i;
+	int i,j;
 	basic_block *bb;
 	int *def_use;
 	fb->width = (fb->uni_item_num + 31) / 32;
@@ -123,7 +136,7 @@ int set_prepare(func_block *fb)
 			if (triple_list[index_index[j]].op == assign_op)
 			{
 				if (def_use[triple_list[index_index[j]].arg1_uni] == 0)
-					def_use[triple_list[index_index[j]].arg1_uni] == 1;
+					def_use[triple_list[index_index[j]].arg1_uni] = 1;
 			}
 			else
 			{
@@ -136,9 +149,9 @@ int set_prepare(func_block *fb)
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
 			if (def_use[j] == 1)
-				def[i][j/32] = def[i][j/32] | (1 << (31-j%32));
+				fb->def[i][j/32] = fb->def[i][j/32] | (1 << (31-j%32));
 			if (def_use[j] == -1)
-				use[i][j/32] = use[i][j/32] | (1 << (31-j%32));
+				fb->use[i][j/32] = fb->use[i][j/32] | (1 << (31-j%32));
 		}
 	}
 	return 0;
@@ -158,15 +171,16 @@ int solve_in_out(func_block *fb)
 			if (i + 1 < fb->bb_num && bb->follow != NULL)
 			{
 				for (j = 0; j < fb->width; j++)
-					fb->v_out[i][j] = fb->v_in[(bb->follow).m][j];
+					fb->v_out[i][j] = fb->v_in[bb->follow->m][j];
 			}
 			if (bb->jump != NULL)
 			{
 				for (j = 0; j < fb->width; j++)
-					fb->v_out[i][j] = fb->v_out[i][j] | fb->v_in[(bb->jump).m][j];
+					fb->v_out[i][j] = fb->v_out[i][j] | fb->v_in[bb->jump->m][j];
 			}
 			for (j = 0; j < fb->width; j++)
-				newin[j] = (fb->v_out[i][j] - fb->v_out[i][j]&fb->def[i][j]) | fb->use[i][j];
+				newin[j] = (fb->v_out[i][j] - (fb->v_out[i][j]&fb->def[i][j]
+							)) | fb->use[i][j];
 			for (j = 0; j < fb->width; j++)
 			{
 				if (fb->v_in[i][j] != newin[j])
@@ -187,7 +201,7 @@ int analyze_live(func_block *fb)
 	for (bb = fb->over; bb != fb->start; bb = bb->prev)
 	{
 		for (j = 0; j < fb->width; j++)
-			fb->live_status[bb->end][j] = fb->v_out[bb.m][j];
+			fb->live_status[bb->end][j] = fb->v_out[bb->m][j];
 		for (i = bb->end; i > bb->begin; i--)
 		{
 			for (j = 0; j < fb->width; j++)
@@ -196,16 +210,16 @@ int analyze_live(func_block *fb)
 			arg1 = triple_list[index_index[i]].arg1_uni;
 			arg2 = triple_list[index_index[i]].arg2_uni;
 			if (tmp != -1)
-				change_live(fb, i, 1, tmp_uni);
+				change_live(fb, i, 1, tmp);
 			if (arg1 != -1)
 			{
 				if (triple_list[index_index[i]].op == assign_op)
-					change_live(fb, i, 1, arg1_uni);
+					change_live(fb, i, 1, arg1);
 				else
-					change_live(fb, i, 0, arg1_uni);
+					change_live(fb, i, 0, arg1);
 			}
 			if (arg2 != -1)
-				change_live(fb, i, 0, arg2_uni);
+				change_live(fb, i, 0, arg2);
 		}
 	}
 	return 0;
