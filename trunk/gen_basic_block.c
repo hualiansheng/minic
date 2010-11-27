@@ -58,12 +58,12 @@ int gen_basic_block()
 	cur_block = bblist;
 	cur_block->begin = 0;
 	cur_block->prev = NULL;
-	cur_block->m = m;
 	for (i = 1; i < triple_list_index; i++)
 	{
 		if (isLeader[i] == 1)
 		{
 			cur_block->end = i-1;
+			cur_block->m = m++;
 			if (triple_list[index_index[i-1]].op != goto_op && triple_list[index_index[i-1]].op != leaveF)
 				cur_block->follow = triple_list[index_index[i]].block;
 			else
@@ -83,7 +83,6 @@ int gen_basic_block()
 			triple_list[index_index[i]].block->prev = cur_block;
 			cur_block = triple_list[index_index[i]].block;
 			cur_block->begin = i;
-			cur_block->m = ++m;
 		}
 		if (triple_list[index_index[i]].op == enterF)
 		{
@@ -97,10 +96,12 @@ int gen_basic_block()
 		}
 	}
 	cur_block->end = triple_list_index-1;
+	cur_block->m = m++;
 	cur_block->next = NULL;
 	cur_block->follow = NULL;
 	cur_func->next = NULL;
 	cur_func->over = cur_block;
-	cur_func->bb_num = m+1;
+	cur_func->bb_num = m;
+	free(isLeader);
 	return 0;
 }

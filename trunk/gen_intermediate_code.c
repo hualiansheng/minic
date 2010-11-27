@@ -52,7 +52,7 @@ void gen_code_initial()
 void push_scope(symtbl_hdr *scope)
 {
 	int i;
-	printf("push_scope_dbg: %d\n", scope_size);
+	//printf("push_scope_dbg: %d\n", scope_size);
 	if(scope_top == scope_size){
 		i = scope_size * sizeof(symtbl_hdr*);
 		adjustSize((void**)&scope_stack, &i);
@@ -458,11 +458,11 @@ int rvalue_code(AST_NODE *p)
 			ptr = p ->leftChild;
 			temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 			if(temp_rvalue == -1){
-				fprintf(stderr,"%s\n",ptr->leftChild->content.s_content);
+				//fprintf(stderr,"%s\n",ptr->leftChild->content.s_content);
 				temp_symtbl = symtbl_query(ptr->symtbl,ptr->leftChild->content.s_content,  0);
 				assert(temp_symtbl != NULL);
 				temp_item.item = (union arg)(ptr->leftChild->content.s_content);
-				fprintf(stderr,"%s\n",temp_item.item.var_name);
+				//fprintf(stderr,"%s\n",temp_item.item.var_name);
 				if(ptr->rightSibling->content.i_content == PLUSPLUS) temp_item.flag = 1;
 				else temp_item.flag = 0;
 				temp_item.item_type = 0;

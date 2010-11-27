@@ -1,3 +1,15 @@
+int f(int a, int b)
+{
+	int c;
+	c = 1;
+	while (a < b)
+	{
+		c = c * 2;
+ 		a++;
+	}
+	return c;
+}
+
 int main()
 {
 	int i, j, n;
@@ -16,4 +28,11 @@ int main()
 		a[temp] = a[i];
 		a[i] = min;
 	}
+}
+
+int g()
+{
+	int k;
+	k = 1;
+	return 0;
 }
