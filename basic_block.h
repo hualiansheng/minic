@@ -3,9 +3,6 @@
 #include "symtbl.h"
 #include "gen_intermediate_code.h"
 
-extern triple *triple_list;
-extern int *index_index;
-extern int triple_list_index;
 
 typedef struct basic_block {
 	int begin;
@@ -25,7 +22,7 @@ typedef struct func_block {
 	int code_num;
 	int bb_num;
 	int width;
-	symtbl_item* uni_table;
+	symtbl_item** uni_table;
 	int uni_item_num;
 	int uni_table_size;
 	unsigned int **live_status;

@@ -29,7 +29,7 @@ typedef struct triple
 	//Brills modified here:
 	//Bind triple with symtbl
 	symtbl_hdr* symtbl;
-	basic_block *block;
+	struct basic_block *block;
 	int arg1_uni;
 	int arg2_uni;
 	int tmp_uni;
