@@ -151,8 +151,8 @@ void gen_intermediate_code(AST_NODE *root)
 		return;
 	}
 	if(root->nodeType == FUNCTION_BODY){
-		add_triple(enterF, -1, -1, -1, -1, -1);
 		push_scope(root->symtbl);
+		add_triple(enterF, -1, -1, -1, -1, -1);		
 	}
 	for(p = p->leftChild ; p != NULL; p = p->rightSibling)
 		gen_intermediate_code(p);
