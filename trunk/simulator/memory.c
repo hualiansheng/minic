@@ -4,7 +4,7 @@
 
 #include "memory.h"
 
-//Initialize stack, the stack_size is based on Byte
+//Initialize stack, the stack_size is based in Byte
 PROC_STACK * stack_initial(unsigned int stack_size){
   PROC_STACK *stack = malloc(sizeof(PROC_STACK));
   //printf("stack initial addr: %x\n", (unsigned int)stack);
@@ -21,6 +21,44 @@ void stack_destroy(PROC_STACK * stack){
   free(stack);
 }
 
+//allocate for a stack, based in byte
+int stack_allocate(PROC_STACK* stack, int size){
+  if(stack->used_size + size <= stack->size){
+    stack->sp = stack->sp + size;
+    stack->used_size = stack->used_size + size;
+    return size;
+  }else{
+    int tmp = stack->size - stack->used_size;
+    stack->used_size = stack->size;
+    stack->sp += tmp;
+    return tmp;
+  }
+}
+
+//free for a stack, based in byte
+int stack_free(PROC_STACK* stack, int size){
+  if(stack->used_size >= size){
+    stack->used_size -= size;
+    stack->sp -= size;
+    return size;
+  }else{
+    int tmp = stack->used_size;
+    stack->used_size = 0;
+    stack->sp = stack->base;
+    return tmp;
+  }
+}
+
+//test if addr is the address in stack
+//true returns 1, false returns 0
+int stack_test_addr(PROC_STACK* stack, uint32_t addr){
+  if(addr >= (uint32_t)stack->base
+     && addr< (uint32_t)(stack->base + stack->size))
+    return 1;
+  return 0;
+}
+
+/*
 //push onto stack
 //addr is the address of the data
 //size is the size of data, based on Byte
@@ -47,6 +85,7 @@ int stack_pop(PROC_STACK *stack, void* addr, unsigned int size){
   memcpy(addr, stack->sp, size);
   return 0;
 }
+*/
 
 //Above is stack implementation
 //---------------------------------------------------------------------

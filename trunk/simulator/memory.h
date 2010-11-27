@@ -31,8 +31,12 @@ typedef struct{
 
 extern PROC_STACK* stack_initial(unsigned int stack_size);
 extern void stack_destroy(PROC_STACK* stack);
-extern int stack_push(PROC_STACK* stack, void *addr, unsigned int size);
-extern int stack_pop(PROC_STACK* stack, void *addr, unsigned int size);
+//extern int stack_push(PROC_STACK* stack, void *addr, unsigned int size);
+//extern int stack_pop(PROC_STACK* stack, void *addr, unsigned int size);
+extern int stack_allocate(PROC_STACK* stack, int size);
+extern int stack_free(PROC_STACK* stack, int size);
+extern int stack_test_addr(PROC_STACK* stack, uint32_t addr);
+
 
 extern PROC_MEM* mem_initial(unsigned int _seg_num);
 extern void mem_destroy(PROC_MEM *mem);
