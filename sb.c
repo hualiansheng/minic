@@ -1,10 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 int main()
 {
-	char *a, *b;
-	a = "peng lao ban shi sb";
-	b = "peng lao ban shi sb";
-	a[0] = 'b';
-	printf("%p\n%p\n", a, b);
+	unsigned int a;
+	a = 1<<31;
+	printf("%ud\n", a);
 	return 0;
 }

@@ -32,6 +32,7 @@ typedef struct triple
 	basic_block *block;
 	int arg1_uni;
 	int arg2_uni;
+	int tmp_uni;
 }triple;
 
 typedef struct stack_item//++ -- stack的item

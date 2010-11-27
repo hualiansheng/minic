@@ -1,5 +1,4 @@
 #include "basic_block.h"
-#include "gen_intermediate_code.h"
 #include <stdlib.h>
 #include <memory.h>
 
@@ -9,7 +8,7 @@ int block_num;
 
 int gen_basic_block()
 {
-	int i, k;
+	int i, k, m;
 	basic_block *cur_block;
 	func_block *cur_func;
 	enum operator tmp_op;
@@ -19,7 +18,7 @@ int gen_basic_block()
 	for (i = 0; i < triple_list_index; i++)
 	{
 		tmp_op = triple_list[index_index[i]].op;
-		if (tmp_op == enter && isLeader[i] == 0)
+		if (tmp_op == enterF && isLeader[i] == 0)
 		{
 			block_num++;
 			triple_list[index_index[i]].block = (basic_block*)malloc(sizeof(basic_block));
@@ -52,15 +51,20 @@ int gen_basic_block()
 	cur_func = fblist;
 	cur_func->prev = NULL;
 	cur_func->start = triple_list[index_index[0]].block;
+	m = 0;
 	cur_block = bblist;
 	cur_block->begin = 0;
 	cur_block->prev = NULL;
+	cur_block->m = m;
 	for (i = 1; i < triple_list_index; i++)
 	{
 		if (isLeader[i] == 1)
 		{
-			cur_block->end = i;
-			cur_block->next = triple_list[index_index[i]].block;
+			cur_block->end = i-1;
+			if (triple_list[index_index[i-1]].op != goto_op && triple_list[index_index[i-1]].op != leaveF)
+				cur_block->follow = triple_list[index_index[i]].block;
+			else
+				cur_block->follow = NULL;				
 			tmp_op = triple_list[index_index[i-1]].op;
 			if (tmp_op == if_op || tmp_op == if_not_op || tmp_op == goto_op)
 			{
@@ -72,22 +76,28 @@ int gen_basic_block()
 			}
 			else
 				cur_block->jump = NULL;
+			cur_block->next = triple_list[index_index[i]].block;
 			triple_list[index_index[i]].block->prev = cur_block;
 			cur_block = triple_list[index_index[i]].block;
 			cur_block->begin = i;
+			cur_block->m = ++m;
 		}
-		if (triple_list[index_index[i]].op == enter)
+		if (triple_list[index_index[i]].op == enterF)
 		{
-			cur_func->over = cur_block;
+			cur_func->bb_num = m;
+			cur_func->over = cur_block->prev;
 			cur_func->next = (func_block*)malloc(sizeof(func_block));
 			cur_func->next->prev = cur_func;
 			cur_func = cur_func->next;
 			cur_func->start = cur_block;
+			m = 0;
 		}
 	}
-	cur_block->end = triple_list_index;
+	cur_block->end = triple_list_index-1;
 	cur_block->next = NULL;
+	cur_block->follow = NULL;
 	cur_func->next = NULL;
-	cur_func->over = NULL;
+	cur_func->over = cur_block;
+	cur_func->bb_num = m+1;
 	return 0;
 }
