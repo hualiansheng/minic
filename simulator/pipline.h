@@ -14,8 +14,7 @@ typedef struct{
   uint32_t inst_code;
   int inst_type;
   uint32_t opcodes;
-  uint32_t operand1, operant2;
-  int32_t *dest_reg;
+  uint32_t Rn, Rd, Rs, Rm;
   int imm;
   int shift;
   int rotate;
@@ -35,7 +34,8 @@ typedef struct{
 
 typedef struct{
   int cycles_total;//total cycles of cpu
-  int cycles_idle;//idle cycles of cpu, include bubles and cache miss
+  //int cycles_idle;//idle cycles of cpu, include bubles and cache miss
+  int cycles_work;//work cycles of cpu
   int bubbles;//bubbles of pipline
   int rd_mem_times;//times of read memory
   int wr_mem_times;//times of write memory
