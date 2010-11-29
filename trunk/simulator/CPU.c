@@ -4,6 +4,8 @@
 #include <malloc.h>
 #include <memory.h>
 
+#include "debugger.h"
+
 CPU_d* CPU_initial(int id, int mode){
   CPU_d* cpu = malloc(sizeof(CPU_d));
   memset(cpu, 0, sizeof(CPU_d));
@@ -38,7 +40,12 @@ int CPU_load_process(CPU_d* cpu, PROCESS* proc){
 }
 
 int CPU_next_beat(CPU_d* cpu){
-  pipline_next_step(cpu->pipline, cpu->cpu_info);
+  int i;
+  for(i=0; i<13; i++)
+    pipline_next_step(cpu->pipline, cpu->cpu_info);
+  debugger_print_cpu_info(cpu->cpu_info);
+  
+//  pipline_next_step(cpu->pipline, cpu->cpu_info);
   return 1;
 }
 

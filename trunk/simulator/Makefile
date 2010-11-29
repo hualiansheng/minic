@@ -13,7 +13,7 @@ memory.o:memory.h memory.c
 	gcc $(ARGS) -c memory.c
 process.o:process.h process.c ELF_parser.h
 	gcc $(ARGS) -c process.c
-decode.o:decode.h decode.c register.h
+decode.o:decode.h decode.c register.h inst.h
 	gcc $(ARGS) -c decode.c
 cache.o:cache.h cache.c
 	gcc $(ARGS) -c cache.c
