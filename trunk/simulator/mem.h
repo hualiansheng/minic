@@ -1,5 +1,5 @@
-#ifndef _MEMORY_H_
-#define _MEMORY_H_
+#ifndef _MEM_H_
+#define _MEM_H_
 
 #include <stdint.h>
 
@@ -9,13 +9,6 @@
 
 #define DATA_RD 4
 #define DATA_EX 1
-
-typedef struct{
-  uint8_t *base;
-  unsigned int size;
-  unsigned int used_size;
-  uint8_t *sp;
-}PROC_STACK;
 
 typedef struct{
   unsigned int vaddr_offset;
@@ -29,14 +22,7 @@ typedef struct{
   PROC_SEGMENT * segments;
 }PROC_MEM;
 
-extern PROC_STACK* stack_initial(unsigned int stack_size);
-extern void stack_destroy(PROC_STACK* stack);
-//extern int stack_push(PROC_STACK* stack, void *addr, unsigned int size);
-//extern int stack_pop(PROC_STACK* stack, void *addr, unsigned int size);
-extern int stack_allocate(PROC_STACK* stack, int size);
-extern int stack_free(PROC_STACK* stack, int size);
-extern int stack_test_addr(PROC_STACK* stack, uint32_t addr);
-
+typedef PROC_SEGMENT PROC_STACK;
 
 extern PROC_MEM* mem_initial(unsigned int _seg_num);
 extern void mem_destroy(PROC_MEM *mem);

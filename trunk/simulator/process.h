@@ -1,7 +1,7 @@
 #ifndef _PROCESS_H_
 #define _PROCESS_H_
 
-#include "memory.h"
+#include "mem.h"
 #include <stdint.h>
 
 #define	PROC_READY	0
@@ -9,7 +9,7 @@
 #define PROC_TRAP	2
 #define PROC_DEAD	3
 #define PROC_INITIAL	4
-#define STACK_SIZE	4096
+#define STACK_SIZE	8192
 
 typedef struct{
   int status;

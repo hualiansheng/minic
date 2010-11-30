@@ -2,7 +2,7 @@
 #define _DEBUGGER_H_
 
 #include "CPU.h"
-#include "memory.h"
+#include "mem.h"
 #include <stdint.h>
 
 #define BYTE	0

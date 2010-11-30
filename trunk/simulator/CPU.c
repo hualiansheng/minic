@@ -35,13 +35,14 @@ int CPU_load_process(CPU_d* cpu, PROCESS* proc){
   cache_mem_link(cpu->i_cache, proc->mem);
   cache_mem_link(cpu->d_cache, proc->mem);
   cpu->regs->REG_PC = proc->entry;
+  cpu->regs->REG_SP = (uint32_t)proc->stack->vaddr_offset + (uint32_t)(proc->stack->size * 4);
   cpu->pipline->stack = proc->stack;
   return 1;
 }
 
 int CPU_next_beat(CPU_d* cpu){
   int i;
-  for(i=0; i<13; i++)
+  for(i=0; i<1; i++)
     pipline_next_step(cpu->pipline, cpu->cpu_info);
   debugger_print_cpu_info(cpu->cpu_info);
   

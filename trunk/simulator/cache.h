@@ -2,7 +2,7 @@
 #define _CACHE_H_
 
 #include <stdint.h>
-#include "memory.h"
+#include "mem.h"
 
 //All macro is in Byte
 #define CACHE_SIZE		1024
