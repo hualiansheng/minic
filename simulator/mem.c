@@ -2,93 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "memory.h"
-
-//Initialize stack, the stack_size is based in Byte
-PROC_STACK * stack_initial(unsigned int stack_size){
-  PROC_STACK *stack = malloc(sizeof(PROC_STACK));
-  //printf("stack initial addr: %x\n", (unsigned int)stack);
-  stack->size = stack_size;
-  stack->base = malloc(stack_size);
-  stack->used_size = 0;
-  stack->sp = stack->base;
-  return stack;
-}
-
-//destroy stack
-void stack_destroy(PROC_STACK * stack){
-  free(stack->base);
-  free(stack);
-}
-
-//allocate for a stack, based in byte
-int stack_allocate(PROC_STACK* stack, int size){
-  if(stack->used_size + size <= stack->size){
-    stack->sp = stack->sp + size;
-    stack->used_size = stack->used_size + size;
-    return size;
-  }else{
-    int tmp = stack->size - stack->used_size;
-    stack->used_size = stack->size;
-    stack->sp += tmp;
-    return tmp;
-  }
-}
-
-//free for a stack, based in byte
-int stack_free(PROC_STACK* stack, int size){
-  if(stack->used_size >= size){
-    stack->used_size -= size;
-    stack->sp -= size;
-    return size;
-  }else{
-    int tmp = stack->used_size;
-    stack->used_size = 0;
-    stack->sp = stack->base;
-    return tmp;
-  }
-}
-
-//test if addr is the address in stack
-//true returns 1, false returns 0
-int stack_test_addr(PROC_STACK* stack, uint32_t addr){
-  if(addr >= (uint32_t)stack->base
-     && addr< (uint32_t)(stack->base + stack->size))
-    return 1;
-  return 0;
-}
-
-/*
-//push onto stack
-//addr is the address of the data
-//size is the size of data, based on Byte
-int stack_push(PROC_STACK * stack, void * addr, unsigned int size){
-  if(stack->used_size + size > stack->size){
-    fprintf(stderr, "Stack high overflow.\n");
-    exit(1);
-  }
-  memcpy(stack->sp, addr, size);
-  stack->used_size = stack->used_size + size;
-  stack->sp = stack->sp + size;
-  return 0;
-}
-
-//pop from stack
-//addr is the address of the data
-//size is the size of data, based on Byte
-int stack_pop(PROC_STACK *stack, void* addr, unsigned int size){
-  if(stack->used_size < size){
-    fprintf(stderr, "Stack low overflow.\n");
-    exit(1);
-  }
-  stack->sp = stack->sp - size;
-  memcpy(addr, stack->sp, size);
-  return 0;
-}
-*/
-
-//Above is stack implementation
-//---------------------------------------------------------------------
+#include "mem.h"
 
 //Initial memory
 PROC_MEM* mem_initial(unsigned int _seg_num){
@@ -101,6 +15,9 @@ PROC_MEM* mem_initial(unsigned int _seg_num){
 
 //Destroy memory
 void mem_destroy(PROC_MEM* mem){
+  int i;
+  for(i=0; i<mem->seg_num; i++)
+    free((mem->segments[i]).base);
   free(mem->segments);
   free(mem);
 }
@@ -172,7 +89,7 @@ int mem_set(PROC_MEM* mem, unsigned int addr,
     if(((mem->segments[i]).flag & SEG_WR) !=0
        && (mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset + 
-       (mem->segments[i]).size){
+       (mem->segments[i]).size * 4){
       uint8_t *dest_addr = (mem->segments[i]).base;
       unsigned int offset;
       offset = (addr-(unsigned int)(mem->segments[i]).vaddr_offset);
@@ -192,7 +109,7 @@ int mem_type(PROC_MEM* mem, uint32_t addr){
   for(i=0; i<mem->seg_num; i++)
     if((mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset +
-       (mem->segments[i]).size){
+       (mem->segments[i]).size * 4){
       return (mem->segments[i]).flag;
     }
   fprintf(stderr, "mem_type : Not an effective address\n");
@@ -208,7 +125,8 @@ int mem_invalid(PROC_MEM* mem, uint32_t addr){
   for(i=0; i<mem->seg_num; i++)
     if((mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset +
-       (mem->segments[i]).size)
+       (mem->segments[i]).size*4)
       return 0;
   return -1;
 }
+

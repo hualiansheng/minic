@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#define REG_SP r[29]
 #define REG_BL r[30]
 #define REG_PC r[31]
 #define REG_CMSR flag

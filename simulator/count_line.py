@@ -9,7 +9,7 @@ count=0
 
 for i in files:
     if(os.path.isfile(i)):
-        if(i[-2:len(i)]==".c" or i[-2:len(i)]==".h"):
+        if(i[-2:len(i)]==".c" or i[-2:len(i)]==".h" or i[-2:len(i)]==".l" or i[-2:len(i)]==".y"):
             f=open(sys.argv[1]+"/"+str(i), "r")
             data=f.read()
             data = string.split(data, "\n")

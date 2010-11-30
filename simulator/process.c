@@ -1,8 +1,17 @@
 #include <malloc.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "ELF_parser.h"
 #include "process.h"
+
+int stack_initial(PROC_SEGMENT* stack, unsigned int stack_size){
+  stack->vaddr_offset = 0x10000000 - stack_size * 4;
+  stack->size = stack_size;
+  stack->flag = SEG_RD | SEG_WR;
+  stack->base = malloc(stack_size * sizeof(uint8_t));
+  return 1;
+}
 
 PROCESS* proc_initial(char* filename){
   PROCESS* proc;
@@ -20,11 +29,13 @@ PROCESS* proc_initial(char* filename){
   proc->mem = NULL;
   ELF_initial(filename);
   seg_num = ELF_loadable_seg_num();
-  //printf("loadable segment num : %d\n", seg_num);
-  proc->stack = stack_initial(STACK_SIZE);
-  proc->mem = mem_initial(seg_num);
+  proc->mem = mem_initial(seg_num+1);
   
-  for(i=0; i<seg_num; i++){
+  //Initial stack, the physical place of stack is proc->mem->segments[0]
+  stack_initial(&(proc->mem->segments[0]), STACK_SIZE);
+  proc->stack = &(proc->mem->segments[0]);
+  
+  for(i=1; i<=seg_num; i++){
     phdr = ELF_next_loadable_phdr();
     uint8_t* data = malloc(phdr->p_filesz + 1);
     fseek(fp, phdr->p_offset, 0);
@@ -38,18 +49,6 @@ PROCESS* proc_initial(char* filename){
   proc->entry = ELF_main_entry();
 
   ELF_close();
-  /*
-  uint8_t d;
-  for(i=0x020085b0; i<0x020086c0; i++){
-    if(mem_fetch(proc->mem, i, &d, sizeof(d), DATA_RD) == 0){
-      printf("addr=%x\tvalue=%x\n", i, d);
-    }
-  }
-  for(i=0; i<0x110; i++){
-    printf("addr=%x\tvalue=%x\n", i, proc->mem->segments[1].base[i]);
-    }
-  */
-  //printf("%x\n", proc->mem->segments[1].size);
   return proc;
 }
 
@@ -57,8 +56,6 @@ int proc_destroy(PROCESS* proc){
   proc->status = PROC_DEAD;
   if(proc->mem != NULL)
     mem_destroy(proc->mem);
-  if(proc->stack != NULL)
-    stack_destroy(proc->stack);
   free(proc);
   return 0;
 }
