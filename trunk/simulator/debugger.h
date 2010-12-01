@@ -10,6 +10,8 @@
 #define DWORD	2
 
 extern void debugger_print_cpu_info(CPU_info* cpu_info);
+extern void debugger_print_registers(REGISTERS* regs, int reg_num);
+extern void debugger_modify_registers(REGISTERS* regs, int reg_num, int32_t content);
 extern void debugger_print_mem(PROC_MEM* mem, uint32_t addr, int data_type);
 extern void debugger_print_stack(PROC_STACK* stack);
 extern void debugger_modify_mem(PROC_MEM* mem, uint32_t addr, int data_type);

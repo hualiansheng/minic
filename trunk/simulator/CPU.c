@@ -42,8 +42,12 @@ int CPU_load_process(CPU_d* cpu, PROCESS* proc){
 
 int CPU_next_beat(CPU_d* cpu){
   int i;
-  for(i=0; i<1; i++)
+  //cpu->regs->r[24] = 1;
+  for(i=0; i<10; i++){
     pipline_next_step(cpu->pipline, cpu->cpu_info);
+    debugger_print_registers(cpu->regs, -1);
+    printf("\n");
+  }
   debugger_print_cpu_info(cpu->cpu_info);
   
 //  pipline_next_step(cpu->pipline, cpu->cpu_info);

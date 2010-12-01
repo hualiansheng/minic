@@ -4,6 +4,7 @@
 #include <memory.h>
 
 #include "memory.h"
+#include "instEx.h"
 
 int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info);
@@ -49,6 +50,7 @@ int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
 }
 
 int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
+  printf("--Fetching Instruction.--\n");
   PIPLINE_DATA* data = malloc(sizeof(PIPLINE_DATA));
   CACHE_RETURN cache_return;
   uint32_t addr = pipline->regs->REG_PC;
@@ -57,6 +59,7 @@ int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
   data->inst_addr = addr;
   cache_return = cache_search(pipline->i_cache, addr);
   data->inst_code = cache_return.data;
+  data->cur_inst_PC = pipline->regs->REG_PC;
   pipline->pipline_data[0] = data;
   if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)
     cpu_info->cache_miss ++;
@@ -70,19 +73,31 @@ int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
 
 int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info){
   if(pipline->pipline_data[0] != NULL){
-    inst_decode(pipline->pipline_data[0]);
+    decode_inst_decode(pipline->pipline_data[0]);
   }
   pipline->pipline_data[1] = pipline->pipline_data[0];
   pipline_IF(pipline, cpu_info);
+  
+  if(pipline->pipline_data[1] == NULL)
+    printf("--Instruction Decoder Level Empty.--\n");
+  else
+    printf("--Decoding Instruction--\n");
+    
   return 1;
 }
 
 int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   if(pipline->pipline_data[1] != NULL){
-
+    inst_Ex(pipline, cpu_info, 1);
   }
   pipline->pipline_data[2] = pipline->pipline_data[1];
   pipline_ID(pipline, cpu_info);
+  
+  if(pipline->pipline_data[2] == NULL)
+    printf("--Inst Execuation Level Empty.--\n");
+  else
+    printf("--Ececuating Instruction--\n");
+  
   return 1;
 }
 
@@ -92,6 +107,12 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
   }
   pipline->pipline_data[3] = pipline->pipline_data[2];
   pipline_Ex(pipline, cpu_info);
+  
+  if(pipline->pipline_data[3] == NULL)
+    printf("--Memory Level Empty.--\n");
+  else
+    printf("--Writing Memory--\n");
+  
   return 1;
 }
 
@@ -107,5 +128,11 @@ int pipline_WB(PIPLINE* pipline, CPU_info* cpu_info){
   cpu_info->cache_visit = 0;
   cpu_info->cache_miss = 0;
   pipline_Mem(pipline, cpu_info);
+  
+  if(pipline->pipline_data[4] == NULL)
+    printf("--Write Back Level Empty.--\n");
+  else
+    printf("--Writing Back--\n");
+  
   return 1;
 }
