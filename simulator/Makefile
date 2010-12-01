@@ -1,4 +1,4 @@
-OBJECT = simulator.o ELF_parser.o register.o mem.o process.o decode.o cache.o CPU.o pipline.o debugger.o
+OBJECT = simulator.o ELF_parser.o register.o mem.o process.o decode.o cache.o CPU.o pipline.o debugger.o instEx.o
 ARGS = -g -Wall
 LIBS = -L/usr/local/lib -lelf
 simulator:$(OBJECT)
@@ -23,6 +23,8 @@ pipline.o:pipline.h pipline.c
 	gcc $(ARGS) -c pipline.c
 debugger.o:debugger.h debugger.c
 	gcc $(ARGS) -c debugger.c
+instEx.o:instEx.h instEx.c pipline.h
+	gcc $(ARGS) -c instEx.c
 
 clean:
 	rm -f *.o simulator

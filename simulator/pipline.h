@@ -13,7 +13,7 @@ typedef struct{
   uint32_t inst_addr;
   uint32_t inst_code;
   int inst_type;
-  uint32_t opcodes;
+  int opcodes;
   uint32_t Rn, Rd, Rs, Rm;
   int imm;
   int shift;
@@ -21,6 +21,7 @@ typedef struct{
   int cond;
   int high_offset, low_offset;
   int S, A, P, U, B, W, L, H;
+  uint32_t cur_inst_PC;
 }PIPLINE_DATA;
 
 typedef struct{

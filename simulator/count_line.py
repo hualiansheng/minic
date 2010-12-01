@@ -13,7 +13,12 @@ for i in files:
             f=open(sys.argv[1]+"/"+str(i), "r")
             data=f.read()
             data = string.split(data, "\n")
-            count=count+len(data)
+            length = 0
+            for j in data:
+                if(len(j) != 0):
+                    length = length + 1
+            print str(i)+" : "+str(length)+" lines."
+            count=count+length
 
 print count
     

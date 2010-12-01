@@ -52,7 +52,7 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
   c_r.cpu_cycles = CACHE_MISSED_CYCLE;
   presult = (uint32_t*)&(cache->data[block_index][in_block_index]);
   c_r.data = *presult;
-  printf("Cache missed! Data : %x\n", c_r.data);
+  printf("Cache missed! Data : 0x%x\n", c_r.data);
   return c_r;
 }
 
@@ -70,7 +70,7 @@ CACHE_RETURN cache_hit(CACHE* cache, uint32_t addr){
   c_r.cpu_cycles = CACHE_HIT_CYCLE;
   presult = (uint32_t*)&(cache->data[block_index][in_block_index]);
   c_r.data = *presult;
-  printf("Cache Hit! Data : %x\n", c_r.data);
+  printf("Cache Hit! Data : 0x%x\n", c_r.data);
   return c_r;
 }
 

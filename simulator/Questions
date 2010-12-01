@@ -3,3 +3,6 @@
 3.乘法指令在流水线中是如何实现的（如何用两个cycles完成乘法指令的）
 
 4.乘法和乘加指令是两个32位数乘积放在一个32位寄存器中，如何处理溢出问题？
+5.数据处理指令中opcodes是mov,mvn时operand1 is conditional是什么意思？（见手册第三页，实现在instEx.c，搜索Question5即可）
+6.ldw.m stw.m指令编码
+
