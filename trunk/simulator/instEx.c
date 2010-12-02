@@ -24,6 +24,11 @@ int logical_shift_right(int32_t* operand, int imm);
 int math_shift_right(int32_t* operand, int imm);
 int rotate_shift_right(int32_t* operand, int imm);
 
+
+// The entry of instruction execuation
+// pipline - Pipline of cpu
+// cpu_info - cpu_info to be write when execuating
+// level - the leve of pipline to execuation
 int inst_Ex(PIPLINE* pipline, CPU_info* cpu_info, int level){
   if(pipline->pipline_data[level]->inst_type == MULTIPLY
      && cpu_info->cycles_total <= 2)
@@ -69,8 +74,10 @@ int inst_Ex(PIPLINE* pipline, CPU_info* cpu_info, int level){
   return 1;
 }
 
+// The execuation func of Ex_D_Imm_Shift
 void inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_D_Imm_Shift instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  printf("----Execuating Ex_D_Imm_Shift instruction : 0x%.8x.----\n",
+         pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   int32_t operand1, operand2;
   int32_t result;
@@ -89,17 +96,37 @@ void inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
   result = data_Ex(operand1, operand2, data->opcodes, carry);
   // Some opcodes will not write back
   if(data->opcodes != CAND && data->opcodes != CXOR
-     && data->opcodes != CSUB && data->opcodes != CADD
-     && data->opcodes != MOV && data->opcodes != MVN)
+     && data->opcodes != CSUB && data->opcodes != CADD)
     pipline->regs->r[data->Rd] = result;
-  // MOV and MOV will write back when conditional
-  // And operand1 is conditional
-  else if(data->opcodes == MOV || data->opcodes == MVN){
-    if(operand1 == 0)/* Question5 : how operand1 becomes conditional? */
-      pipline->regs->r[data->Rd] = result;
-  }
-  // Other condition will write back
-  else
+  // Set CMSR when S bit is 1 and Rd is not PC
+  if(data->S == 1 && data->Rd != 31)
+    set_CMSR(pipline->regs, operand1, operand2,
+	     result, data->opcodes, shift_carry);
+  //printf("Rd : %d\n", data->Rd);
+  return;
+}
+
+// The execuation func of Ex_D_Reg_Shift
+void inst_Ex_D_Reg_Shift(PIPLINE* pipline, int level){
+  printf("----Execuating Ex_D_Reg_Shift instruction : 0x%.8x.----\n",
+         pipline->pipline_data[level]->inst_code);
+  PIPLINE_DATA* data = pipline->pipline_data[level];
+  int32_t operand1, operand2;
+  int32_t result;
+  int carry, shift_carry;
+  // fetch operands
+  operand1 = pipline->regs->r[data->Rn];
+  operand2 = pipline->regs->r[data->Rm];
+  // shift operand2 and return shift_carry,
+  // shift_carry means whether shift operation is carried
+  shift_carry = shift_Ex(&operand2, pipline->regs->r[data->Rs], data->shift);
+  // get register heap C bit in CMSR
+  carry = reg_getC(pipline->regs);
+  // Caculate result
+  result = data_Ex(operand1, operand2, data->opcodes, carry);
+  // Some opcodes will not write back
+  if(data->opcodes != CAND && data->opcodes != CXOR
+     && data->opcodes != CSUB && data->opcodes != CADD)
     pipline->regs->r[data->Rd] = result;
   // Set CMSR when S bit is 1 and Rd is not PC
   if(data->S == 1 && data->Rd != 31)
@@ -108,20 +135,48 @@ void inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
   return;
 }
 
-void inst_Ex_D_Reg_Shift(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_D_Reg_Shift instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
-}
-
 void inst_Ex_Multiply(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_Multiply instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  printf("----Execuating Ex_Multiply instruction : 0x%.8x.----\n",
+         pipline->pipline_data[level]->inst_code);
 }
 
 void inst_Ex_Branch_Ex(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_Branch_Ex instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  printf("----Execuating Ex_Branch_Ex instruction : 0x%.8x.----\n",
+         pipline->pipline_data[level]->inst_code);
 }
 
 void inst_Ex_D_Immediate(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_D_Immediate instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  printf("----Execuating Ex_D_Immediate instruction : 0x%.8x.----\n",
+         pipline->pipline_data[level]->inst_code);
+  PIPLINE_DATA* data = pipline->pipline_data[level];
+  int32_t operand1, operand2;
+  int32_t result;
+  int carry, shift_carry;
+  // extend immediate
+  data->imm = sign_extend(data->imm, 9);
+  //printf("Sign extend imm : %.8x\n", data->imm);
+  // fetch operands
+  operand1 = pipline->regs->r[data->Rn];
+  operand2 = data->imm;
+  // shift operand2 and return shift_carry,
+  // shift_carry means whether shift operation is carried
+  shift_carry = rotate_shift_right(&operand2, data->rotate);
+  //printf("Rotate shift right imm : %.8x\n", operand2);
+  // get register heap C bit in CMSR
+  carry = reg_getC(pipline->regs);
+  // Caculate result
+  result = data_Ex(operand1, operand2, data->opcodes, carry);
+  // Some opcodes will not write back
+  if(data->opcodes != CAND && data->opcodes != CXOR
+     && data->opcodes != CSUB && data->opcodes != CADD)
+    pipline->regs->r[data->Rd] = result;
+  // Set CMSR when S bit is 1 and Rd is not PC
+  if(data->S == 1 && data->Rd != 31)
+    set_CMSR(pipline->regs, operand1, operand2,
+	     result, data->opcodes, shift_carry);
+  //printf("Operand2 : %.8x\n", operand2);
+  printf("Result : %.8x\n", result);
+  return;
 }
 
 void inst_Ex_L_S_R_offset(PIPLINE* pipline, int level){
@@ -157,6 +212,14 @@ int sign_extend(int imm, int size){
   return (imm << (32-size)) >> (32-size);
 }
 
+// execuate shift operation
+// operand - the operand to shift
+// imm - shift offset
+// shift_type - 0 : logical shift left
+//              1 : logical shift right
+//              2 : mathematical shift right
+//              3 : rotate shift right
+// return val - shift carry bit
 int shift_Ex(int32_t* operand, int imm, int shift_type){
   switch(shift_type){
   case 0:
@@ -171,6 +234,13 @@ int shift_Ex(int32_t* operand, int imm, int shift_type){
   return 0;
 }
 
+// execuate data, referred by 
+//          D_Imm_Shift, D_Reg_Shift, D_Immediate
+// operand1 - the first operand
+// operand2 - the second operand
+// opcodes - operation code, see file "inst.h"
+// carry - the carry bit of CMSR
+// return val - result of data execuation
 int32_t data_Ex(int32_t operand1, int32_t operand2, int opcodes, int carry){
   int32_t op1 = operand1;
   int32_t op2 = operand2;
@@ -208,9 +278,6 @@ void set_CMSR(REGISTERS* regs, int32_t operand1, int32_t operand2,
   if(opcodes == AND || opcodes == XOR || opcodes == CAND ||
      opcodes == CXOR || opcodes == ORR || opcodes == MOV ||
      opcodes == CLB || opcodes == MVN){
-    if(opcodes == MOV || opcodes == MVN)
-      if(operand1 == 0)
-	return;
     //set CMSR C bit
     if(shift_carry != -1)
       reg_setC(regs, shift_carry);
@@ -363,3 +430,4 @@ int rotate_shift_right(int32_t* operand, int imm){
 		       ((uint32_t)*operand << (32 - imm)));
   return result;
 }
+
