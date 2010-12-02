@@ -11,7 +11,6 @@
 #define CPU_NORMAL	1
 
 
-
 typedef struct{
   int cpu_id;
   int mode;
