@@ -1,0 +1,93 @@
+Simulator (simulator.c)
+  |----Process Module (process.c)
+  |  |----ELF_parser Module (ELF_parser.c)
+  |  |----Memory Module (mem.c)
+  |
+  |----CPU Module (CPU.c)
+  |  |----Cache Module (cache.c)
+  |  |----Register Module (register.c)
+  |  |----Pipline Module (pipline.c)
+  |  |  |----Decode Module (decode.c)
+  |  |  |----Instruction Execuation Module (instEx.c)
+  |
+  |----Debugger Module (Debugger.c)
+  |
+
+The struct of Process:
+typedef struct{
+  int status;
+  uint32_t entry;
+  PROC_STACK* stack;
+  PROC_MEM* mem;
+}PROCESS;
+
+
+The struct of Process Memory Management:
+typedef struct{
+  unsigned int vaddr_offset;
+  unsigned int size;
+  uint8_t *base;
+  int flag;
+}PROC_SEGMENT;
+
+typedef struct{
+  unsigned int seg_num;
+  PROC_SEGMENT * segments;
+}PROC_MEM;
+
+typedef PROC_SEGMENT PROC_STACK;
+
+
+The struct of CPU descriptor:
+typedef struct{
+  int cpu_id;
+  int mode;
+  REGISTERS* regs;
+  CACHE *i_cache, *d_cache;
+  PIPLINE * pipline;
+  PROCESS* proc;
+  CPU_info* cpu_info;
+}CPU_d;
+
+
+The struct of Cache:
+typedef struct{
+  int block_num;
+  int sign_bits_num;
+  PROC_MEM* mem;
+  int valid[CACHE_SIZE/CACHE_BLOCK_SIZE];
+  uint8_t data[CACHE_SIZE/CACHE_BLOCK_SIZE][CACHE_BLOCK_SIZE];
+  uint32_t mark[CACHE_SIZE/CACHE_BLOCK_SIZE];
+}CACHE;
+
+
+The struct of Register Heap:
+typedef struct{
+  int32_t r[32];
+  int32_t flag;
+}REGISTERS;
+
+The struct of Pipline:
+typedef struct{
+  int block;//1 means pipline block, 0 mean the opposite
+  PIPLINE_DATA* pipline_data[PIPLINE_LEVEL];
+  int using_regs[31];
+  PROC_STACK* stack;
+  REGISTERS* regs;
+  CACHE *i_cache, *d_cache;
+}PIPLINE;
+
+typedef struct{
+  uint32_t inst_addr;
+  uint32_t inst_code;
+  int inst_type;
+  int opcodes;
+  uint32_t Rn, Rd, Rs, Rm;
+  int imm;
+  int shift;
+  int rotate;
+  int cond;
+  int high_offset, low_offset;
+  int S, A, P, U, B, W, L, H;
+  uint32_t cur_inst_PC;
+}PIPLINE_DATA;
