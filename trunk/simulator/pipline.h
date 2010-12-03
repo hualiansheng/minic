@@ -22,15 +22,17 @@ typedef struct{
   int high_offset, low_offset;
   int S, A, P, U, B, W, L, H;
   uint32_t cur_inst_PC;
+  uint32_t addr;
 }PIPLINE_DATA;
 
 typedef struct{
   int block;//1 means pipline block, 0 mean the opposite
+  int block_reg;
   PIPLINE_DATA* pipline_data[PIPLINE_LEVEL];
-  int using_regs[31];
   PROC_STACK* stack;
   REGISTERS* regs;
   CACHE *i_cache, *d_cache;
+  int drain_pipline;
 }PIPLINE;
 
 typedef struct{
@@ -48,5 +50,6 @@ extern PIPLINE* pipline_initial(REGISTERS* regs, CACHE* i_cache,
 				CACHE* d_cache);
 extern int pipline_destroy(PIPLINE* pipline);
 extern int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info);
+extern void drain_pipline(PIPLINE* pipline, int level);
 
 #endif

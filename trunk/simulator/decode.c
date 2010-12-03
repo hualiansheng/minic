@@ -182,6 +182,7 @@ int decode_inst_decode(PIPLINE_DATA* _pipline_data){
   decode_pipline_data = _pipline_data;
   int inst_type =  get_bits(inst, 31, 29);
   int cycles;
+  printf("----Decoder : inst - 0x%.8x ----\n", inst);
   if(inst_type == 0 && get_bits(inst, 8, 8) == 0
      && get_bits(inst, 5, 5) == 0)
     cycles = inst_D_Imm_Shift();
