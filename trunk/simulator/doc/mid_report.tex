@@ -30,7 +30,7 @@
 \begin{document}
 \begin{CJK}{UTF8}{gbsn}
 
-\title[Simulator]{\huge Unicore Simulator Interim Report}
+\title[Simulator]{\huge Unicore Simulator Mid-term Report}
 \author[Author]{\begin{center}Li Chunqi \and Peng Zhuo \\ Wang Kan \and Hua Liansheng\end{center}}
 \date{\today}
 
@@ -57,15 +57,16 @@
 \subsection{Project Target Review}
 \begin{frame}
   \frametitle{Project Target Review}
+  Project target citing from opening report:
   \begin{itemize}
     \item
-      Realize CPU controller and datapath with {\color{red}five} level pipline
+      Simulate CPU controller and datapath with {\color{red}five} level pipline
     \item
-      Realize at least one level cache, {\color{red}Havard architecture}.
+      Simulate at least one level cache, {\color{red}Havard architecture}.
     \item
-      Realize dynamic memory management.
+      Simulate dynamic memory management.
     \item
-      Support of some system library functions.
+      Some system library functions are realized in an alternative way.
     \item
       Debugger utils and Performance Analysis utils support.
   \end{itemize}
@@ -84,6 +85,8 @@
     \item
       {\color{blue}7-8 weeks} Debugger module and some latter works.{\color{red}(To be finished in 1-2 week)}
   \end{itemize}
+  Program total lines : about 2000.
+  
   More infomation about our project progress, see our svn:
 
   {\color{blue}http://code.google.com/p/minic/wiki/MINICintroduction?tm=6}
@@ -226,7 +229,8 @@ typedef struct{
   Struct of Pipline:
 \begin{lstlisting}[language={C}]
 typedef struct{
-  int block;//1 means pipline block, 0 mean the opposite
+  int block;//1 means pipline block,
+            //0 mean the opposite
   PIPLINE_DATA* pipline_data[PIPLINE_LEVEL];
   int using_regs[31];
   PROC_STACK* stack;
@@ -236,26 +240,26 @@ typedef struct{
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Total Lines}
-  Project has {\color{blue}1987} lines until now.(Exclude blank lines)
-  \includegraphics[height=5cm]{count_line.png}
-\end{frame}
+%\begin{frame}
+%  \frametitle{Total Lines}
+%  Project has {\color{blue}1987} lines until now.(Exclude blank lines)
+%  \includegraphics[height=5cm]{count_line.png}
+%\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Project Bottleneck}
+\section{Project Bottlenecks}
 
 \begin{frame}
   \huge{Summary Before Mid-term Check}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Project Bottleneck}
-  Some problems when do the project
+  \frametitle{Project Bottlenecks}
+  Some problems when doing the project
   \begin{enumerate}
     \item Keeping each module independent is important but difficult.
     \item System library function handling is yet left to be realized.
-    \item Some instructions are not realized because of lacking manual.
+    \item Some instructions are not realized because of lack of manual.
     \item Instruction execuation module is hard to test and verify, bacause constructing test set is sometimes ambiguous.
     \item Too many modules leads to high maintenance cost.
     \item Some potential bugs need to be resolved.
