@@ -21,12 +21,12 @@ void reg_destroy(REGISTERS *regs){
 
 //flag operations
 //flag N operation
-int reg_setN(REGISTERS *regs, int N){
+int reg_setN(REGISTERS *regs, int n){
   if(regs == NULL)
     return 0;
-  if(N!=0)
-    N = 1;
-  regs->flag = regs->flag | (N<<31);
+  if(n!=0)
+    n = 1;
+  regs->flag = regs->flag | (n<<31);
   return 1;
 }
 
@@ -37,12 +37,12 @@ int reg_getN(REGISTERS *regs){
 }
 
 //flag Z operation
-int reg_setZ(REGISTERS *regs, int Z){
+int reg_setZ(REGISTERS *regs, int z){
   if(regs == NULL)
     return 0;
-  if(Z!=0)
-    Z = 1;
-  regs->flag = regs->flag | (Z<<30);
+  if(z!=0)
+    z = 1;
+  regs->flag = regs->flag | (z<<30);
   return 1;
 }
 
@@ -53,12 +53,12 @@ int reg_getZ(REGISTERS *regs){
 }
 
 //flag C operation
-int reg_setC(REGISTERS *regs, int C){
+int reg_setC(REGISTERS *regs, int c){
   if(regs == NULL)
     return 0;
-  if(C!=0)
-    C = 1;
-  regs->flag = regs->flag | (C<<29);
+  if(c!=0)
+    c = 1;
+  regs->flag = regs->flag | (c<<29);
   return 1;
 }
 
@@ -69,12 +69,12 @@ int reg_getC(REGISTERS *regs){
 }
 
 //flag V operation
-int reg_setV(REGISTERS *regs, int V){
+int reg_setV(REGISTERS *regs, int v){
   if(regs == NULL)
     return 0;
-  if(V!=0)
-    V = 1;
-  regs->flag = regs->flag | (V<<28);
+  if(v!=0)
+    v = 1;
+  regs->flag = regs->flag | (v<<28);
   return 1;
 }
 

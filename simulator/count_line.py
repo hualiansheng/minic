@@ -20,5 +20,5 @@ for i in files:
             print str(i)+" : "+str(length)+" lines."
             count=count+length
 
-print count
+print "----Total : " + str(count) + " lines.----"
     

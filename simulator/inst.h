@@ -18,6 +18,22 @@
 #define CLB 	14
 #define MVN 	15
 
+#define EQ    0
+#define NE    1
+#define UGE   2
+#define ULT   3
+#define N     4
+#define NN    5
+#define OV    6
+#define NV    7
+#define UGT   8
+#define ULE   9
+#define SGE   10
+#define SLT   11
+#define SGT   12
+#define SLE   13
+#define AL    14
+
 #define D_IMM_SHIFT    0
 #define D_REG_SHIFT    1
 #define MULTIPLY       2
