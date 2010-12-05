@@ -250,10 +250,8 @@ int analyze_live(func_block *fb)
 	{
 		for (j = 0; j < fb->width; j++)
 			fb->live_status[bb->end-base][j] = fb->v_out[bb->m][j];
-		for (i = bb->end; i > bb->begin; i--)
+		for (i = bb->end; i >= bb->begin; i--)
 		{
-			for (j = 0; j < fb->width; j++)
-				fb->live_status[i-1-base][j] = fb->live_status[i-base][j];			
 			tmp = triple_list[index_index[i]].tmp_uni;
 			arg1 = triple_list[index_index[i]].arg1_uni;
 			arg2 = triple_list[index_index[i]].arg2_uni;
@@ -268,6 +266,11 @@ int analyze_live(func_block *fb)
 			}
 			if (arg2 != -1)
 				change_live(fb, i-base, 0, arg2);
+			if (i > bb->begin)
+			{
+				for (j = 0; j < fb->width; j++)
+					fb->live_status[i-1-base][j] = fb->live_status[i-base][j];
+			}
 		}
 		if (bb == fb->start)
 			break;
@@ -278,9 +281,9 @@ int analyze_live(func_block *fb)
 int change_live(func_block *fb, int code_k, int def_or_use, int uni_k)
 {
 	if (def_or_use == 1)
-		fb->live_status[code_k-1][uni_k/32] = fb->live_status[code_k-1][uni_k/32] & (0xffffffff - (1 << (31 - uni_k%32)));
+		fb->live_status[code_k][uni_k/32] = fb->live_status[code_k][uni_k/32] & (0xffffffff - (1 << (31 - uni_k%32)));
 	else		
-		fb->live_status[code_k-1][uni_k/32] = fb->live_status[code_k-1][uni_k/32] | (1 << (31 - uni_k%32));
+		fb->live_status[code_k][uni_k/32] = fb->live_status[code_k][uni_k/32] | (1 << (31 - uni_k%32));
 	return 0;
 }
 
