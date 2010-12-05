@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 		print_interference_graph();
 		return 0;
 	}
-	register_allocation(2);
+	register_allocation(6);
 	print_register_allocation();
 	/*
 	 * TODO: next compilation step
