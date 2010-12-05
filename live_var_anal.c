@@ -1,6 +1,7 @@
 #include "basic_block.h"
 #include <stdlib.h>
 #include <memory.h>
+#include <assert.h>
 #define INIT_ITEM_NUM 64
 
 extern triple *triple_list;
@@ -54,21 +55,26 @@ int gen_uni_table(func_block *fb)
 	for (i = begin; i <= end; i++)
 	{
 		tmp_op = triple_list[index_index[i]].op;
-		if (tmp_op != if_op && tmp_op != if_not_op && tmp_op != goto_op && tmp_op != set_rb && tmp_op != call && tmp_op != param && tmp_op != enterS && tmp_op != enterF && tmp_op != leaveS && tmp_op != leaveF && tmp_op != return_op)
+		if (tmp_op != if_op && tmp_op != if_not_op && tmp_op != goto_op && tmp_op != set_rb && tmp_op != param && tmp_op != enterS && tmp_op != enterF && tmp_op != leaveS && tmp_op != leaveF && tmp_op != return_op)
 			triple_list[index_index[i]].tmp_uni = gen_tmp_item(fb, i);
 		else
 			triple_list[index_index[i]].tmp_uni = -1;
-		if (tmp_op == call)
+		if (tmp_op == call || tmp_op == goto_op)
 		{
 			triple_list[index_index[i]].arg1_uni = -1;
 			triple_list[index_index[i]].arg2_uni = -1;
 			continue;
-		}			
+		}
 		if (triple_list[index_index[i]].arg1_type == 0)
 			triple_list[index_index[i]].arg1_uni = get_uni_item(fb, i, triple_list[index_index[i]].arg1.var_name);
 		else if (triple_list[index_index[i]].arg1_type == 1)
 			triple_list[index_index[i]].arg1_uni = triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]].tmp_uni;
 			else triple_list[index_index[i]].arg1_uni = -1;
+		if (tmp_op == if_op || tmp_op == if_not_op)
+		{
+			triple_list[index_index[i]].arg2_uni = -1;
+			continue;
+		}
 		if (triple_list[index_index[i]].arg2_type == 0)
 			triple_list[index_index[i]].arg2_uni = get_uni_item(fb, i, triple_list[index_index[i]].arg2.var_name);
 		else if (triple_list[index_index[i]].arg2_type == 1)
@@ -80,7 +86,6 @@ int gen_uni_table(func_block *fb)
 
 int gen_tmp_item(func_block *fb, int i)
 {
-	int size;
 	symtbl_item *new_tmp_item = (symtbl_item*)malloc(sizeof(symtbl_item));
 	if ((fb->uni_item_num+1)*sizeof(symtbl_item) > fb->uni_table_size)
 	{
@@ -184,6 +189,12 @@ int set_prepare(func_block *fb)
 			if (def_use[j] == -1)
 				fb->use[i][j/32] = fb->use[i][j/32] | (1 << (31-j%32));
 		}
+		/*for (j = 0; j < fb->uni_item_num; j++)
+			printf("%d", def_use[j]);
+		printf("\n");
+		for (j = 0; j < fb->width; j++)
+			printf("%x", fb->use[i][j]);
+		printf("\n");*/
 	}
 	return 0;
 }
@@ -210,8 +221,12 @@ int solve_in_out(func_block *fb)
 					fb->v_out[i][j] = fb->v_out[i][j] | fb->v_in[bb->jump->m][j];
 			}
 			for (j = 0; j < fb->width; j++)
-				newin[j] = (fb->v_out[i][j] - (fb->v_out[i][j]&fb->def[i][j]
-							)) | fb->use[i][j];
+			{			
+				newin[j] = (fb->v_out[i][j] - (fb->v_out[i][j]&fb->def[i][j])) | fb->use[i][j];
+				//printf("%u\n", fb->use[i][j]);
+				//assert((int)fb->use[i][j] >= 0);
+				//assert((int)newin[j] >= 0);
+			}
 			for (j = 0; j < fb->width; j++)
 			{
 				if (fb->v_in[i][j] != newin[j])
@@ -230,7 +245,8 @@ int analyze_live(func_block *fb)
 	basic_block *bb;
 	int i, j, base, tmp, arg1, arg2;
 	base = fb->start->begin;
-	for (bb = fb->over; bb != fb->start; bb = bb->prev)
+	bb = fb->over;
+	for (bb = fb->over; ; bb = bb->prev)
 	{
 		for (j = 0; j < fb->width; j++)
 			fb->live_status[bb->end-base][j] = fb->v_out[bb->m][j];
@@ -253,6 +269,8 @@ int analyze_live(func_block *fb)
 			if (arg2 != -1)
 				change_live(fb, i-base, 0, arg2);
 		}
+		if (bb == fb->start)
+			break;
 	}
 	return 0;
 }

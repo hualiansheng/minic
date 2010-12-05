@@ -38,6 +38,7 @@ typedef struct func_block {
 	unsigned int **use;
 	map_table* mapping;
 	int map_table_size;
+	int *reg;
 }func_block;
 
 #endif

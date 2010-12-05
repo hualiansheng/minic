@@ -21,6 +21,7 @@ Options:\n\
 	-s Print symbol tables\n\
 	-i Print intermediate code\n\
 	-b Print basic block in a DOT file\n\
+	-g Print interference graph\n\
 	-a All of above = -tds\n");
 }
 int main(int argc, char** argv)
@@ -32,6 +33,7 @@ int main(int argc, char** argv)
 		dbg_print_tree_dot = 0,
 		dbg_no_intermediate = 0,
 		dbg_print_basic_block = 0,
+		dbg_print_interference_graph=0,
 		dbg_print_intermediate_code = 0;
 	int gen_symtbl_result ;
 	FILE* source_file;
@@ -40,7 +42,7 @@ int main(int argc, char** argv)
 	//symtable support: scope number
 	scope_number = 0;
 	//yydebug = 1;
-	while((oc = getopt(argc, argv, "dotsvaxib")) != -1)
+	while((oc = getopt(argc, argv, "dotsgaxib")) != -1)
 	{
 		switch(oc)
 		{
@@ -65,16 +67,25 @@ int main(int argc, char** argv)
 				dbg_print_tree = 1;
 				dbg_print_intermediate_code = 0;
 				dbg_print_basic_block = 0;
+				dbg_print_interference_graph = 0;
 				break;
 			case 'i':
 				dbg_print_tree = 0;
 				dbg_print_basic_block = 0;
+				dbg_print_interference_graph = 0;
 				dbg_print_intermediate_code = 1;
 				break;
 			case 'b':
 				dbg_print_intermediate_code = 0;
 				dbg_print_tree = 0;
+				dbg_print_interference_graph = 0;
 				dbg_print_basic_block = 1;
+				break;
+			case 'g':
+				dbg_print_intermediate_code = 0;
+				dbg_print_tree = 0;
+				dbg_print_interference_graph = 1;
+				dbg_print_basic_block = 0;
 				break;
 			default:
 				usage();
@@ -133,12 +144,25 @@ int main(int argc, char** argv)
 	}
 	intermediate_code(tree_root);
 	if(dbg_print_intermediate_code)
+	{
 		print_intermediate_code();
+		return 0;
+	}	
 	gen_basic_block();
 	if(dbg_print_basic_block)
+	{	
 		print_basic_block();
+		return 0;
+	}	
 	live_var_anal();
-	//print_live_var();
+	print_live_var();
+	if(dbg_print_interference_graph)
+	{	
+		print_interference_graph();
+		return 0;
+	}
+	register_allocation(3);
+	print_register_allocation();
 	/*
 	 * TODO: next compilation step
 	 */

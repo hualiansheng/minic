@@ -1,6 +1,7 @@
 #include "AST.h"
 #include "gen_intermediate_code.h"
 #include "basic_block.h"
+#include "register.h"
 #include <stdio.h>
 #include <memory.h>
 char name[][30] = {"PROGRAM","EXTERNAL_DECLS","DECLARATION","FUNCTION_LIST","TYPE_NAME","VAR_LIST","VAR_ITEM","ARRAY_VAR","SCALAR_VAR","FUNCTION_DEF","FUNCTION_HDR","PARM_TYPE_LIST","PARM_LIST","PARM_DECL","FUNCTION_BODY","INTERNAL_DECLS","STATEMENT_LIST","STATEMENT","COMPOUNDSTMT","NULLSTMT","EXPRESSION_STMT","IFSTMT","FOR_STMT","WHILE_STMT","RETURN_STMT","EXPRESSION","ASSIGNMENT_EXPRESSION","LVALUE","RVALUE","OP","CONSTANT","ARGUMENT_LIST","EXTERN_T","REGISTER_T","VOID_T","INT_T","CHAR_T","IF_T","ELSE_T","FOR_T","WHILE_T","RETURN_T","BOOLEAN_OP_T","REL_OP_T","DOUBLE_OP_T","ICONSTANT_T","CHAR_CONSTANT_T","STRING_CONSTANT_T","SEMICOLON","COMMA","STAR","LEFT_SQUARE_BRACKET","RIGHT_SQUARE_BRACKET","LEFT_PARENTHESE","RIGHT_PARENTHESE","LEFT_BRACE","RIGHT_BRACE","EQUALITY_SIGN","MINUS_SIGN","PLUS_SIGN","MULTIPLY_SIGN","POSITIVE_SIGN","NEGATIVE_SIGN","NOT_SIGN","ADDRESS_SIGN","IDENT_T","EPSILON"};
@@ -186,6 +187,61 @@ void print_live_var()
 					fprintf(out, "(%d) ", triple_list[i].arg2.temp_index);
 				else	fprintf(out, "%d ", triple_list[i].arg2.temp_index);
 			fprintf(out, "\n");
+		}
+		fprintf(out, "---------------------------------------------------------------------------------------------------\n");
+	}
+	fclose(out);
+}
+
+void print_interference_graph()
+{
+	int i, j, l, x, y;
+	func_block *fb;
+	printf("strict graph G {\n");
+	for (fb = fblist; fb != NULL; fb = fb->next)
+	{
+		for (l = 0; l < fb->code_num; l++)
+		{
+			for (i = 0; i < fb->uni_item_num-1; i++)
+			{
+				x = (fb->live_status[l][i/32] & (1<<(31-i%32))) >> (31-i%32);
+				for (j = i+1; j < fb->uni_item_num; j++)
+				{
+					y = (fb->live_status[l][j/32] & (1<<(31-j%32))) >> (31-j%32);
+					if (x == 1 && y == 1)
+					{					
+						if (fb->mapping[i].isTmp == 1)
+							printf("%d", fb->mapping[i].tmp_k);
+						else
+							printf("%s", fb->mapping[i].var_name);
+						printf("\t--\t");
+						if (fb->mapping[j].isTmp == 1)
+							printf("%d", fb->mapping[j].tmp_k);
+						else
+							printf("%s", fb->mapping[j].var_name);
+						printf(";\n");
+					}
+				}
+			}
+		}
+	}
+	printf("}\n");	
+}
+
+void print_register_allocation()
+{
+	FILE *out = fopen("register_allocation.debug", "w");
+	func_block *fb;
+	int i, j;
+	for (fb = fblist; fb != NULL; fb = fb->next)
+	{
+		for (i = 0; i < fb->uni_item_num; i++)
+		{
+			if (fb->mapping[i].isTmp == 1)
+				fprintf(out, "(%d)", fb->mapping[i].tmp_k);
+			else
+				fprintf(out, "%s", fb->mapping[i].var_name);
+			fprintf(out, "\t\t%d\n", fb->reg[i]);
 		}
 		fprintf(out, "---------------------------------------------------------------------------------------------------\n");
 	}
