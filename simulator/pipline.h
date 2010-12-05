@@ -51,5 +51,6 @@ extern PIPLINE* pipline_initial(REGISTERS* regs, CACHE* i_cache,
 extern int pipline_destroy(PIPLINE* pipline);
 extern int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info);
 extern void drain_pipline(PIPLINE* pipline, int level);
+extern int sign_extend(int imm, int size);
 
 #endif

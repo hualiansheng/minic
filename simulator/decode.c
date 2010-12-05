@@ -25,7 +25,7 @@ uint32_t get_bits(uint32_t num, int bit_num_high, int bit_num_low){
 }
 
 int inst_D_Imm_Shift(){
-  printf("----Decoder : Inst Type - inst_D_Imm_Shift.----\n");
+  //printf("----Decoder : Inst Type - inst_D_Imm_Shift.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = D_IMM_SHIFT;
   pd->opcodes = get_bits(pd->inst_code, 28, 25);
@@ -39,7 +39,7 @@ int inst_D_Imm_Shift(){
 }
 
 int inst_D_Reg_Shift(){
-  printf("----Decoder : Inst Type - inst_D_Reg_Shift.----\n");
+  //printf("----Decoder : Inst Type - inst_D_Reg_Shift.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = D_REG_SHIFT;
   pd->opcodes = get_bits(pd->inst_code, 28, 25);
@@ -53,7 +53,7 @@ int inst_D_Reg_Shift(){
 }
 
 int inst_Multiply(){
-  printf("----Decoder : Inst Type - inst_Multiply.----\n");
+  //printf("----Decoder : Inst Type - inst_Multiply.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = MULTIPLY;
   pd->A = get_bits(pd->inst_code, 25, 25);
@@ -66,7 +66,7 @@ int inst_Multiply(){
 }
 
 int inst_Branch_Ex(){
-  printf("----Decoder : Inst Type - inst_Branch_Ex.----\n");
+  //printf("----Decoder : Inst Type - inst_Branch_Ex.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = BRANCH_EX;
   pd->L = get_bits(pd->inst_code, 24, 24);
@@ -75,7 +75,7 @@ int inst_Branch_Ex(){
 }
 
 int inst_D_Immediate(){
-  printf("----Decoder : Inst Type - inst_D_Immediate.----\n");
+  //printf("----Decoder : Inst Type - inst_D_Immediate.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = D_IMMEDIATE;
   pd->opcodes = get_bits(pd->inst_code, 28, 25);
@@ -88,7 +88,7 @@ int inst_D_Immediate(){
 }
 
 int inst_L_S_R_offset(){
-  printf("----Decoder : Inst Type - inst_L_S_R_offset.----\n");
+  //printf("----Decoder : Inst Type - inst_L_S_R_offset.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = L_S_R_OFFSET;
   pd->P = get_bits(pd->inst_code, 28, 28);
@@ -105,7 +105,7 @@ int inst_L_S_R_offset(){
 }
 
 int inst_L_S_Hw_Sb_Rof(){
-  printf("----Decoder : Inst Type - inst_L_S_Hw_Sb_Rof.----\n");
+  //printf("----Decoder : Inst Type - inst_L_S_Hw_Sb_Rof.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = L_S_HW_SB_ROF;
   pd->P = get_bits(pd->inst_code, 28, 28);
@@ -121,7 +121,7 @@ int inst_L_S_Hw_Sb_Rof(){
 }
 
 int inst_L_S_Hw_Sb_Iof(){
-  printf("----Decoder : Inst Type - inst_L_S_Hw_Sb_Iof.----\n");
+  //printf("----Decoder : Inst Type - inst_L_S_Hw_Sb_Iof.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = L_S_HW_SB_IOF;
   pd->P = get_bits(pd->inst_code, 28, 28);
@@ -139,7 +139,7 @@ int inst_L_S_Hw_Sb_Iof(){
 }
 
 int inst_L_S_I_offset(){
-  printf("----Decoder : Inst Type - inst_L_S_I_offset.----\n");
+  //printf("----Decoder : Inst Type - inst_L_S_I_offset.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = L_S_I_OFFSET;
   pd->P = get_bits(pd->inst_code, 28, 28);
@@ -154,7 +154,7 @@ int inst_L_S_I_offset(){
 }
 
 int inst_Branch_Link(){
-  printf("----Decoder : Inst Type - inst_Branch_Link.----\n");
+  //printf("----Decoder : Inst Type - inst_Branch_Link.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = BRANCH_LINK;
   pd->cond = get_bits(pd->inst_code, 28, 25);
@@ -164,7 +164,7 @@ int inst_Branch_Link(){
 }
 
 int inst_ST(){
-  printf("----Decoder : Inst Type - inst_ST.----\n");
+  //printf("----Decoder : Inst Type - inst_ST.----\n");
   PIPLINE_DATA* pd = decode_pipline_data;
   pd->inst_type = ST;
   pd->imm = get_bits(pd->inst_code, 23, 0);
@@ -182,7 +182,7 @@ int decode_inst_decode(PIPLINE_DATA* _pipline_data){
   decode_pipline_data = _pipline_data;
   int inst_type =  get_bits(inst, 31, 29);
   int cycles;
-  printf("----Decoder : inst - 0x%.8x ----\n", inst);
+  //printf("----Decoder : inst - 0x%.8x ----\n", inst);
   if(inst_type == 0 && get_bits(inst, 8, 8) == 0
      && get_bits(inst, 5, 5) == 0)
     cycles = inst_D_Imm_Shift();
@@ -213,7 +213,7 @@ int decode_inst_decode(PIPLINE_DATA* _pipline_data){
   else if(get_bits(inst, 31, 24) == 0xFF)
     cycles = inst_ST();
   else{
-    fprintf(stderr, "Decoder Error : Unrecognize instruction 0x%x.\n", inst);
+    //fprintf(stderr, "Decoder Error : Unrecognize instruction 0x%x.\n", inst);
     cycles = inst_unknown();
     return -1;
   }

@@ -69,11 +69,16 @@ int mem_fetch(PROC_MEM* mem, unsigned int addr,
       //printf("offset=%d\n", offset);
       src_addr = src_addr + offset;
       memcpy(data, src_addr, data_size);
+      //printf("Segment Num : %d\n", i);
+      //printf("vaddr_offset : 0x%.8x, size: %d\n", (mem->segments[i]).vaddr_offset, (mem->segments[0]).size);
+      //printf("High bound : 0x%.8x\n", (mem->segments[i]).vaddr_offset+ (mem->segments[i]).size);
       return 0;
     }
   }
+  printf("vaddr_offset : 0x%.8x, size: %d\n", (mem->segments[i]).vaddr_offset, (mem->segments[0]).size);
+  printf("High bound : 0x%.8x\n", (mem->segments[i]).vaddr_offset+ (mem->segments[i]).size);
   data = NULL;
-  fprintf(stderr, "mem_fetch : Not an effective address\n");
+  fprintf(stderr, "mem_fetch : Not an effective address : 0x%.8x\n", addr);
   exit(1);
 }
 

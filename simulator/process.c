@@ -6,7 +6,7 @@
 #include "process.h"
 
 int stack_initial(PROC_SEGMENT* stack, unsigned int stack_size){
-  stack->vaddr_offset = 0x10000000 - stack_size * 4;
+  stack->vaddr_offset = 0x10000000 - stack_size;
   stack->size = stack_size;
   stack->flag = SEG_RD | SEG_WR;
   stack->base = malloc(stack_size * sizeof(uint8_t));

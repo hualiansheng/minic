@@ -8,6 +8,7 @@
 #define SEG_EX	1
 
 #define DATA_RD 4
+#define DATA_WR 2
 #define DATA_EX 1
 
 typedef struct{
@@ -35,6 +36,6 @@ extern int mem_fetch(PROC_MEM* mem, uint32_t addr,
 extern int mem_set(PROC_MEM* mem, uint32_t addr,
 	    void *data, unsigned int data_size);
 extern int mem_type(PROC_MEM* mem, uint32_t addr);
-extern int mem_invalid(PROC_MEM* mem, uint32_t addr);
+extern int mem_invalid(PROC_MEM* mem, uint32_t addr);// incalid return 0, else return -1
 
 #endif

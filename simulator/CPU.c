@@ -35,7 +35,7 @@ int CPU_load_process(CPU_d* cpu, PROCESS* proc){
   cache_mem_link(cpu->i_cache, proc->mem);
   cache_mem_link(cpu->d_cache, proc->mem);
   cpu->regs->REG_PC = proc->entry;
-  cpu->regs->REG_SP = (uint32_t)proc->stack->vaddr_offset + (uint32_t)(proc->stack->size * 4);
+  cpu->regs->REG_SP = (uint32_t)proc->stack->vaddr_offset + (uint32_t)(proc->stack->size);
   cpu->pipline->stack = proc->stack;
   return 1;
 }
@@ -45,12 +45,18 @@ int CPU_next_beat(CPU_d* cpu){
   //cpu->regs->r[24] = 1;
   for(i=0; i<20; i++){
     pipline_next_step(cpu->pipline, cpu->cpu_info);
-    debugger_print_registers(cpu->regs, -1);
+    //debugger_print_mem(cpu->proc->mem, 0x020003cc);
+    //debugger_modify_register(cpu->regs, 0, -1);
+    //debugger_modify_mem(cpu->proc->mem, 0x020085b0, -1);
+    //debugger_print_mem(cpu->proc->mem, 0x020085b0);
+    debugger_print_stack(cpu->proc->mem, cpu->regs->REG_SP);
+    debugger_modify_stack(cpu->proc->mem, cpu->regs->REG_SP,
+			  cpu->regs->REG_SP, -1);
     printf("\n");
   }
-  debugger_print_cpu_info(cpu->cpu_info);
+  //debugger_print_cpu_info(cpu->cpu_info);
   
-//  pipline_next_step(cpu->pipline, cpu->cpu_info);
+  //pipline_next_step(cpu->pipline, cpu->cpu_info);
   return 1;
 }
 

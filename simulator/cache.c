@@ -52,7 +52,7 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
   c_r.cpu_cycles = CACHE_MISSED_CYCLE;
   presult = (uint32_t*)&(cache->data[block_index][in_block_index]);
   c_r.data = *presult;
-  printf("Cache missed! Data : 0x%x\n", c_r.data);
+  //printf("Cache missed! Data : 0x%x\n", c_r.data);
   return c_r;
 }
 
@@ -70,7 +70,7 @@ CACHE_RETURN cache_hit(CACHE* cache, uint32_t addr){
   c_r.cpu_cycles = CACHE_HIT_CYCLE;
   presult = (uint32_t*)&(cache->data[block_index][in_block_index]);
   c_r.data = *presult;
-  printf("Cache Hit! Data : 0x%x\n", c_r.data);
+  //printf("Cache Hit! Data : 0x%x\n", c_r.data);
   return c_r;
 }
 
@@ -96,12 +96,13 @@ int cache_rewrite(CACHE* cache, uint32_t addr){
     }
     mem_set(cache->mem, block_addr, (cache->data)[block_index],
 	    CACHE_BLOCK_SIZE-in_block_count);
-    printf("Rewrite NO. %d block.\n", block_index);
+    //printf("Rewrite NO. %d block.\n", block_index);
     return 0;
   }
   else if(type != -1){
-    printf("Read only address, NO. %d block rewrite ignored.\n",
-	   block_index);
+    fprintf(stderr,
+	    "Warning : Read only address, NO. %d block rewrite ignored.\n",
+	    block_index);
     return 1;
   }
   return -1;
@@ -138,6 +139,50 @@ CACHE_RETURN cache_search(CACHE* cache, uint32_t addr){
       c_r.cpu_cycles = -1;
   }
   return c_r;
+}
+
+int cache_write(CACHE* cache, uint32_t addr, uint32_t data, int data_type){
+  CACHE_RETURN c_r;
+  memset(&c_r, 0, sizeof(CACHE_RETURN));
+  int block_index;
+  int mark_addr;
+  int in_block_index;
+  block_index = (addr % CACHE_SIZE)/CACHE_BLOCK_SIZE;
+  mark_addr = addr >> ((int)(log(CACHE_SIZE)/log(2)));
+  in_block_index = addr % CACHE_BLOCK_SIZE;
+  //printf("block index : %x\n", block_index);
+  //printf("mark_addr : %x\n", mark_addr);
+  //printf("in block index : %x\n", in_block_index);
+  if(cache->mem == NULL){
+    fprintf(stderr, "No memory linked to cache!");
+    exit(1);
+  }
+  if(cache->valid[block_index] == 0){
+    cache->valid[block_index] = 1;
+    c_r = cache_miss(cache, addr);
+  }
+  else if(cache->mark[block_index] == mark_addr){
+    c_r = cache_hit(cache, addr);
+  }
+  else{
+    int re_tmp = cache_rewrite(cache, addr);
+    if(re_tmp == 0)
+      c_r = cache_miss(cache, addr);
+    else
+      c_r.cpu_cycles = -1;
+  }
+  // Make data right
+  if(data_type == DATA_B){
+    data = data & 0x000000FF;
+    data = data | (c_r.data & 0xFFFFFF00);
+  }else if(data_type == DATA_HW){
+    data = data & 0x0000FFFF;
+    data = data | (c_r.data & 0xFFFF0000);
+  }
+  int32_t* presult;
+  presult = (int32_t*)&(cache->data[block_index][in_block_index]);
+  *presult = data;
+  return 0;
 }
 
 int cache_destroy(CACHE* cache){
