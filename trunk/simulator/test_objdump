@@ -227,7 +227,7 @@ Disassembly of section .text:
 
 020003bc <Factorial>:
  20003bc:	1a07001d 	mov	ip, sp
-          000 1101 0 00000 11100 0000 0 00 0 01110 
+          000 1101 0 00000 11100 0000 0 00 0 1q1101 
  20003c0:	92eeec40 	stm.w	(r23, r24, sl, fp, ip, lr, pc), [sp-]
 		      1001 0010 1110 1110 1110 1100 0100 0000
  20003c4:	24e6c004 	sub	fp, ip, #4	; 0x4

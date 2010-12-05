@@ -11,6 +11,9 @@
 #define WORD_WIDTH		32
 #define CACHE_MISSED_CYCLE	8
 #define CACHE_HIT_CYCLE		1
+#define DATA_W      0
+#define DATA_HW     1
+#define DATA_B      2
 
 typedef struct{
   int block_num;
@@ -23,12 +26,13 @@ typedef struct{
 
 typedef struct{
   int cpu_cycles;
-  uint32_t data;
+  int32_t data;
 }CACHE_RETURN;
 
 extern CACHE* cache_initial(PROC_MEM* _mem);
 extern int cache_mem_link(CACHE* cache, PROC_MEM* _mem);
-extern CACHE_RETURN cache_search(CACHE* cache,uint32_t addr);
+extern CACHE_RETURN cache_search(CACHE* cache, uint32_t addr);
+extern int cache_write(CACHE* cache, uint32_t addr, uint32_t data, int data_type);
 extern int cache_destroy(CACHE* cache);
 
 #endif

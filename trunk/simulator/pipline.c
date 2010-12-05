@@ -2,6 +2,7 @@
 #include "decode.h"
 #include <malloc.h>
 #include <memory.h>
+#include <stdlib.h>
 
 #include "instEx.h"
 
@@ -39,24 +40,24 @@ int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
   cpu_info->cache_visit += pipline_cpu_info->cache_visit;
   cpu_info->cache_miss += pipline_cpu_info->cache_miss;
   
-  printf("CPU total cycle : %d\n", pipline_cpu_info->cycles_total);
-  printf("CPU work cycle : %d\n", pipline_cpu_info->cycles_work);
+  //printf("CPU total cycle : %d\n", pipline_cpu_info->cycles_total);
+  //printf("CPU work cycle : %d\n", pipline_cpu_info->cycles_work);
   
   free(pipline_cpu_info);
     
   /*
-  printf("==============================\n");
-  printf("PC : %x\n", pipline->regs->REG_PC);
-  printf("now inst : %x\n", (pipline->pipline_data[0])->inst_code);
-  printf("now inst cycles : %d\n", cpu_info->cycles_total);
-  printf("===============================\n\n");
+    printf("==============================\n");
+    printf("PC : %x\n", pipline->regs->REG_PC);
+    printf("now inst : %x\n", (pipline->pipline_data[0])->inst_code);
+    printf("now inst cycles : %d\n", cpu_info->cycles_total);
+    printf("===============================\n\n");
   */
 
   return 0;
 }
 
 int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
-  printf("--Fetching Instruction.--\n");
+  //printf("--Fetching Instruction.--\n");
   PIPLINE_DATA* data = malloc(sizeof(PIPLINE_DATA));
   CACHE_RETURN cache_return;
   uint32_t addr = pipline->regs->REG_PC;
@@ -100,19 +101,21 @@ int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info){
        inst_type == L_S_R_OFFSET || inst_type == L_S_HW_SB_ROF)
       if(pipline->block_reg == pipline->pipline_data[1]->Rm)
 	pipline->block = 1;
+    //printf("Set block!!!\n");
   }
 
-  if(pipline->pipline_data[1] == NULL)
+  /*
+    if(pipline->pipline_data[1] == NULL)
     printf("--Instruction Decoder Level Empty.--\n");
-  else
+    else
     printf("--Decoding Instruction--\n");
-    
+  */
   return 1;
 }
 
 int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   if(pipline->block != 0){
-    printf("--Inst Execuation Level Blocked.--\n");
+    //printf("--Inst Execuation Level Blocked.--\n");
     pipline->block --;
     cpu_info->bubbles ++;
     if(pipline->block == 0)
@@ -129,25 +132,112 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
     drain_pipline(pipline, 2);
     pipline->drain_pipline = 0;
   }
+  
   if(pipline->pipline_data[2] == NULL)
     printf("--Inst Execuation Level Empty.--\n");
   else
-    printf("--Ececuating Instruction--\n");
+    printf("--Ececuating Instruction : 0x%.8x--\n", pipline->pipline_data[2]->inst_code);
   
   return 1;
 }
 
 int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
   if(pipline->pipline_data[2] != NULL){
-
+    PIPLINE_DATA* data = pipline->pipline_data[2];
+    if(data->inst_type == L_S_R_OFFSET ||
+       data->inst_type == L_S_I_OFFSET ||
+       data->inst_type == L_S_HW_SB_ROF ||
+       data->inst_type == L_S_HW_SB_IOF){
+      //printf("----Visiting Mem, inst code : 0x%.8x\n.----", data->inst_code);
+      //printf("--Mem addr : 0x%.8x\n.--", data->addr);
+    }
+    if(data->inst_type == L_S_R_OFFSET
+       || data->inst_type == L_S_I_OFFSET){
+      if(data->B == 0 && data->addr % 4 != 0){
+	fprintf(stderr, "Error : Data Transprotation Error.\n");
+	exit(1);
+      }
+      CACHE_RETURN cache_return;
+      cache_return = cache_search(pipline->d_cache, data->addr);
+      // update cpu info about cache
+      cpu_info->cache_visit ++;
+      if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)
+	cpu_info->cache_miss ++;
+      if(cpu_info->cycles_total < cache_return.cpu_cycles)
+	cpu_info->cycles_total = cache_return.cpu_cycles;
+      // update cpu info about mem
+      if(data->L == 1)
+	cpu_info->rd_mem_times ++;
+      else
+	cpu_info->wr_mem_times ++;
+      // visit memory
+      if(data->L == 1)
+	pipline->regs->r[data->Rd] = cache_return.data;
+      else{
+	if(data->B == 1)
+	  cache_write(pipline->d_cache, data->addr,
+		      pipline->regs->r[data->Rd], DATA_B);
+	else
+	  cache_write(pipline->d_cache, data->addr,
+		      pipline->regs->r[data->Rd], DATA_W);
+      }
+      // handle when PC is Rd, drain pipline
+      if(data->L == 1 && data->Rd == 31)
+	pipline->drain_pipline = 1;
+    }
+    else if(data->inst_type == L_S_HW_SB_ROF ||
+	    data->inst_type == L_S_HW_SB_IOF){
+      CACHE_RETURN cache_return;
+      cache_return = cache_search(pipline->d_cache, data->addr);
+      // update cpu info about cache
+      cpu_info->cache_visit ++;
+      if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)
+	cpu_info->cache_miss ++;
+      if(cpu_info->cycles_total < cache_return.cpu_cycles)
+	cpu_info->cycles_total = cache_return.cpu_cycles;
+      // update cpu info about mem
+      if(data->L == 1)
+	cpu_info->rd_mem_times ++;
+      else
+	cpu_info->wr_mem_times ++;
+      // visit memory
+      if(data->L == 1){
+	if(data->H == 1){
+	  pipline->regs->r[data->Rd] = cache_return.data & 0x0000FFFF;
+	  if(data->S == 1)
+	    pipline->regs->r[data->Rd] = sign_extend(pipline->regs->r[data->Rd], 16);
+	}
+	else{
+	  pipline->regs->r[data->Rd] = cache_return.data & 0x000000FF;
+	  if(data->S == 1)
+	    pipline->regs->r[data->Rd] = sign_extend(pipline->regs->r[data->Rd], 8);
+	}
+      }
+      else{
+	if(data->H == 1)
+	  cache_write(pipline->d_cache, data->addr,
+		      pipline->regs->r[data->Rd], DATA_HW);
+	else
+	  cache_write(pipline->d_cache, data->addr,
+		      pipline->regs->r[data->Rd], DATA_B);
+      }
+      // handle when PC is Rd, drain pipline
+      if(data->L == 1 && data->Rd == 31)
+	pipline->drain_pipline = 1;
+    }
   }
   pipline->pipline_data[3] = pipline->pipline_data[2];
   pipline_Ex(pipline, cpu_info);
-  
+  if(pipline->drain_pipline == 1){
+    drain_pipline(pipline, 3);
+    pipline->drain_pipline = 0;
+  }
+  /*
   if(pipline->pipline_data[3] == NULL)
     printf("--Memory Level Empty.--\n");
   else
     printf("--Writing Memory--\n");
+  */
   return 1;
 }
 
@@ -165,11 +255,12 @@ int pipline_WB(PIPLINE* pipline, CPU_info* cpu_info){
     free(pipline->pipline_data[4]);
   pipline->pipline_data[4] = pipline->pipline_data[3];
   pipline_Mem(pipline, cpu_info);
-  
+  /*
   if(pipline->pipline_data[4] == NULL)
     printf("--Write Back Level Empty.--\n");
   else
     printf("--Writing Back--\n");
+  */
   return 1;
 }
 
@@ -181,7 +272,10 @@ void drain_pipline(PIPLINE* pipline, int level){
       free(pipline->pipline_data[i]);
     pipline->pipline_data[i] = NULL;
   }
-  printf("--Drain pipline.--\n");
+  //printf("--Drain pipline.--\n");
   return;
 }
 
+int sign_extend(int imm, int size){
+  return (imm << (32-size)) >> (32-size);
+}

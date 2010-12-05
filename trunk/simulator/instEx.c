@@ -89,8 +89,8 @@ int inst_Ex(PIPLINE* pipline, CPU_info* cpu_info, int level){
 // The execuation func of Ex_D_Imm_Shift
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_D_Imm_Shift instruction : 0x%.8x.----\n",
-         pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_D_Imm_Shift instruction : 0x%.8x.----\n",
+  //       pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   int32_t operand1, operand2;
   int32_t result;
@@ -127,8 +127,8 @@ int inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
 // The execuation func of Ex_D_Reg_Shift
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_D_Reg_Shift(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_D_Reg_Shift instruction : 0x%.8x.----\n",
-         pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_D_Reg_Shift instruction : 0x%.8x.----\n",
+  //       pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   int32_t operand1, operand2;
   int32_t result;
@@ -162,8 +162,8 @@ int inst_Ex_D_Reg_Shift(PIPLINE* pipline, int level){
 // The execuation func of Ex_Multiply instruction
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_Multiply(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_Multiply instruction : 0x%.8x.----\n",
-         pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_Multiply instruction : 0x%.8x.----\n",
+  //       pipline->pipline_data[level]->inst_code);
   int32_t operand_Rm, operand_Rn, operand_Rs;
   int32_t result;
   PIPLINE_DATA* data = pipline->pipline_data[level];
@@ -204,8 +204,8 @@ int inst_Ex_Multiply(PIPLINE* pipline, int level){
 // The execuation func of Ex_Branch_Ex instruction
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_Branch_Ex(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_Branch_Ex instruction : 0x%.8x.----\n",
-         pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_Branch_Ex instruction : 0x%.8x.----\n",
+  //       pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   if(data->L == 1)
     pipline->regs->REG_LR = data->cur_inst_PC;
@@ -217,8 +217,8 @@ int inst_Ex_Branch_Ex(PIPLINE* pipline, int level){
 // The execuation func of Ex_D_Immediate
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_D_Immediate(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_D_Immediate instruction : 0x%.8x.----\n",
-         pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_D_Immediate instruction : 0x%.8x.----\n",
+  //       pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   int32_t operand1, operand2;
   int32_t result;
@@ -258,7 +258,7 @@ int inst_Ex_D_Immediate(PIPLINE* pipline, int level){
 // The execuation func of Ex_L_S_R_offset
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_L_S_R_offset(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_L_S_R_offset instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_L_S_R_offset instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   // addr is the final address
   // addr_c is the address which is calculated
@@ -289,7 +289,7 @@ int inst_Ex_L_S_R_offset(PIPLINE* pipline, int level){
 // The execuation func of Ex_L_S_Hw_Sb_Rof
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_L_S_Hw_Sb_Rof(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_L_S_Hw_Sb_Rof instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_L_S_Hw_Sb_Rof instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   // addr is the final address
   // addr_c is the address which is calculated
@@ -320,7 +320,7 @@ int inst_Ex_L_S_Hw_Sb_Rof(PIPLINE* pipline, int level){
 // The execuation func of Ex_L_S_Hw_Sb_Iof
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_L_S_Hw_Sb_Iof(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_L_S_Hw_Sb_Iof instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_L_S_Hw_Sb_Iof instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   // addr is the final address
   // addr_c is the address which is calculated
@@ -353,7 +353,7 @@ int inst_Ex_L_S_Hw_Sb_Iof(PIPLINE* pipline, int level){
 // The execuation func of Ex_L_S_I_offset
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_L_S_I_offset(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_L_S_I_offset instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_L_S_I_offset instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   // addr is the final address
   // addr_c is the address which is calculated
@@ -380,7 +380,7 @@ int inst_Ex_L_S_I_offset(PIPLINE* pipline, int level){
 // The execuation func of Ex_Branch_Link
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_Branch_Link(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_Branch_Link instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_Branch_Link instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
   data->imm = sign_extend(data->imm, 24);
   //printf("PC of this inst : %.8x\n", data->cur_inst_PC);
@@ -396,7 +396,7 @@ int inst_Ex_Branch_Link(PIPLINE* pipline, int level){
 // The execuation func of
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_ST(PIPLINE* pipline, int level){
-  printf("----Execuating Ex_Ex_ST instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
+  //printf("----Execuating Ex_Ex_ST instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
   fprintf(stderr, "Software Trap, unknown manner.\n");
   exit(1);
   return 0;
@@ -405,14 +405,12 @@ int inst_Ex_ST(PIPLINE* pipline, int level){
 // The execuation func of
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Unknown(PIPLINE* pipline, int level){
-  printf("----Execuating Unknown instruction : 0x%.8x.----\n",
-	 pipline->pipline_data[level]->inst_code);
+  fprintf(stderr,
+	  "Warning : Execuating Unknown instruction : 0x%.8x, ignored.\n",
+	  pipline->pipline_data[level]->inst_code);
   return 1;
 }
 
-int sign_extend(int imm, int size){
-  return (imm << (32-size)) >> (32-size);
-}
 
 // execuate shift operation
 // operand - the operand to shift
