@@ -639,6 +639,8 @@ int rvalue_code(AST_NODE *p)
 int lvalue_code(AST_NODE *p)
 {
 	int temp_rvalue = 0;
+	char* b_ident;
+	int b_sizetype;
 	symtbl_item *temp_symtbl;
 	AST_NODE *ptr;
 	if(p->leftChild->nodeType == IDENT_T && p->leftChild->rightSibling == NULL)
@@ -659,11 +661,92 @@ int lvalue_code(AST_NODE *p)
 		else return temp_rvalue;
 	}
 	else{
+//b_ident: get the basic address	
+		ptr = p->leftChild;
+		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
+		b_ident = p->leftChild->content.s_content;
+		assert(temp_symtbl != NULL);
+		if(temp_symtbl->type == CHAR_T ) b_sizetype = 0;
+		else b_sizetype = 1;
+
+		ptr = p->leftChild->rightSibling->rightSibling;
+		temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+
+		if(b_sizetype == 0){
+			switch(temp_rvalue){
+			case -1:{
+				temp_symtbl = symtbl_query(ptr->symtbl,temp_ID, 0);
+				if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 0){
+					add_triple(char_to_int_op, (int)temp_ID,-1,1,0,-1);
+					add_triple(add_op, (int)b_ident, triple_list_index-1,b_sizetype,0,1);
+				}
+				else add_triple(add_op, (int)b_ident, (int)temp_ID , b_sizetype,0,0);
+				break;
+			}
+			case -2:{
+				add_triple(add_op,(int)b_ident,const_value,b_sizetype,0,2);
+				break;
+			}
+			case -3:{
+				add_triple(add_op,(int)b_ident,const_value,b_sizetype,0,2);
+				break;
+			}
+			case -4:{
+				add_triple(add_op,(int)b_ident,(int)const_string,b_sizetype,0,3);
+				break;
+			}
+			default:{
+				if(triple_list[temp_rvalue].result_type == 0){
+					add_triple(char_to_int_op, temp_rvalue,-1,1,1,-1);
+					add_triple(add_op, (int)b_ident, triple_list_index-1,b_sizetype,0,1);
+				}
+				else add_triple(add_op,(int)b_ident,temp_rvalue,b_sizetype,0,1);
+				break;
+			}			
+			}
+		}
+
+		else{
+			switch(temp_rvalue){
+			case -1:{
+				temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
+				if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 0){
+					add_triple(char_to_int_op, (int)temp_ID,-1,1,0,-1);
+					add_triple(adds_op, (int)b_ident, triple_list_index-1,b_sizetype,0,1);
+				}
+				else
+				add_triple(adds_op, (int)b_ident, (int)temp_ID , b_sizetype,0,0);
+				break;
+			}
+			case -2:{
+				add_triple(adds_op,(int)b_ident,const_value,b_sizetype,0,2);
+				break;
+			}
+			case -3:{
+				add_triple(adds_op,(int)b_ident,const_value,b_sizetype,0,2);
+				break;
+			}
+			case -4:{
+				add_triple(adds_op,(int)b_ident,(int)const_string,b_sizetype,0,3);
+				break;
+			}
+			default:{
+				if(triple_list[temp_rvalue].result_type == 0){
+					add_triple(char_to_int_op, temp_rvalue,-1,1,1,-1);
+					add_triple(adds_op, (int)b_ident, triple_list_index-1,b_sizetype,0,1);
+				}
+				else add_triple(adds_op,(int)b_ident,temp_rvalue,b_sizetype,0,1);
+				break;
+			}			
+			}
+		}
+		return triple_list_index - 1;
+/*
 		ptr = p->leftChild->rightSibling->rightSibling;
 		temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0){
+		if(temp_symtbl->type == CHAR_T){
 			switch(temp_rvalue){
 			case -1:{
 				add_triple(multiply_op, (int)temp_ID,1,1,0,2);
@@ -682,7 +765,7 @@ int lvalue_code(AST_NODE *p)
 				break;
 			}
 			default:{
-				add_triple(multiply_op,temp_rvalue,4,1,1,2);
+				add_triple(multiply_op,temp_rvalue,1,1,1,2);
 				break;
 			}
 			}
@@ -719,6 +802,7 @@ int lvalue_code(AST_NODE *p)
 		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num ==0)	add_triple(add_op, (int)ptr->content.s_content, triple_list_index - 1, 0, 0, 1);
 		else 	add_triple(add_op, (int)ptr->content.s_content, triple_list_index - 1, 1, 0, 1);
 		return triple_list_index - 1;
+		*/
 	}
 }
 int assignment_expression_code(AST_NODE *p)
@@ -888,7 +972,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 			temp_index = triple_list_index-1;
 			add_triple(op, var1, temp_index, 1, var_type1, 1);	
 		}
-		else if(size_type1 == 0 && size_type2 == 1){
+		else if(size_type1 == 0 && size_type2 == 1 && op != assign_op){
 			/**Brills modified here: -1 for var_type1??*/			
 			add_triple(char_to_int_op, var1,-1,1,var_type1,-1);
 			temp_index = triple_list_index-1;
