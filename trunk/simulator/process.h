@@ -2,6 +2,7 @@
 #define _PROCESS_H_
 
 #include "mem.h"
+#include "breakpoint.h"
 #include <stdint.h>
 
 #define	PROC_READY	0
@@ -16,6 +17,7 @@ typedef struct{
   uint32_t entry;
   PROC_STACK* stack;
   PROC_MEM* mem;
+  BP_LIST* bp_list;
 }PROCESS;
 
 extern PROCESS* proc_initial(char* filename);

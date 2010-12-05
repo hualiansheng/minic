@@ -7,8 +7,10 @@
 #include "cache.h"
 #include "pipline.h"
 
-#define CPU_TRAP	0
+#define CPU_TRAP	  0
 #define CPU_NORMAL	1
+#define CPU_STOP    2
+#define CPU_INIT    3
 
 
 typedef struct{
