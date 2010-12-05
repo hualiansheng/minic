@@ -44,6 +44,8 @@ PROCESS* proc_initial(char* filename){
     		 phdr->p_memsz, (void *)data, phdr->p_filesz);
   }
 
+  proc->bp_list = bp_initial();
+
   proc->status = PROC_READY;
   //proc->entry = ELF_entry_point();
   proc->entry = ELF_main_entry();
@@ -57,5 +59,6 @@ int proc_destroy(PROCESS* proc){
   if(proc->mem != NULL)
     mem_destroy(proc->mem);
   free(proc);
+  bp_destroy(proc->bp_list);
   return 0;
 }

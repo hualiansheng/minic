@@ -101,6 +101,7 @@ uint32_t ELF_main_entry(){
   Elf32_Sym * sym;
   int strtab_index = 0;
   scn = NULL;
+  data = NULL;
   while((scn = elf_nextscn(e, scn)) != NULL){
     if(gelf_getshdr(scn, &shdr) != &shdr){
       fprintf(stderr, "getshdr() failed.\n");
