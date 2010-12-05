@@ -217,7 +217,7 @@ int if_code(AST_NODE *p)
 		case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
 		case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
 		case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
-		default: add_triple(if_op, temp_ID, triple_list_index + 2, 0, 1, 1);
+		default: add_triple(if_op, (int)exp, triple_list_index + 2, 0, 1, 1);
 		}
 		backpatch = triple_list_index;
 		add_triple(goto_op, -1, -1, 0, 1, -1);
@@ -233,13 +233,13 @@ int if_code(AST_NODE *p)
 		last = triple_list_index - 1;
 		triple_list[backpatch].arg1 = (union arg)(last + 1);
 		return triple_list_index - 1;
-	}		
+	}
+	return triple_list_index -1;
 }
 
 int compound_code(AST_NODE *p)
 {
 	AST_NODE *ptr;
-	int last;
 	add_triple(enterS, -1, -1, -1, -1, -1);
 	push_scope(p->symtbl);
 	ptr = p->leftChild->rightSibling->rightSibling;
@@ -251,7 +251,6 @@ int compound_code(AST_NODE *p)
 	gen_intermediate_code(ptr);
 	add_triple(leaveS, -1, -1, -1, -1, -1);
 	pop_scope();
-	//return last;
 	return triple_list_index - 1;
 }
 
@@ -277,10 +276,10 @@ int for_code(AST_NODE *p)
 		 * Brills modified here:
 		 * argument 2 of if-goto should be an index
 		 */
-	case -1:add_triple(if_op, temp_ID, triple_list_index + 2, 0, 0, 1);break;
+	case -1:add_triple(if_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
 	case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
 	case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-	case -4:add_triple(if_op, const_string, triple_list_index + 2, 0, 3, 1);break;
+	case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
 	default: add_triple(if_op, exp, triple_list_index + 2, 0, 1, 1);
 	}
 	add_triple(goto_op, -1, -1, 0, 1, -1);
@@ -312,10 +311,10 @@ int while_code(AST_NODE *p)
 		 * Brills modified here:
 		 * arg2_type of add_triple below should be 1 (temp_var)
 		 */
-	case -1:add_triple(if_op, temp_ID, triple_list_index + 2, 0, 0, 1);break;
+	case -1:add_triple(if_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
 	case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
 	case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-	case -4:add_triple(if_op, const_string, triple_list_index + 2, 0, 3, 1);break;
+	case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
 	default: add_triple(if_op, exp, triple_list_index + 2, 0, 1, 1);
 	}
 	backpatch = triple_list_index;
@@ -346,7 +345,6 @@ int rvalue_code(AST_NODE *p)
 	int temp_rvalue2=0;
 	symtbl_item* temp_symtbl;
 	symtbl_hdr* temp_hdr;
-	int temp_const;
 	int temp_index;
 	stack_item temp_item;
 	int *arg_list;
@@ -431,18 +429,18 @@ int rvalue_code(AST_NODE *p)
 				 * what is the difference between CHAR_T and INT_T here??
 				 */
 				//if(temp_symtbl->type == CHAR_T){
-				if(temp_symtbl->type == CHAR_T){
-					if(p->leftChild->content.i_content == PLUSPLUS) add_triple(add_op, ptr->leftChild->content.s_content, 1, 0, 0, 2);
-					else add_triple(minus_op, ptr->leftChild->content.s_content, 1, 0, 0, 2);
+				if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0){
+					if(p->leftChild->content.i_content == PLUSPLUS) add_triple(add_op, (int)ptr->leftChild->content.s_content, 1, 0, 0, 2);
+					else add_triple(minus_op, (int)ptr->leftChild->content.s_content, 1, 0, 0, 2);
 					temp_index = triple_list_index-1;
-					add_triple(assign_op, ptr->leftChild->content.s_content, temp_index, 0, 0, 1);
+					add_triple(assign_op, (int)ptr->leftChild->content.s_content, temp_index, 0, 0, 1);
 				}
 				else{					
-					if(p->leftChild->content.i_content == PLUSPLUS) add_triple(add_op, ptr->leftChild->content.s_content, 1, 1, 0, 2);
-					else add_triple(minus_op, ptr->leftChild->content.s_content, 1, 1, 0, 2);
+					if(p->leftChild->content.i_content == PLUSPLUS) add_triple(add_op, (int)ptr->leftChild->content.s_content, 1, 1, 0, 2);
+					else add_triple(minus_op, (int)ptr->leftChild->content.s_content, 1, 1, 0, 2);
 					//add_triple(add_op, ptr->leftChild->content.s_content, 1, 1, 0, 2);
 					temp_index = triple_list_index-1;
-					add_triple(assign_op, ptr->leftChild->content.s_content, temp_index, 1, 0, 1);
+					add_triple(assign_op, (int)ptr->leftChild->content.s_content, temp_index, 1, 0, 1);
 				}					
 			}
 			else{
@@ -568,7 +566,7 @@ int rvalue_code(AST_NODE *p)
 			if(ptr->leftChild->nodeType == EXPRESSION){
 				temp_rvalue = gen_triple_code[ptr->leftChild->nodeType-FUNC_OFFSET](ptr->leftChild);
 				if(temp_rvalue == -1){
-					arg_list[arg_num] = temp_ID;
+					arg_list[arg_num] =(int)temp_ID;
 					arg_type_list[arg_num] = 0;
 					arg_num ++;		
 				}
@@ -582,7 +580,7 @@ int rvalue_code(AST_NODE *p)
 						arg_type_list[arg_num] = 2;
 					}
 					else if(ptr->leftChild->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
-						arg_list[arg_num] = const_string;
+						arg_list[arg_num] = (int)const_string;
 						arg_type_list[arg_num] = 3;
 					}
 					arg_num ++;
@@ -599,7 +597,7 @@ int rvalue_code(AST_NODE *p)
 				temp_rvalue = gen_triple_code[ptr->leftChild->rightSibling->rightSibling->nodeType-FUNC_OFFSET](ptr->leftChild->rightSibling->rightSibling);
 
 				if(temp_rvalue == -1){
-					arg_list[arg_num] = temp_ID;
+					arg_list[arg_num] = (int)temp_ID;
 					arg_type_list[arg_num] = 0;
 					arg_num ++;		
 				}
@@ -613,7 +611,7 @@ int rvalue_code(AST_NODE *p)
 						arg_type_list[arg_num] = 2;
 					}
 					else if(ptr->leftChild->rightSibling->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
-						arg_list[arg_num] = const_string;
+						arg_list[arg_num] = (int)const_string;
 						arg_type_list[arg_num] = 3;
 					}
 					arg_num ++;
@@ -636,14 +634,13 @@ int rvalue_code(AST_NODE *p)
 		return triple_list_index - 1;
 	}//end case 4
 	}
-	
+	return triple_list_index -1;
 }
 int lvalue_code(AST_NODE *p)
 {
 	int temp_rvalue = 0;
 	symtbl_item *temp_symtbl;
 	AST_NODE *ptr;
-	int temp_const;
 	if(p->leftChild->nodeType == IDENT_T && p->leftChild->rightSibling == NULL)
 	{
 		temp_ID = p->leftChild->content.s_content;
@@ -655,8 +652,8 @@ int lvalue_code(AST_NODE *p)
 			ptr = p->leftChild->rightSibling;
 			temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
 			assert(temp_symtbl != NULL);
-			if(temp_symtbl->type == CHAR_T)	add_triple(add_op, temp_ID,0,1,0,2);
-			else 	add_triple(add_op, temp_ID,0,1,0,2);
+			if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0)	add_triple(add_op, (int)temp_ID,0,1,0,2);
+			else 	add_triple(add_op, (int)temp_ID,0,1,0,2);
 			return triple_list_index - 1;
 		}
 		else return temp_rvalue;
@@ -666,10 +663,10 @@ int lvalue_code(AST_NODE *p)
 		temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T){
+		if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0){
 			switch(temp_rvalue){
 			case -1:{
-				add_triple(multiply_op, temp_ID,1,1,0,2);
+				add_triple(multiply_op, (int)temp_ID,1,1,0,2);
 				break;
 			}
 			case -2:{
@@ -681,7 +678,7 @@ int lvalue_code(AST_NODE *p)
 				break;
 			}
 			case -4:{
-				add_triple(multiply_op,const_string,1,1,3,2);
+				add_triple(multiply_op,(int)const_string,1,1,3,2);
 				break;
 			}
 			default:{
@@ -693,7 +690,7 @@ int lvalue_code(AST_NODE *p)
 		else{
 			switch(temp_rvalue){
 			case -1:{
-				add_triple(multiply_op, temp_ID,4,1,0,2);
+				add_triple(multiply_op, (int)temp_ID,4,1,0,2);
 				break;
 			}
 			case -2:{
@@ -705,7 +702,7 @@ int lvalue_code(AST_NODE *p)
 				break;
 			}
 			case -4:{
-				add_triple(multiply_op,const_string,4,1,3,2);
+				add_triple(multiply_op,(int)const_string,4,1,3,2);
 				break;
 			}
 			default:{
@@ -719,14 +716,13 @@ int lvalue_code(AST_NODE *p)
 		ptr = p->leftChild;
 		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
 		assert (temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T)	add_triple(add_op, ptr->content.s_content, triple_list_index - 1, 0, 0, 1);
-		else 	add_triple(add_op, ptr->content.s_content, triple_list_index - 1, 1, 0, 1);
+		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num ==0)	add_triple(add_op, (int)ptr->content.s_content, triple_list_index - 1, 0, 0, 1);
+		else 	add_triple(add_op, (int)ptr->content.s_content, triple_list_index - 1, 1, 0, 1);
 		return triple_list_index - 1;
 	}
 }
 int assignment_expression_code(AST_NODE *p)
 {
-	AST_NODE *ptr;
 	int temp_rvalue = 0;
 	int temp_lvalue = 0;
 	if(p->leftChild->leftChild->nodeType == IDENT_T && p->leftChild->leftChild->rightSibling == NULL) temp_lvalue = -1;
@@ -743,13 +739,12 @@ int return_code(AST_NODE *p)
 		return triple_list_index-1;
 	}		
 	temp_rvalue = gen_triple_code[p->leftChild->rightSibling->nodeType-FUNC_OFFSET](p->leftChild->rightSibling);
-	//int temp_const;
 	switch(temp_rvalue){
 	case -1:{
 		temp_symtbl = symtbl_query(p->symtbl,temp_ID,  0);
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T)	add_triple(return_op,temp_ID, -1, 0, 0,-1);
-		else add_triple(return_op,temp_ID, -1, 1, 0,-1);
+		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num ==0)	add_triple(return_op,(int)temp_ID, -1, 0, 0,-1);
+		else add_triple(return_op,(int)temp_ID, -1, 1, 0,-1);
 		break;
 	}
 	case -2:{
@@ -762,7 +757,7 @@ int return_code(AST_NODE *p)
 		break;
 	}
 	case -4:{
-		add_triple(return_op, const_string, -1, 1, 3, -1);
+		add_triple(return_op, (int)const_string, -1, 1, 3, -1);
 		break;
 	}
 	default:{
@@ -778,13 +773,12 @@ void add_triple_single_op(int temp_rvalue, enum operator op, AST_NODE *ptr)
 {
 	symtbl_item* temp_symtbl;
 	temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
-	//int temp_const;
 	switch(temp_rvalue){
 	case -1:{
 		temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T)	add_triple(op,temp_ID, -1, 0, 0,-1);
-		else add_triple(op,temp_ID, -1, 1, 0,-1);
+		if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0)	add_triple(op,(int)temp_ID, -1, 0, 0,-1);
+		else add_triple(op,(int)temp_ID, -1, 1, 0,-1);
 		break;
 	}
 	case -2:{
@@ -797,7 +791,7 @@ void add_triple_single_op(int temp_rvalue, enum operator op, AST_NODE *ptr)
 		break;
 	}
 	case -4:{
-		add_triple(op, const_string, -1, 1, 3, -1);
+		add_triple(op, (int)const_string, -1, 1, 3, -1);
 		break;
 	}
 	default:{
@@ -818,7 +812,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	temp_rvalue1 = gen_triple_code[ptr1->nodeType-FUNC_OFFSET](ptr1);
 	switch(temp_rvalue1){
 	case -1:{
-		var1 = temp_ID;
+		var1 = (int)temp_ID;
 		temp_symtbl = symtbl_query(ptr1->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
 		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 0) size_type1 = 0;
@@ -839,7 +833,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		break;	
 	}
 	case -4:{
-		var1 = const_string;
+		var1 = (int)const_string;
 		size_type1 = 1;
 		var_type1 = 2;
 		break;
@@ -854,7 +848,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	temp_rvalue2 = gen_triple_code[ptr2->nodeType-FUNC_OFFSET](ptr2);
 	switch(temp_rvalue2){
 	case -1:{
-		var2 = temp_ID;
+		var2 = (int)temp_ID;
 		temp_symtbl = symtbl_query(ptr2->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
 		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 0) size_type2 = 0;
@@ -875,7 +869,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		break;	
 	}
 	case -4:{
-		var2 = const_string;
+		var2 = (int)const_string;
 		size_type2 = 1;
 		var_type2 = 2;
 		break;
@@ -936,17 +930,17 @@ void resume_doubleop(AST_NODE *p)
 		temp_item = pop();
 		if(temp_item.item_type == 0){
 			temp_symtbl = symtbl_query(p->symtbl,temp_item.item.var_name, 0);
-			if(temp_symtbl->type == CHAR_T) {
-				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 0, 0, 2);
-				else add_triple(minus_op, temp_item.item.var_name, 1, 0, 0, 2);
+			if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0) {
+				if(temp_item.flag == 1) add_triple(add_op, (int)temp_item.item.var_name, 1, 0, 0, 2);
+				else add_triple(minus_op, (int)temp_item.item.var_name, 1, 0, 0, 2);
 				a_index = triple_list_index-1;
-				add_triple(assign_op, temp_item.item.var_name, a_index, 0, 0, 1);
+				add_triple(assign_op, (int)temp_item.item.var_name, a_index, 0, 0, 1);
 			}
 			else {
-				if(temp_item.flag == 1) add_triple(add_op, temp_item.item.var_name, 1, 1, 0, 2);
-				else add_triple(minus_op, temp_item.item.var_name, 1, 1, 0, 2);
+				if(temp_item.flag == 1) add_triple(add_op, (int)temp_item.item.var_name, 1, 1, 0, 2);
+				else add_triple(minus_op, (int)temp_item.item.var_name, 1, 1, 0, 2);
 				a_index = triple_list_index-1;
-				add_triple(assign_op, temp_item.item.var_name, a_index, 1, 0, 1);
+				add_triple(assign_op, (int)temp_item.item.var_name, a_index, 1, 0, 1);
 			}		
 		}
 		else{
