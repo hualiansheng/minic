@@ -221,12 +221,14 @@ int union_node(func_block *fb, int i, int j)
 		if ((var_vexs[j].adj_vexs[l/32] & (1<<(31-l%32))) == (1<<(31-l%32)))
 		{
 			var_vexs[l].adj_vexs[j/32] = var_vexs[l].adj_vexs[j/32] - (1<<(31-j%32));
-			var_vexs[l].adj_vexs[i/32] = var_vexs[l].adj_vexs[j/32] | (1<<(31-i%32));
 			if ((var_vexs[i].adj_vexs[l/32] & (1<<(31-l%32))) != (1<<(31-l%32)))
 			{
+				var_vexs[l].adj_vexs[i/32] = var_vexs[l].adj_vexs[j/32] | (1<<(31-i%32));
 				var_vexs[i].adj_vexs[l/32] = var_vexs[i].adj_vexs[l/32] | (1<<(31-l%32));
 				new_deg++;
 			}
+			else
+				var_vexs[l].deg--;
 		}
 	}
 	var_vexs[i].deg = new_deg;

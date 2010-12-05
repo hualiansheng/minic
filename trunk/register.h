@@ -3,5 +3,4 @@ typedef struct var_vertex {
 	struct var_vertex* con_vexs;
 	int* adj_vexs;
 	int deg;
-	int reg;
 }var_vertex;
