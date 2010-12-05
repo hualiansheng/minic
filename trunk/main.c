@@ -19,8 +19,9 @@ Options:\n\
 	-o Print AST in a DOT file\n\
 	-t Print ASCII AST tree\n\
 	-s Print symbol tables\n\
-	-v Print type verification debug output\n\
-	-a All of above = -tdsv\n");
+	-i Print intermediate code\n\
+	-b Print basic block in a DOT file\n\
+	-a All of above = -tds\n");
 }
 int main(int argc, char** argv)
 {	
@@ -28,7 +29,6 @@ int main(int argc, char** argv)
 	int oc,
 		dbg_print_tree = 0,
 		dbg_print_symtbl = 0,
-		dbg_type_check = 0,
 		dbg_print_tree_dot = 0,
 		dbg_no_intermediate = 0,
 		dbg_print_basic_block = 0,
@@ -53,13 +53,9 @@ int main(int argc, char** argv)
 			case 's':
 				dbg_print_symtbl = 1;
 				break;
-			case 'v':
-				dbg_type_check = 1;
-				break;
 			case 'a':
 				yydebug = dbg_print_tree
 					= dbg_print_symtbl 
-					= dbg_type_check 
 					= 1;
 				break;
 			case 'x':
@@ -142,7 +138,7 @@ int main(int argc, char** argv)
 	if(dbg_print_basic_block)
 		print_basic_block();
 	live_var_anal();
-	print_live_var();
+	//print_live_var();
 	/*
 	 * TODO: next compilation step
 	 */
