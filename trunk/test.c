@@ -1,10 +1,13 @@
 int main()
 {
-	int i;
-	for (i = 0; i < 10; i++)
+	int a, b, temp;
+	b = 64;
+	a = 100;
+	while (b)
 	{
-		i++;
-		i--;
+		temp = b;
+		b = a - b;
+		a = temp;
 	}
 	return 0;
 }

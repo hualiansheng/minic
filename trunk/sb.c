@@ -1,38 +1,13 @@
-int f(int a, int b)
-{
-	int c;
-	c = 1;
-	while (a < b)
-	{
-		c = c * 2;
- 		a++;
-	}
-	return c;
-}
-
 int main()
 {
-	int i, j, n;
-	int a[10], min, temp;
+	int i, n, min, temp;
 	min = 0; 
 	n = 10;
-	for(i = 0 ;i < n ; i++){
-		min = a[i];
-		temp = i;
-		for(j = i ; j < n ; j ++){
-			if(a[j] < min){
-				min = a[j];
-				temp = j;		
-			}					
-		}
-		a[temp] = a[i];
-		a[i] = min;
+	for(i = 0 ;i < n ; i++) {
+		temp = i - 1;
+		if(temp < min)
+			temp = i;
+		min = i + 1;
 	}
 }
 
-int g()
-{
-	int k;
-	k = 1;
-	return 0;
-}
