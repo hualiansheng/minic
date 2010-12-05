@@ -29,6 +29,9 @@ int triple_list_index=0;
 int scope_top=0;
 int scope_size;
 
+void gen_intermediate_code(AST_NODE *root);
+int statement_code(AST_NODE *p);
+void resume_doubleop(AST_NODE *p);
 void gen_code_initial()
 {
 	int i;
@@ -86,8 +89,6 @@ stack_item pop()
 //add a triple item
 void add_triple(enum operator op, int arg1, int arg2, int result_type, int arg1_type, int arg2_type)
 {
-	union arg tmp1 = (union arg)arg1;
-	union arg tmp2 = (union arg)arg2; 
 	int i;
 	if(triple_list_index == triple_list_size){
 		i = triple_list_size * sizeof(triple);
@@ -132,7 +133,6 @@ void intermediate_code(AST_NODE* root)
 }
 void gen_intermediate_code(AST_NODE *root)
 {
-	//gen_code_initial();
 	AST_NODE* p = root;
 	AST_NODE* ptr;
 	symtbl_item* temp_symtbl;
@@ -189,10 +189,10 @@ int if_code(AST_NODE *p)
 		 * argument 2 of if-goto should be an index.
 		 */
 		switch(exp){
-		case -1:add_triple(if_op, temp_ID, triple_list_index + 2, 0, 0, 1);break;
+		case -1:add_triple(if_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
 		case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
 		case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-		case -4:add_triple(if_op, const_string, triple_list_index + 2, 0, 3, 1);break;
+		case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
 		default: add_triple(if_op, exp, triple_list_index + 2, 0, 1, 1);
 		}
 		backpatch = triple_list_index;
@@ -213,10 +213,10 @@ int if_code(AST_NODE *p)
 			 * Brills modified here:
 			 * the argument 2 of if-goto should be an index.
 			 */
-		case -1:add_triple(if_op, temp_ID, triple_list_index + 2, 0, 0, 1);break;
+		case -1:add_triple(if_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
 		case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
 		case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-		case -4:add_triple(if_op, const_string, triple_list_index + 2, 0, 3, 1);break;
+		case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
 		default: add_triple(if_op, temp_ID, triple_list_index + 2, 0, 1, 1);
 		}
 		backpatch = triple_list_index;
@@ -805,29 +805,6 @@ void add_triple_single_op(int temp_rvalue, enum operator op, AST_NODE *ptr)
 		break;
 	}
 	}
-/*
-	if(temp_rvalue == -1){
-		temp_symtbl = symtbl_query(temp_ID, ptr->symtbl, 0);
-		if(temp_symtbl->type == CHAR_T)	add_triple(op,temp_ID, -1, 0, 0,0);
-		else add_triple(op,temp_ID, -1, 1, 0,0);
-	}
-	else if (temp_rvalue == -2){
-		if(ptr->leftChild->leftChild->nodeType == ICONSTANT_T){
-			temp_const = ptr->leftChild->leftChild->content.i_content;
-			add_triple(op, temp_const, -1, 1, 2, 0);
-		}
-		else if(ptr->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
-			temp_const = ptr->leftChild->leftChild->.content.c_content;
-			add_triple(op, temp_const, -1, 0, 2, 0);
-		}
-		else if(ptr->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
-			temp_const = ptr->leftChild->leftChild->.content.s_content;
-			add_triple(op, temp_const, -1, 1, 3, 0);
-		}
-	}
-	else add_triple(op, temp_rvalue, -1, triple_list[temp_rvalue].type_result, 1, 0);
-*/
-	
 }
 void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, AST_NODE *ptr1, AST_NODE *ptr2)//1, 2分别对应两个操作数
 {
@@ -844,7 +821,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		var1 = temp_ID;
 		temp_symtbl = symtbl_query(ptr1->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T) size_type1 = 0;
+		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 0) size_type1 = 0;
 		else size_type1 = 1;
 		var_type1 = 0;
 		break;
@@ -880,7 +857,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		var2 = temp_ID;
 		temp_symtbl = symtbl_query(ptr2->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T) size_type2 = 0;
+		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 0) size_type2 = 0;
 		else size_type2 = 1;
 		var_type2 = 0;
 		break;
@@ -909,69 +886,6 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		var_type2 = 1;
 	}
 	}
-/*
-	//var1
-	if(temp_rvalue1 == -1){
-		var1 = (union arg)ptr1->content.s_content;
-		temp_symtbl = symtbl_query(ptr1->content.s_content, ptr1->symtbl, 0);
-		if(temp_symtbl->type == CHAR_T) size_type1 = 0;
-		else size_type1 = 1;
-		var_type1 = 0;
-	}
-	else if (temp_rvalue1 == -2){
-		if(ptr1->leftChild->leftChild->nodeType == ICONSTANT_T){
-			var1 = (union arg)ptr1->leftChild->leftChild->content.i_content;
-			size_type1 = 1;
-			var_type1 = 2;
-		}
-		else if(ptr1->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
-			var1 = (union arg)ptr1->leftChild->leftChild->content.i_content;
-			size_type1 = 0;
-			var_type1 = 2;
-		}
-		else if(ptr1->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
-			var1 = (union arg)ptr1->leftChild->leftChild->content.i_content;
-			size_type1 = 0;
-			var_type1 = 3;
-		}
-	}
-	else {
-		var1 = (union arg)temp_rvalue1;
-		size_type1 = triple_list[temp_rvalue1].type_result;
-		var_type1 = 1;
-	}
-
-	//var2
-	if(temp_rvalue2 == -1){
-		var2 = (union arg)ptr2->content.s_content;
-		temp_symtbl = symtbl_query(ptr2->content.s_content, ptr2->symtbl, 0);
-		if(temp_symtbl->type == CHAR_T) size_type2 = 0;
-		else size_type2 = 1;
-		var_type2 = 0;
-	}
-	else if (temp_rvalue2 == -2){
-		if(ptr2->leftChild->leftChild->nodeType == ICONSTANT_T){
-			var2 = (union arg)ptr2->leftChild->leftChild->content.i_content;
-			size_type2 = 1;
-			var_type2 = 2;
-		}
-		else if(ptr2->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
-			var2 = (union arg)ptr2->leftChild->leftChild->content.i_content;
-			size_type2 = 0;
-			var_type2 = 2;
-		}
-		else if(ptr2->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
-			var2 = (union arg)ptr2->leftChild->leftChild->content.i_content;
-			size_type2 = 0;
-			var_type2 = 3;
-		}
-	}
-	else {
-		var2 = (union arg)temp_rvalue1;
-		size_type2 = triple_list[temp_rvalue2].type_result;
-		var_type2 = 1;
-	}
-*/
 	if(op == add_op || op == minus_op || op == multiply_op || op == assign_op || op == star_assign_op){
 		if(size_type1 == 1 && size_type2 == 0){
 			/**Brills modified here: -1 for var_type2??*/

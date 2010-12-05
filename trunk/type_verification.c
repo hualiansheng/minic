@@ -59,10 +59,6 @@ data_type check_type_assignment(AST_NODE* assignment_node)
 	{
 		if(child_type[j].type == -1 )return check_wrong();
 	}
-	/*if(check_double(child_type[1].type,child_type[0],child_type[2]) == 0){
-		return check_wrong();
-	}
-	else return child_type[0];*/
 	return check_double(child_type[1].type,child_type[0],child_type[2]);
 }
 data_type check_type_lvalue(AST_NODE* lvalue)
@@ -330,7 +326,30 @@ data_type check_double(int op_type,data_type op1, data_type op2)
 		}
 		break;
 	}
-	case OP:{
+	case REL_OP_T:{
+		if(op1.star_num != op2.star_num){
+			printf("warning!\n");
+			op1.type = INT_T;
+			op1.star_num = 0;
+			op1.size = -1;
+			return op1;
+		}
+		else if(op1.type != op2.type){
+			printf("warning!\n");
+			op1.type = INT_T;
+			op1.star_num = 0;
+			op1.size = -1;
+			return op1;
+		}
+		else{
+			op1.type = INT_T;
+			op1.star_num = 0;
+			op1.size = -1;
+			return op1;
+		}
+		break;
+	}
+	case BOOLEAN_OP_T:{
 		if(op1.star_num != op2.star_num){
 			printf("warning!\n");
 			op1.type = INT_T;
@@ -429,5 +448,6 @@ data_type check_wrong()
 	temp.type = -1;
 	temp.star_num = -1;
 	temp.size = -1;
+	error_number = 1;
 	return temp;
 }
