@@ -195,6 +195,18 @@ int cache_write(CACHE* cache, uint32_t addr, uint32_t data, int data_type){
   return 0;
 }
 
+int cache_update(CACHE* cache, uint32_t addr){
+  int block_index;
+  block_index = (addr % CACHE_SIZE)/CACHE_BLOCK_SIZE;
+  if(cache->mem == NULL){
+    fprintf(stderr, "No memory linked to cache!");
+    exit(1);
+  }
+  if(cache->valid[block_index] == 1)
+    cache_miss(cache, addr);
+  return 1;
+}
+
 int cache_destroy(CACHE* cache){
   free(cache);
   return 1;

@@ -61,6 +61,9 @@ int console_next_cmd(CPU_d* cpu, char* filename){
   else if(strcmp(cmd.command, "n") == 0 ||
 	  strcmp(cmd.command, "next") == 0)
     console_next(cpu);
+  else if(strcmp(cmd.command, "m") == 0 ||
+	  strcmp(cmd.command, "modify") == 0)
+    console_modify(cpu, cmd);
   else
     console_help(cmd);
   return 1;
@@ -276,12 +279,53 @@ int console_info(CPU_d* cpu, CMD cmd){
     return 0;
   }
   if(strcmp(cmd.args[0], "registers") == 0 ||
-     strcmp(cmd.args[0], "register") == 0)
+     strcmp(cmd.args[0], "register") == 0 ||
+     strcmp(cmd.args[0], "r") == 0)
     debugger_print_register(cpu->regs, -1);
-  else if(strcmp(cmd.args[0], "stack") == 0)
+  else if(strcmp(cmd.args[0], "stack") == 0 ||
+	  strcmp(cmd.args[0], "s") == 0)
     debugger_print_stack(cpu->proc->mem, cpu->regs->REG_SP);
   else
     console_help_info();
+  return 1;
+}
+
+int console_modify(CPU_d* cpu, CMD cmd){
+  if(cmd.arg_num < 3){
+    console_help_modify();
+    return 0;
+  }
+  uint32_t addr;
+  int32_t content;
+  // parse second param, addr or the number of register
+  if(cmd.args[1][0] == '0' && cmd.args[1][1] == 'x'){
+    cmd.args[1][0] = ' ';
+    cmd.args[1][1] = ' ';
+    sscanf(cmd.args[1], "  %x", &addr);
+  }else
+    sscanf(cmd.args[1], "%d", &addr);
+  // parse third param, content
+  if(cmd.args[2][0] == '0' && cmd.args[2][1] == 'x'){
+    cmd.args[2][0] = ' ';
+    cmd.args[2][1] = ' ';
+    sscanf(cmd.args[2], "  %x", &content);
+  }else
+    sscanf(cmd.args[2], "%d", &content);
+  printf("0x%.8x  0x%.8x\n", addr, content);
+  // modify register
+  if(strcmp(cmd.args[0], "registers") == 0 ||
+     strcmp(cmd.args[0], "register") == 0 ||
+     strcmp(cmd.args[0], "r") == 0)
+    debugger_modify_register(cpu->regs, addr, content);
+  else if(strcmp(cmd.args[0], "memory") == 0 ||
+	  strcmp(cmd.args[0], "mem") == 0 ||
+	  strcmp(cmd.args[0], "m") == 0){
+    debugger_modify_mem(cpu->proc->mem, addr, content);
+    cache_update(cpu->i_cache, addr);
+    cache_update(cpu->d_cache, addr);
+  }
+  else
+    console_help_modify();
   return 1;
 }
 
@@ -327,11 +371,6 @@ int console_next(CPU_d* cpu){
   CMD cmd;
   cmd.arg_num = 0;
   while(console_step(cpu, cmd) != -1);
-  return 1;
-}
-
-int console_modify(CPU_d* cpu, CMD cmd){
-
   return 1;
 }
 

@@ -48,7 +48,7 @@ void debugger_modify_register(REGISTERS* regs, int reg_num, int32_t content){
     printf("Invalid register number : %d\n", reg_num);
     return;
   }
-  printf("Modify r[%d] : prev val - 0x%.8x  new val - 0x%.8x",
+  printf("Modify r[%d] : prev val - 0x%.8x  new val - 0x%.8x\n",
 	 reg_num, regs->r[reg_num], content);
   regs->r[reg_num] = content;
 }
