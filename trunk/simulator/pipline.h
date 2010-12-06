@@ -33,6 +33,8 @@ typedef struct{
   REGISTERS* regs;
   CACHE *i_cache, *d_cache;
   int drain_pipline;
+  int pc_src;
+  int ex_begin;
 }PIPLINE;
 
 typedef struct{

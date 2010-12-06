@@ -52,8 +52,10 @@ int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
     printf("now inst cycles : %d\n", cpu_info->cycles_total);
     printf("===============================\n\n");
   */
-
-  return 0;
+  if(pipline->ex_begin == 1 && pipline->regs->REG_PC == 0){
+    return 0;
+  }
+  return 1;
 }
 
 int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
@@ -61,13 +63,16 @@ int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
   PIPLINE_DATA* data = malloc(sizeof(PIPLINE_DATA));
   CACHE_RETURN cache_return;
   uint32_t addr = pipline->regs->REG_PC;
-  pipline->regs->REG_PC += 4;
+  if(pipline->pc_src == 0)
+    pipline->regs->REG_PC += 4;
+  else
+    pipline->pc_src = 0;
   memset(data, 0, sizeof(PIPLINE_DATA));
   data->inst_addr = addr;
   cache_return = cache_search(pipline->i_cache, addr);
   data->inst_code = cache_return.data;
   // save current instruction PC
-  data->cur_inst_PC = pipline->regs->REG_PC - 4;
+  data->cur_inst_PC = pipline->regs->REG_PC;
   pipline->pipline_data[0] = data;
   if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)
     cpu_info->cache_miss ++;
@@ -86,6 +91,7 @@ int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info){
   pipline->pipline_data[1] = pipline->pipline_data[0];
   pipline_IF(pipline, cpu_info);
   if(pipline->block_reg != -1){
+    //printf("aaaaaaaaaaaaaaaa\n");
     int inst_type = pipline->pipline_data[1]->inst_type;
     if(inst_type == D_IMM_SHIFT || inst_type == D_REG_SHIFT ||
        inst_type == MULTIPLY || inst_type == D_IMMEDIATE ||
@@ -101,6 +107,7 @@ int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info){
        inst_type == L_S_R_OFFSET || inst_type == L_S_HW_SB_ROF)
       if(pipline->block_reg == pipline->pipline_data[1]->Rm)
 	pipline->block = 1;
+    pipline->block_reg = -1;
     //printf("Set block!!!\n");
   }
 
@@ -124,6 +131,7 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
     return 1;
   }
   if(pipline->pipline_data[1] != NULL){
+    pipline->ex_begin = 1;
     inst_Ex(pipline, cpu_info, 1);
   }
   pipline->pipline_data[2] = pipline->pipline_data[1];
@@ -174,16 +182,26 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
       if(data->L == 1)
 	pipline->regs->r[data->Rd] = cache_return.data;
       else{
+	//printf("store.\n");
+	// Handle PC is Rd
+	int32_t write_data;
+	if(data->Rd == 31)
+	  write_data = data->cur_inst_PC;
+	else
+	  write_data = pipline->regs->r[data->Rd];
+	// write memory
 	if(data->B == 1)
 	  cache_write(pipline->d_cache, data->addr,
-		      pipline->regs->r[data->Rd], DATA_B);
+		      write_data, DATA_B);
 	else
 	  cache_write(pipline->d_cache, data->addr,
-		      pipline->regs->r[data->Rd], DATA_W);
+		      write_data, DATA_W);
       }
       // handle when PC is Rd, drain pipline
-      if(data->L == 1 && data->Rd == 31)
+      if(data->L == 1 && data->Rd == 31){
+	pipline->pc_src = 1;
 	pipline->drain_pipline = 1;
+      }
     }
     else if(data->inst_type == L_S_HW_SB_ROF ||
 	    data->inst_type == L_S_HW_SB_IOF){
@@ -214,16 +232,24 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
 	}
       }
       else{
+	int32_t write_data;
+	// Handle PC is Rd
+	if(data->Rd == 31)
+	  write_data = data->cur_inst_PC;
+	else
+	  write_data = pipline->regs->r[data->Rd];
 	if(data->H == 1)
 	  cache_write(pipline->d_cache, data->addr,
-		      pipline->regs->r[data->Rd], DATA_HW);
+		      write_data, DATA_HW);
 	else
 	  cache_write(pipline->d_cache, data->addr,
-		      pipline->regs->r[data->Rd], DATA_B);
+		      write_data, DATA_B);
       }
       // handle when PC is Rd, drain pipline
-      if(data->L == 1 && data->Rd == 31)
+      if(data->L == 1 && data->Rd == 31){
+	pipline->pc_src = 1;
 	pipline->drain_pipline = 1;
+      }
     }
   }
   pipline->pipline_data[3] = pipline->pipline_data[2];

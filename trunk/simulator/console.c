@@ -12,7 +12,7 @@ typedef struct{
   char args[30][30];
 }CMD;
 
-int console_step(CPU_d* cpu);// command step/s
+int console_step(CPU_d* cpu, CMD cmd);// command step/s
 int console_next(CPU_d* cpu);// command next/s
 int console_run(CPU_d* cpu, char* filename, int mode);// command r/rt
 int console_x(CPU_d* cpu, CMD cmd);// command x
@@ -44,7 +44,7 @@ int console_next_cmd(CPU_d* cpu, char* filename){
   else if(strcmp(cmd.command, "h") == 0 || strcmp(cmd.command, "help") == 0)
     console_help(cmd);
   else if(strcmp(cmd.command, "s") == 0 || strcmp(cmd.command, "step") == 0)
-    console_step(cpu);
+    console_step(cpu, cmd);
   else if(strcmp(cmd.command, "r") == 0 || strcmp(cmd.command, "run") == 0)
     console_run(cpu, filename, 0);
   else if(strcmp(cmd.command, "rt") == 0 ||
@@ -101,12 +101,25 @@ int console_help(CMD cmd){
   return 1;
 }
 
-int console_step(CPU_d* cpu){
+int console_step(CPU_d* cpu, CMD cmd){
   if(cpu->mode != CPU_TRAP && cpu->mode != CPU_NORMAL){
     printf("Program is not run.\n");
     return 0;
   }
-  pipline_next_step(cpu->pipline, cpu->cpu_info);
+  int num, i;
+  if(cmd.arg_num != 0)
+    sscanf(cmd.args[0], "%d", &num);
+  else
+    num = 1;
+  if(num <= 0){
+    printf("Invalid step argument.\n");
+    return 0;
+  }
+  for(i=0; i<num; i++)
+    if(pipline_next_step(cpu->pipline, cpu->cpu_info) == 0){
+      cpu->mode = CPU_STOP;
+      break;
+    }
   return 1;
 }
 
@@ -131,8 +144,10 @@ int console_run(CPU_d* cpu, char* filename, int mode){
     if(mode == 0)
       console_next(cpu);
     else{
+      CMD cmd;
+      cmd.arg_num = 0;
       cpu->mode = CPU_TRAP;
-      console_step(cpu);
+      console_step(cpu, cmd);
     }
   }
   return 1;
@@ -305,7 +320,9 @@ int console_next(CPU_d* cpu){
   }
   printf("console next, to be finished.\n");
   cpu->mode = CPU_NORMAL;
-  console_step(cpu);
+  CMD cmd;
+  cmd.arg_num = 0;
+  console_step(cpu, cmd);
   return 1;
 }
 
