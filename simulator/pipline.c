@@ -31,6 +31,10 @@ int pipline_destroy(PIPLINE* pipline){
 
 int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
   CPU_info* pipline_cpu_info = malloc(sizeof(CPU_info));
+  printf("REG_PC : 0x%.8x\n", pipline->regs->REG_PC);
+  if(pipline->ex_begin == 1 && pipline->regs->REG_PC == 0){
+    return 0;
+  }
   pipline_WB(pipline, pipline_cpu_info);
   cpu_info->cycles_total += pipline_cpu_info->cycles_total;
   cpu_info->cycles_work += pipline_cpu_info->cycles_work;
@@ -52,9 +56,6 @@ int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
     printf("now inst cycles : %d\n", cpu_info->cycles_total);
     printf("===============================\n\n");
   */
-  if(pipline->ex_begin == 1 && pipline->regs->REG_PC == 0){
-    return 0;
-  }
   return 1;
 }
 

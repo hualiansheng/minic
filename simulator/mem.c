@@ -117,7 +117,7 @@ int mem_type(PROC_MEM* mem, uint32_t addr){
        (mem->segments[i]).size * 4){
       return (mem->segments[i]).flag;
     }
-  fprintf(stderr, "mem_type : Not an effective address\n");
+  fprintf(stderr, "mem_type : Not an effective address 0x%.8x\n", addr);
   exit(1);
 }
 
