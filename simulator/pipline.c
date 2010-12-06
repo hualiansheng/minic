@@ -31,8 +31,9 @@ int pipline_destroy(PIPLINE* pipline){
 
 int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
   CPU_info* pipline_cpu_info = malloc(sizeof(CPU_info));
-  printf("REG_PC : 0x%.8x\n", pipline->regs->REG_PC);
+  //printf("REG_PC : 0x%.8x\n", pipline->regs->REG_PC);
   if(pipline->ex_begin == 1 && pipline->regs->REG_PC == 0){
+    printf("Program finished.\n");
     return 0;
   }
   pipline_WB(pipline, pipline_cpu_info);
@@ -64,6 +65,10 @@ int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
   PIPLINE_DATA* data = malloc(sizeof(PIPLINE_DATA));
   CACHE_RETURN cache_return;
   uint32_t addr = pipline->regs->REG_PC;
+  //printf("IF addr : 0x%.8x\n", addr);
+  pipline->pipline_data[0] = data;
+  if(pipline->regs->REG_PC == 0)
+    return 0;
   if(pipline->pc_src == 0)
     pipline->regs->REG_PC += 4;
   else
@@ -74,7 +79,6 @@ int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
   data->inst_code = cache_return.data;
   // save current instruction PC
   data->cur_inst_PC = pipline->regs->REG_PC;
-  pipline->pipline_data[0] = data;
   if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)
     cpu_info->cache_miss ++;
   if(cpu_info->cycles_total < cache_return.cpu_cycles)
