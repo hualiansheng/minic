@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gelf.h>
+//#include <curses.h>
 
 #include "console.h"
 
@@ -9,6 +10,11 @@ int main(int argc, char **argv){
     fprintf(stderr, "usage: %s file-name\n", argv[0]);
     exit(1);
   }
+
+  //  initscr();
+  //  refresh();
+  //  echo();
+  
   CPU_d* cpu;
   int sig;
   cpu = process_start(argv[1]);
@@ -24,8 +30,9 @@ int main(int argc, char **argv){
   }
   printf("=================================\n");
   printf("Simulator end.\n");
-
   process_end(cpu);
   
+  //  endwin();
+
   return 0;
 }

@@ -2,7 +2,7 @@ OBJECT = simulator.o ELF_parser.o register.o mem.o process.o decode.o cache.o CP
 ARGS = -g -Wall
 LIBS = -L/usr/local/lib -lelf
 simulator:$(OBJECT)
-	gcc $(ARGS) $(LIBS) -o simulator $(OBJECT) 
+	gcc $(ARGS) $(LIBS) -o simulator $(OBJECT)
 simulator.o:simulator.c
 	gcc $(ARGS) -c simulator.c
 ELF_parser.o:ELF_parser.h ELF_parser.c
