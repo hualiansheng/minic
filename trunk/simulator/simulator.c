@@ -3,7 +3,6 @@
 #include <gelf.h>
 
 #include "console.h"
-#include "debugger.h"
 
 int main(int argc, char **argv){
   if(argc !=2){
@@ -22,8 +21,6 @@ int main(int argc, char **argv){
     sig = console_next_cmd(cpu, argv[1]);
     if(sig == 0)
       break;
-    if(cpu->mode == CPU_STOP)
-      debugger_print_cpu_info(cpu->cpu_info);
   }
   printf("=================================\n");
   printf("Simulator end.\n");

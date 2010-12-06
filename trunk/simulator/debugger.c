@@ -11,6 +11,9 @@ void debugger_print_cpu_info(CPU_info* cpu_info){
   printf("\tWrite memory times : %d\n", cpu_info->wr_mem_times);
   printf("\tCache visit times : %d\n", cpu_info->cache_visit);
   printf("\tCache miss times : %d\n", cpu_info->cache_miss);
+  printf("\t----------------\n");
+  printf("\tCPU idle rate : %.2lf%%\n", (cpu_info->cycles_total - cpu_info->cycles_work) * 100.0 /cpu_info->cycles_total);
+  printf("\tCache miss rate : %.2lf%%\n", (double)(cpu_info->cache_miss) / (double)(cpu_info->cache_visit));
   printf("====================================\n");
 }
 
