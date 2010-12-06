@@ -115,7 +115,7 @@ int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info){
 
 int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   if(pipline->block != 0){
-    //printf("--Inst Execuation Level Blocked.--\n");
+    printf("--Inst Execuation Level Blocked.--\n");
     pipline->block --;
     cpu_info->bubbles ++;
     if(pipline->block == 0)
@@ -136,7 +136,7 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   if(pipline->pipline_data[2] == NULL)
     printf("--Inst Execuation Level Empty.--\n");
   else
-    printf("--Ececuating Instruction : 0x%.8x--\n", pipline->pipline_data[2]->inst_code);
+    printf("--Ececuating Instruction - addr : 0x%.8x - code : 0x%.8x--\n", pipline->pipline_data[2]->inst_addr, pipline->pipline_data[2]->inst_code);
   
   return 1;
 }
