@@ -34,6 +34,9 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
   block_offset = (int)(log(CACHE_BLOCK_SIZE)/log(2));
   block_addr = (addr >> block_offset) << (block_offset);
 
+  //printf("addr : 0x%.8x\n", addr);
+  //printf("block addr init : 0x%.8x\n", block_addr);  
+
   c_r.cpu_cycles = -1;
   cache->mark[block_index] = mark_addr;
   while(mem_invalid(cache->mem, block_addr) != 0){
@@ -87,8 +90,12 @@ int cache_rewrite(CACHE* cache, uint32_t addr){
     mark_addr = addr >> ((int)(log(CACHE_SIZE)/log(2)));
     in_block_index = addr % CACHE_BLOCK_SIZE;
     block_offset = (int)(log(CACHE_BLOCK_SIZE)/log(2));
-    block_addr = (mark_addr << block_offset)
-      + block_index * CACHE_BLOCK_SIZE;
+    //block_addr = (mark_addr << block_offset)
+    //  + block_index * CACHE_BLOCK_SIZE;
+    block_addr = (addr >> block_offset) << (block_offset);
+
+    //printf("addr : 0x%.8x\n", addr);
+    //printf("block addr init : 0x%.8x\n", block_addr);
 
     while(mem_invalid(cache->mem, block_addr) != 0){
       block_addr += 4;
@@ -97,6 +104,7 @@ int cache_rewrite(CACHE* cache, uint32_t addr){
     mem_set(cache->mem, block_addr, (cache->data)[block_index],
 	    CACHE_BLOCK_SIZE-in_block_count);
     //printf("Rewrite NO. %d block.\n", block_index);
+    //printf("block addr : 0x%.8x\n", block_addr);
     return 0;
   }
   else if(type != -1){
@@ -182,6 +190,8 @@ int cache_write(CACHE* cache, uint32_t addr, uint32_t data, int data_type){
   int32_t* presult;
   presult = (int32_t*)&(cache->data[block_index][in_block_index]);
   *presult = data;
+  //printf("cache rewrite : 0x%.8x.\n", addr);
+  cache_rewrite(cache, addr);
   return 0;
 }
 

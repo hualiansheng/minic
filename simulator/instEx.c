@@ -98,8 +98,14 @@ int inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
   // extend immediate
   data->imm = sign_extend(data->imm, 5);
   // fetch operands
-  operand1 = pipline->regs->r[data->Rn];
-  operand2 = pipline->regs->r[data->Rm];
+  if(data->Rn == 31)
+    operand1 = data->cur_inst_PC;
+  else
+    operand1 = pipline->regs->r[data->Rn];
+  if(data->Rm == 31)
+    operand1 = data->cur_inst_PC;
+  else
+    operand2 = pipline->regs->r[data->Rm];
   // shift operand2 and return shift_carry,
   // shift_carry means whether shift operation is carried
   shift_carry = shift_Ex(&operand2, data->imm, data->shift);
@@ -118,6 +124,7 @@ int inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
   //printf("Rd : %d\n", data->Rd);
   // If Rd is PC, drain pipline of 0 and 1, and return 1
   if(data->Rd == 31){
+    pipline->pc_src = 1;
     pipline->drain_pipline = 1;
     return 1;
   }
@@ -134,8 +141,14 @@ int inst_Ex_D_Reg_Shift(PIPLINE* pipline, int level){
   int32_t result;
   int carry, shift_carry;
   // fetch operands
-  operand1 = pipline->regs->r[data->Rn];
-  operand2 = pipline->regs->r[data->Rm];
+  if(data->Rn == 31)
+    operand1 = data->cur_inst_PC;
+  else
+    operand1 = pipline->regs->r[data->Rn];
+  if(data->Rm == 31)
+    operand1 = data->cur_inst_PC;
+  else
+    operand2 = pipline->regs->r[data->Rm];
   // shift operand2 and return shift_carry,
   // shift_carry means whether shift operation is carried
   shift_carry = shift_Ex(&operand2, pipline->regs->r[data->Rs], data->shift);
@@ -153,6 +166,7 @@ int inst_Ex_D_Reg_Shift(PIPLINE* pipline, int level){
 	     result, data->opcodes, shift_carry);
   // If Rd is PC, drain pipline of 0 and 1, and return 1
   if(data->Rd == 31){
+    pipline->pc_src = 1;
     pipline->drain_pipline = 1;
     return 1;
   }
@@ -168,9 +182,18 @@ int inst_Ex_Multiply(PIPLINE* pipline, int level){
   int32_t result;
   PIPLINE_DATA* data = pipline->pipline_data[level];
   // Get operands
-  operand_Rm = pipline->regs->r[data->Rm];
-  operand_Rn = pipline->regs->r[data->Rn];
-  operand_Rs = pipline->regs->r[data->Rs];
+  if(data->Rm == 31)
+    operand_Rm = data->cur_inst_PC;
+  else
+    operand_Rm = pipline->regs->r[data->Rm];
+  if(data->Rn == 31)
+    operand_Rn = data->cur_inst_PC;
+  else
+    operand_Rn = pipline->regs->r[data->Rn];
+  if(data->Rs == 31)
+    operand_Rs = data->cur_inst_PC;
+  else
+    operand_Rs = pipline->regs->r[data->Rs];
   // Execuate multiply instruction
   result = operand_Rm * operand_Rn;
   // Execuate multiply and plus instruction
@@ -195,6 +218,7 @@ int inst_Ex_Multiply(PIPLINE* pipline, int level){
   }
   // If Rd is PC, drain pipline of 0 and 1, and return 1
   if(data->Rd == 31){
+    pipline->pc_src = 1;
     pipline->drain_pipline = 1;
     return 1;
   }
@@ -210,6 +234,7 @@ int inst_Ex_Branch_Ex(PIPLINE* pipline, int level){
   if(data->L == 1)
     pipline->regs->REG_LR = data->cur_inst_PC;
   pipline->regs->REG_PC = pipline->regs->r[data->Rm];
+  pipline->pc_src = 1;
   pipline->drain_pipline = 1;
   return 1;
 }
@@ -227,7 +252,10 @@ int inst_Ex_D_Immediate(PIPLINE* pipline, int level){
   data->imm = sign_extend(data->imm, 9);
   //printf("Sign extend imm : %.8x\n", data->imm);
   // fetch operands
-  operand1 = pipline->regs->r[data->Rn];
+  if(data->Rn == 31)
+    operand1 = data->cur_inst_PC;
+  else
+    operand1 = pipline->regs->r[data->Rn];
   operand2 = data->imm;
   // shift operand2 and return shift_carry,
   // shift_carry means whether shift operation is carried
@@ -249,6 +277,7 @@ int inst_Ex_D_Immediate(PIPLINE* pipline, int level){
   //printf("Result : %.8x\n", result);
   // If Rd is PC, drain pipline of 0 and 1, and return 1
   if(data->Rd == 31){
+    pipline->pc_src = 1;
     pipline->drain_pipline = 1;
     return 1;
   }
@@ -263,23 +292,28 @@ int inst_Ex_L_S_R_offset(PIPLINE* pipline, int level){
   // addr is the final address
   // addr_c is the address which is calculated
   // offset is the offset of calculation
-  int32_t addr, addr_c, offset;
+  int32_t addr, addr_c, offset, operand;
   // extend immediate
   data->imm = sign_extend(data->imm, 5);
   offset = pipline->regs->r[data->Rm];
   // shift operation
   shift_Ex(&offset, data->imm, data->shift);
-  if(data->U == 1)
-    addr_c = pipline->regs->r[data->Rn] + offset;
+  if(data->Rn == 31)
+    operand = data->cur_inst_PC;
   else
-    addr_c = pipline->regs->r[data->Rn] - offset;
+    operand = pipline->regs->r[data->Rn];
+  if(data->U == 1)
+    addr_c = operand + offset;
+  else
+    addr_c = operand - offset;
   if(data->P == 1)
     addr = addr_c;
   else{
     addr = pipline->regs->r[data->Rn];
-    pipline->regs->r[data->Rn] = addr_c;
+    if(data->Rn != 31)
+      pipline->regs->r[data->Rn] = addr_c;
   }
-  if(data->W == 1)
+  if(data->W == 1 && data->Rn != 31)
     pipline->regs->r[data->Rn] = addr_c;
   pipline->block_reg = data->Rd;
   data->addr = addr;
@@ -294,23 +328,28 @@ int inst_Ex_L_S_Hw_Sb_Rof(PIPLINE* pipline, int level){
   // addr is the final address
   // addr_c is the address which is calculated
   // offset is the offset of calculation
-  int32_t addr, addr_c, offset;
+  int32_t addr, addr_c, offset, operand;
   // extend immediate
   offset = pipline->regs->r[data->Rm];
   // U
-  if(data->U == 1)
-    addr_c = pipline->regs->r[data->Rn] + offset;
+  if(data->Rn == 31)
+    operand = data->cur_inst_PC;
   else
-    addr_c = pipline->regs->r[data->Rn] - offset;
+    operand = pipline->regs->r[data->Rn];
+  if(data->U == 1)
+    addr_c = operand + offset;
+  else
+    addr_c = operand - offset;
   // P
   if(data->P == 1)
     addr = addr_c;
   else{
     addr = pipline->regs->r[data->Rn];
-    pipline->regs->r[data->Rn] = addr_c;
+    if(data->Rn != 31)
+      pipline->regs->r[data->Rn] = addr_c;
   }
   // W
-  if(data->W == 1)
+  if(data->W == 1 && data->Rn != 31)
     pipline->regs->r[data->Rn] = addr_c;
   pipline->block_reg = data->Rd;
   data->addr = addr;
@@ -325,25 +364,30 @@ int inst_Ex_L_S_Hw_Sb_Iof(PIPLINE* pipline, int level){
   // addr is the final address
   // addr_c is the address which is calculated
   // offset is the offset of calculation
-  int32_t addr, addr_c, offset;
+  int32_t addr, addr_c, offset, operand;
   // extend immediate
   offset = pipline->regs->r[data->high_offset] << 5;
   offset += pipline->regs->r[data->low_offset];
   offset = sign_extend(offset, 10);
   // U
-  if(data->U == 1)
-    addr_c = pipline->regs->r[data->Rn] + offset;
+  if(data->Rn == 31)
+    operand = data->cur_inst_PC;
   else
-    addr_c = pipline->regs->r[data->Rn] - offset;
+    operand = pipline->regs->r[data->Rn];
+  if(data->U == 1)
+    addr_c = operand + offset;
+  else
+    addr_c = operand - offset;
   // P
   if(data->P == 1)
     addr = addr_c;
   else{
     addr = pipline->regs->r[data->Rn];
-    pipline->regs->r[data->Rn] = addr_c;
+    if(data->Rn != 31)
+      pipline->regs->r[data->Rn] = addr_c;
   }
   // W
-  if(data->W == 1)
+  if(data->W == 1 && data->Rn != 31)
     pipline->regs->r[data->Rn] = addr_c;
   pipline->block_reg = data->Rd;
   data->addr = addr;
@@ -357,20 +401,25 @@ int inst_Ex_L_S_I_offset(PIPLINE* pipline, int level){
   PIPLINE_DATA* data = pipline->pipline_data[level];
   // addr is the final address
   // addr_c is the address which is calculated
-  int32_t addr, addr_c;
+  int32_t addr, addr_c, operand;
   // extend immediate
   data->imm = sign_extend(data->imm, 14);
-  if(data->U == 1)
-    addr_c = pipline->regs->r[data->Rn] + data->imm;
+  if(data->Rn == 31)
+    operand = data->cur_inst_PC;
   else
-    addr_c = pipline->regs->r[data->Rn] - data->imm;
+    operand = pipline->regs->r[data->Rn];
+  if(data->U == 1)
+    addr_c = operand + data->imm;
+  else
+    addr_c = operand - data->imm;
   if(data->P == 1)
     addr = addr_c;
   else{
     addr = pipline->regs->r[data->Rn];
-    pipline->regs->r[data->Rn] = addr_c;
+    if(data->Rn != 31)
+      pipline->regs->r[data->Rn] = addr_c;
   }
-  if(data->W == 1)
+  if(data->W == 1 && data->Rn != 31)
     pipline->regs->r[data->Rn] = addr_c;
   pipline->block_reg = data->Rd;
   data->addr = addr;
@@ -387,6 +436,8 @@ int inst_Ex_Branch_Link(PIPLINE* pipline, int level){
   //printf("Branch imm : %.8x\n", data->imm);
   if(branch_judge(pipline, data->cond) == 1){
     pipline->regs->REG_PC = data->cur_inst_PC + data->imm * 4;
+    pipline->regs->REG_BL = data->cur_inst_PC;
+    pipline->pc_src = 1;
     pipline->drain_pipline = 1;
     return 1;
   }
