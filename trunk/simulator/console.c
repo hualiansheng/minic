@@ -118,6 +118,7 @@ int console_step(CPU_d* cpu, CMD cmd){
   for(i=0; i<num; i++)
     if(pipline_next_step(cpu->pipline, cpu->cpu_info) == 0){
       cpu->mode = CPU_STOP;
+      printf("CPU STOP\n");
       break;
     }
   return 1;
