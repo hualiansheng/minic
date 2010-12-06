@@ -34,5 +34,6 @@ extern int cache_mem_link(CACHE* cache, PROC_MEM* _mem);
 extern CACHE_RETURN cache_search(CACHE* cache, uint32_t addr);
 extern int cache_write(CACHE* cache, uint32_t addr, uint32_t data, int data_type);
 extern int cache_destroy(CACHE* cache);
+extern int cache_update(CACHE* cache, uint32_t addr);
 
 #endif
