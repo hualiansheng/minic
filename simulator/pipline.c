@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "instEx.h"
+#include "debugger.h"
 
 int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info);
@@ -34,6 +35,8 @@ int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
   //printf("REG_PC : 0x%.8x\n", pipline->regs->REG_PC);
   if(pipline->ex_begin == 1 && pipline->regs->REG_PC == 0){
     printf("Program finished.\n");
+    debugger_print_cpu_info(cpu_info);
+    //pipline->ex_begin = 0;
     return 0;
   }
   pipline_WB(pipline, pipline_cpu_info);

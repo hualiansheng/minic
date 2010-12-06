@@ -101,6 +101,9 @@ int console_help(CMD cmd){
   return 1;
 }
 
+// return val :  0 - wrong
+//               1 - normal
+//              -1 - CPU STOP
 int console_step(CPU_d* cpu, CMD cmd){
   if(cpu->mode != CPU_TRAP && cpu->mode != CPU_NORMAL){
     printf("Program is not run.\n");
@@ -118,8 +121,8 @@ int console_step(CPU_d* cpu, CMD cmd){
   for(i=0; i<num; i++)
     if(pipline_next_step(cpu->pipline, cpu->cpu_info) == 0){
       cpu->mode = CPU_STOP;
-      printf("CPU STOP\n");
-      break;
+      //printf("CPU STOP\n");
+      return -1;
     }
   return 1;
 }
@@ -323,7 +326,7 @@ int console_next(CPU_d* cpu){
   cpu->mode = CPU_NORMAL;
   CMD cmd;
   cmd.arg_num = 0;
-  console_step(cpu, cmd);
+  while(console_step(cpu, cmd) != -1);
   return 1;
 }
 
