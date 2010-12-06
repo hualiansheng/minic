@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <gelf.h>
 
-#include "register.h"
 #include "console.h"
+#include "debugger.h"
 
 int main(int argc, char **argv){
   if(argc !=2){
@@ -18,10 +18,12 @@ int main(int argc, char **argv){
   printf("File : %s\n", argv[1]);
   printf("CPU mode : normal\n");
   printf("=================================\n");
-  while(cpu->mode != CPU_STOP){
+  while(1){
     sig = console_next_cmd(cpu, argv[1]);
     if(sig == 0)
       break;
+    if(cpu->mode == CPU_STOP)
+      debugger_print_cpu_info(cpu->cpu_info);
   }
   printf("=================================\n");
   printf("Simulator end.\n");
