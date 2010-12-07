@@ -21,6 +21,7 @@ int interpret_inst(uint32_t inst_code, uint32_t inst_addr,
   data.inst_code = inst_code;
   data.inst_addr = inst_addr;
   decode_inst_decode(&data);
+  //printf("0x%.8x\n", (uint32_t)proc);
   switch(data.inst_type){
   case D_IMM_SHIFT  :interpret_D(data, result);break;
   case D_REG_SHIFT  :interpret_D(data, result);break;
@@ -121,6 +122,7 @@ int interpret_Branch_Link(PIPLINE_DATA data, char* result, PROCESS* proc){
   char opcode[20];
   char target[100];
   char tmp[100];
+  //printf("0x%.8x\n", (uint32_t)proc);
   switch(data.cond){
   case EQ  : strcpy(opcode, "beq");break;
   case NE  : strcpy(opcode, "bne");break;

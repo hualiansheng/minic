@@ -160,6 +160,7 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   else{
     PIPLINE_DATA* data = pipline->pipline_data[2];
     char ass_code[100];
+    //printf("0x%.8x\n", (uint32_t)pipline->proc);
     interpret_inst(data->inst_code, data->inst_addr,
 		   ass_code, pipline->proc);
     printf("Pipline #2 : Ex - addr:0x%.8x  code:0x%.8x  %s.\n",

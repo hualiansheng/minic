@@ -126,6 +126,7 @@ void debugger_modify_stack(PROC_MEM* mem, uint32_t sp,
 //              1 have such address
 int debugger_search_symtbl(PROCESS* proc, uint32_t addr, char* result,
 			   int type){
+  //printf("0x%.8x\n", (uint32_t)proc);
   PROC_SYMTBL symtbl = proc->symtbl;
   int i;
   for(i=0; i<symtbl.sym_num; i++){

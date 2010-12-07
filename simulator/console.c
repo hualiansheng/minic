@@ -150,16 +150,20 @@ int console_run(CPU_d* cpu, char* filename, int mode){
     if(strcmp(tmp, "Y") == 0 || strcmp(tmp, "y") == 0 ||
        strcmp(tmp, "yes") == 0 || strcmp(tmp, "YES") == 0){
       process_restart(cpu, filename);
+      console_run(cpu, filename, 0);
       return 1;
     }
     else
       return 0;
-  }else if(cpu->mode == CPU_STOP)
+  }else if(cpu->mode == CPU_STOP){
     process_restart(cpu, filename);
+    console_run(cpu, filename, mode);
+  }
   else if(cpu->mode == CPU_INIT){
-    cpu->mode = CPU_NORMAL;
-    if(mode == 0)
+    if(mode == 0){
+      cpu->mode = CPU_NORMAL;
       console_next(cpu);
+    }
     else{
       CMD cmd;
       cmd.arg_num = 0;
@@ -180,12 +184,12 @@ int process_restart(CPU_d* cpu, char* filename){
   cpu->i_cache = cache_initial(NULL);
   cache_destroy(cpu->d_cache);
   cpu->d_cache = cache_initial(NULL);
-  
-  CPU_load_process(cpu, proc);
-  cpu->mode = CPU_NORMAL;
+  //printf("0x%.8x\n", (uint32_t)proc);
+  cpu->mode = CPU_INIT;
   memset(cpu->cpu_info, 0, sizeof(CPU_info));
   pipline_destroy(cpu->pipline);
   cpu->pipline = pipline_initial(cpu->regs, cpu->i_cache, cpu->d_cache);
+  CPU_load_process(cpu, proc);
 
   return 1;
 }
