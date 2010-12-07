@@ -29,6 +29,7 @@ typedef struct{
   int block;//1 means pipline block, 0 mean the opposite
   int block_reg;
   PIPLINE_DATA* pipline_data[PIPLINE_LEVEL];
+  char pipline_info[PIPLINE_LEVEL][200];
   PROC_STACK* stack;
   REGISTERS* regs;
   CACHE *i_cache, *d_cache;
