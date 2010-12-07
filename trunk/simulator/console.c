@@ -5,6 +5,7 @@
 #include "process.h"
 #include "memory.h"
 #include "console.h"
+#include "interpret.h"
 
 typedef struct{
   char command[20];
@@ -19,6 +20,7 @@ int console_x(CPU_d* cpu, CMD cmd);// command x
 int console_print(CPU_d* cpu, CMD cmd);// command print/p
 int console_info(CPU_d* cpu, CMD cmd);// command info/i
 int console_modify(CPU_d* cpu, CMD cmd);// command modify/m
+int console_list(CPU_d* cpu, CMD cmd);// command list/l
 int console_bp(CPU_d* cpu, CMD cmd);// command breakpoint/b
 int console_help(CMD cmd);// command help/h
 int process_restart(CPU_d* cpu, char* filename);// restart process
@@ -28,6 +30,7 @@ void console_help_modify();// help doc of command modify/m
 void console_help_breakpoint();// help doc of command breakpoint/b
 void console_help_x();// help doc of command x
 void console_help_print();// help doc of command print/p
+void console_help_list();// help doc of list/l
 
 
 int console_next_cmd(CPU_d* cpu, char* filename){
@@ -64,6 +67,9 @@ int console_next_cmd(CPU_d* cpu, char* filename){
   else if(strcmp(cmd.command, "m") == 0 ||
 	  strcmp(cmd.command, "modify") == 0)
     console_modify(cpu, cmd);
+  else if(strcmp(cmd.command, "l") == 0 ||
+	  strcmp(cmd.command, "list") == 0)
+    console_list(cpu, cmd);
   else
     console_help(cmd);
   return 1;
@@ -86,6 +92,9 @@ int console_help(CMD cmd){
   else if(strcmp(cmd.args[0], "p") == 0 ||
 	  strcmp(cmd.args[0], "print") == 0)
     console_help_print();
+  else if(strcmp(cmd.args[0], "l") == 0 ||
+	  strcmp(cmd.args[0], "list") == 0)
+    console_help_list();
   else{
     printf("Simulator Debugger Command List:\n");
     printf("h  :  show help message\n");
@@ -96,6 +105,7 @@ int console_help(CMD cmd){
     printf("n  :  step until next breakpoint or the end of program\n");
     printf("x  :  show the value of the given address, see details \"help x\"\n");
     printf("p  :  print the value, see details \"help p\" or \"help print\"\n");
+    printf("l  :  list codes, see details \"help l\" or \"help list\"\n");
     printf("i  :  show informations, see details \"help i\" or \"help info\"\n");
     printf("m  :  modify memory or registers, see details \"help m\" or \"help modify\"\n");
     printf("b  :  breakpoint handling, see details \"help b\" or \"help breakpoint\"\n");
@@ -210,18 +220,20 @@ CMD console_parse_cmd(char* input){
     i ++;
     j ++;
   }
+  while(input[i] == ' ')
+    i++;
   cmd.command[j] = '\0';
   // parse args
   while(input[i] != '\n'){
     j = 0;
-    while(input[i] == ' ')
-      i++;
     while(input[i] != ' ' && input[i] != '\n'){
       cmd.args[cmd.arg_num][j] = input[i];
       i ++;
       j ++;
     }
     cmd.arg_num ++;
+    while(input[i] == ' ')
+      i++;
   }
   return cmd;
 }
@@ -329,6 +341,76 @@ int console_modify(CPU_d* cpu, CMD cmd){
   return 1;
 }
 
+int console_list(CPU_d* cpu, CMD cmd){
+  uint32_t addr;
+  int line_num;
+  if(cmd.arg_num == 0){
+    addr = cpu->proc->list_cur_addr;
+    line_num = 10;
+  }
+  else if(cmd.arg_num == 1){
+    // parse addr
+    if(cmd.args[0][0] == 'c')
+      addr = cpu->proc->list_cur_addr;
+    else if(cmd.args[0][0] == 'i')
+      addr = cpu->proc->entry;
+    else if(cmd.args[0][0] == '0' && cmd.args[0][1] == 'x'){
+      cmd.args[0][0] = ' ';
+      cmd.args[0][1] = ' ';
+      sscanf(cmd.args[0], "  %x", &addr);
+    }else
+      sscanf(cmd.args[0], "%d", &addr);
+    line_num = 10;
+  }
+  else{
+    // parse addr
+    if(cmd.args[0][0] == 'c')
+      addr = cpu->proc->list_cur_addr;
+    else if(cmd.args[0][0] == 'i')
+      addr = cpu->proc->entry;
+    else if(cmd.args[0][0] == '0' && cmd.args[0][1] == 'x'){
+      cmd.args[0][0] = ' ';
+      cmd.args[0][1] = ' ';
+      sscanf(cmd.args[0], "  %x", &addr);
+    }else
+      sscanf(cmd.args[0], "%d", &addr);
+    // parse line number
+    if(cmd.args[1][0] == '0' && cmd.args[1][1] == 'x'){
+      cmd.args[1][0] = ' ';
+      cmd.args[1][1] = ' ';
+      sscanf(cmd.args[1], "  %x", &line_num);
+    }else
+      sscanf(cmd.args[1], "%d", &line_num);
+  }
+  if(line_num < 0){
+    printf("Invalid arguent [lines] : %d\n", line_num);
+    return 0;
+  }
+  if(mem_invalid(cpu->proc->mem, addr) != 0){
+    printf("Invalid address : 0x%.8x\n", addr);
+    return 0;
+  }
+  if(mem_invalid(cpu->proc->mem, cpu->proc->list_cur_addr) != 0){
+    printf("List curse is to the end of segment.\n");
+    return 0;
+  }
+  int i;
+  int32_t data;
+  char name[100];
+  char ass_code[100];
+  for(i=0; i<line_num; i++){
+    if(mem_invalid(cpu->proc->mem, addr) != 0)
+      break;
+    mem_fetch(cpu->proc->mem, addr + 4*i, &data, sizeof(data), DATA_RD);
+    if(debugger_search_symtbl(cpu->proc, addr + 4*i, name, STT_FUNC) == 1)
+      printf("<%s>\n", name);
+    interpret_inst(data, addr+4*i, ass_code, cpu->proc);
+    printf("0x%.8x  :  0x%.8x\t%s\n", addr+4*i, data, ass_code);
+  }
+  cpu->proc->list_cur_addr = addr + i*4;
+  return 1;
+}
+
 void console_help_info(){
   printf("Usage command info:\n");
   printf("info registers : print register heap infomation\n");
@@ -349,6 +431,14 @@ void console_help_print(){
   printf("Format   : print arg|$rx\n");
   printf("\tprint arg : print arg\n");
   printf("\tprint $rx : print content of register, x is the id of register.\n");
+}
+
+void console_help_list(){
+  printf("Usage command list(l):\n");
+  printf("Function : list codes from beginning.\n");
+  printf("Format   : list/l [addr] [lines]\n");
+  printf("\t[addr]  : the address of codes to display, \"i\" is the begining of program, \"c\" is the current position, \"c\" is default.\n");
+  printf("\t[lines] : number of lines to list, 10 is default.\n");
 }
 
 void console_help_modify(){

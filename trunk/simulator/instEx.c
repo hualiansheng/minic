@@ -15,7 +15,7 @@ int inst_Ex_L_S_I_offset(PIPLINE* pipline, int level);
 int inst_Ex_Branch_Link(PIPLINE* pipline, int level);
 int inst_Ex_ST(PIPLINE* pipline, int level);
 int inst_Unknown(PIPLINE* pipline, int level);
-int sign_extend(int imm, int size);
+//int sign_extend(int imm, int size);
 int32_t shift_Ex(int32_t* operand, int imm, int shift_type);
 int32_t data_Ex(int32_t operand1, int32_t operand2, int opcodes, int carry);
 void set_CMSR(REGISTERS* regs, int32_t operand1, int32_t operand2,

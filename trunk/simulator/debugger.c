@@ -1,4 +1,5 @@
 #include "debugger.h"
+#include <string.h>
 
 // print cpu infomation
 // cpu_info - the struct of cpu information
@@ -118,6 +119,23 @@ void debugger_modify_stack(PROC_MEM* mem, uint32_t sp,
   }
   printf("Modify stack 0x%.8x : 0x%.8x\n", addr, content);
   debugger_modify_mem(mem, addr, content);
+}
+
+// search the name of the given address in symbal table
+// return val : 0 no such address
+//              1 have such address
+int debugger_search_symtbl(PROCESS* proc, uint32_t addr, char* result,
+			   int type){
+  PROC_SYMTBL symtbl = proc->symtbl;
+  int i;
+  for(i=0; i<symtbl.sym_num; i++){
+    if(symtbl.addr[i] == addr && 
+       ELF32_ST_TYPE(symtbl.st_info[i]) == type){
+      strcpy(result, symtbl.name[i]);
+      return 1;
+    }
+  }
+  return 0;
 }
 
 void debugger_set_break_point(CPU_d* cpu, uint32_t addr){

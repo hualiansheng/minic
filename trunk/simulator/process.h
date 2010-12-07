@@ -3,6 +3,7 @@
 
 #include "mem.h"
 #include "breakpoint.h"
+#include "ELF_parser.h"
 #include <stdint.h>
 
 #define	PROC_READY	0
@@ -17,7 +18,9 @@ typedef struct{
   uint32_t entry;
   PROC_STACK* stack;
   PROC_MEM* mem;
+  PROC_SYMTBL symtbl;
   BP_LIST* bp_list;
+  uint32_t list_cur_addr;
 }PROCESS;
 
 extern PROCESS* proc_initial(char* filename);

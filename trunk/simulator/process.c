@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "ELF_parser.h"
 #include "process.h"
 
 int stack_initial(PROC_SEGMENT* stack, unsigned int stack_size){
@@ -49,12 +48,24 @@ PROCESS* proc_initial(char* filename){
   proc->status = PROC_READY;
   //proc->entry = ELF_entry_point();
   proc->entry = ELF_main_entry();
-
+  proc->list_cur_addr = proc->entry;
+  //build symbal table
+  ELF_build_symtbl(&(proc->symtbl));
+  /*
+  for(i=0; i<(proc->symtbl).sym_num; i++)
+    printf("%d  %s  :  %d  :  0x%.8x\n", i, (proc->symtbl).name[i], ELF32_ST_TYPE((proc->symtbl).st_info[i]), (proc->symtbl).addr[i]);
+  */
   ELF_close();
   return proc;
 }
 
 int proc_destroy(PROCESS* proc){
+  int i;
+  for(i=0; i<(proc->symtbl).sym_num; i++)
+    free((proc->symtbl).name[i]);
+  free((proc->symtbl).name);
+  free((proc->symtbl).addr);
+  free((proc->symtbl).st_info);
   proc->status = PROC_DEAD;
   if(proc->mem != NULL)
     mem_destroy(proc->mem);
