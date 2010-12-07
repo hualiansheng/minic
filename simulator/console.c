@@ -22,6 +22,7 @@ int console_info(CPU_d* cpu, CMD cmd);// command info/i
 int console_modify(CPU_d* cpu, CMD cmd);// command modify/m
 int console_list(CPU_d* cpu, CMD cmd);// command list/l
 int console_bp(CPU_d* cpu, CMD cmd);// command breakpoint/b
+int console_print_pipline(CPU_d* cpu);
 int console_help(CMD cmd);// command help/h
 int process_restart(CPU_d* cpu, char* filename);// restart process
 CMD console_parse_cmd(char* input);// parse command
@@ -131,12 +132,14 @@ int console_step(CPU_d* cpu, CMD cmd){
     printf("Invalid step argument.\n");
     return 0;
   }
-  for(i=0; i<num; i++)
+  for(i=0; i<num; i++){
     if(pipline_next_step(cpu->pipline, cpu->cpu_info) == 0){
       cpu->mode = CPU_STOP;
       //printf("CPU STOP\n");
       return -1;
     }
+    console_print_pipline(cpu);
+  }
   return 1;
 }
 
@@ -342,6 +345,14 @@ int console_modify(CPU_d* cpu, CMD cmd){
   }
   else
     console_help_modify();
+  return 1;
+}
+
+int console_print_pipline(CPU_d* cpu){
+  int i;
+  for(i=0; i<PIPLINE_LEVEL; i++)
+    printf("%s", cpu->pipline->pipline_info[i]);
+  printf("\n");
   return 1;
 }
 

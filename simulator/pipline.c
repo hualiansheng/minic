@@ -90,12 +90,11 @@ int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
     cpu_info->cycles_work = 1;
   cpu_info->cache_visit ++;
 
-  /*
   char ass_code[100];
-  interpret_inst(data->inst_code, data->inst_addr, ass_code);
-  printf("Pipline #0 : IF - addr:0x%.8x  code:0x%.8x  %s.\n",
-	 data->inst_addr, data->inst_code, ass_code);
-  */
+  interpret_inst(data->inst_code, data->inst_addr, ass_code, pipline->proc);
+  sprintf(pipline->pipline_info[0],
+	  "Pipline #0 : IF  - addr:0x%.8x  code:0x%.8x  %s.\n",
+	  data->inst_addr, data->inst_code, ass_code);
   return 1;
 }
 
@@ -125,18 +124,30 @@ int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info){
     //printf("Set block!!!\n");
   }
 
-  /*
-    if(pipline->pipline_data[1] == NULL)
-    printf("--Instruction Decoder Level Empty.--\n");
-    else
-    printf("--Decoding Instruction--\n");
-  */
+  if(pipline->pipline_data[1] == NULL)
+    sprintf(pipline->pipline_info[1],
+	    "Pipline #1 : ID  - Inst Decode Level Empty.\n");
+  else{
+    PIPLINE_DATA* data = pipline->pipline_data[1];
+    char ass_code[100];
+    //printf("0x%.8x\n", (uint32_t)pipline->proc);
+    interpret_inst(data->inst_code, data->inst_addr,
+		   ass_code, pipline->proc);
+    sprintf(pipline->pipline_info[1],
+	    "Pipline #1 : ID  - addr:0x%.8x  code:0x%.8x  %s.\n",
+	    data->inst_addr, data->inst_code, ass_code);
+  }
   return 1;
 }
 
 int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   if(pipline->block != 0){
-    printf("Pipline #2 : Ex - Inst Execuation Level Blocked.\n");
+    sprintf(pipline->pipline_info[2],
+	    "Pipline #2 : Ex  - Pipline Blocked Above.\n");
+    //sprintf(pipline->pipline_info[1],
+    //        "Pipline #1 : ID  - Inst Decode Level Blocked.\n");
+    //sprintf(pipline->pipline_info[0],
+    //	    "Pipline #0 : IF  - Inst Fetch Level Blocked.\n");
     pipline->block --;
     cpu_info->bubbles ++;
     if(pipline->block == 0)
@@ -156,15 +167,17 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   }
   
   if(pipline->pipline_data[2] == NULL)
-    printf("Pipline #2 : Ex - Inst Execuation Level Empty.\n");
+    sprintf(pipline->pipline_info[2],
+	    "Pipline #2 : Ex  - Inst Execuation Level Empty.\n");
   else{
     PIPLINE_DATA* data = pipline->pipline_data[2];
     char ass_code[100];
     //printf("0x%.8x\n", (uint32_t)pipline->proc);
     interpret_inst(data->inst_code, data->inst_addr,
 		   ass_code, pipline->proc);
-    printf("Pipline #2 : Ex - addr:0x%.8x  code:0x%.8x  %s.\n",
-	   data->inst_addr, data->inst_code, ass_code);
+    sprintf(pipline->pipline_info[2],
+	    "Pipline #2 : Ex  - addr:0x%.8x  code:0x%.8x  %s.\n",
+	    data->inst_addr, data->inst_code, ass_code);
   }
   //    printf("--Ececuating Instruction - addr : 0x%.8x - code : 0x%.8x--\n", pipline->pipline_data[2]->inst_addr, pipline->pipline_data[2]->inst_code);
   
@@ -172,8 +185,8 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
 }
 
 int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
+  PIPLINE_DATA* data = pipline->pipline_data[2];
   if(pipline->pipline_data[2] != NULL){
-    PIPLINE_DATA* data = pipline->pipline_data[2];
     if(data->inst_type == L_S_R_OFFSET ||
        data->inst_type == L_S_I_OFFSET ||
        data->inst_type == L_S_HW_SB_ROF ||
@@ -280,16 +293,23 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
     drain_pipline(pipline, 3);
     pipline->drain_pipline = 0;
   }
-  /*
+
   if(pipline->pipline_data[3] == NULL)
-    printf("--Memory Level Empty.--\n");
-  else
-    printf("--Writing Memory--\n");
-  */
+    sprintf(pipline->pipline_info[3],
+	    "Pipline #3 : Mem - Memory Level Empty.\n");
+  else{
+    char ass_code[100];
+    interpret_inst(data->inst_code, data->inst_addr,
+		   ass_code, pipline->proc);
+    sprintf(pipline->pipline_info[3],
+	    "Pipline #3 : Mem - addr:0x%.8x  code:0x%.8x  %s.\n",
+	    data->inst_addr, data->inst_code, ass_code);
+  }
   return 1;
 }
 
 int pipline_WB(PIPLINE* pipline, CPU_info* cpu_info){
+  PIPLINE_DATA* data = pipline->pipline_data[3];
   // Initial cpu_info
   cpu_info->cycles_total = 1;
   cpu_info->cycles_work = 1;
@@ -303,6 +323,18 @@ int pipline_WB(PIPLINE* pipline, CPU_info* cpu_info){
     free(pipline->pipline_data[4]);
   pipline->pipline_data[4] = pipline->pipline_data[3];
   pipline_Mem(pipline, cpu_info);
+
+  if(pipline->pipline_data[4] == NULL)
+    sprintf(pipline->pipline_info[4],
+	    "Pipline #4 : WB  - Write Back Level Empty.\n");
+  else{
+    char ass_code[100];
+    interpret_inst(data->inst_code, data->inst_addr,
+		   ass_code, pipline->proc);
+    sprintf(pipline->pipline_info[4],
+	    "Pipline #4 : WR  - addr:0x%.8x  code:0x%.8x  %s.\n",
+	    data->inst_addr, data->inst_code, ass_code);
+  }
   /*
   if(pipline->pipline_data[4] == NULL)
     printf("--Write Back Level Empty.--\n");
