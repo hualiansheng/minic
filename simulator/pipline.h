@@ -32,6 +32,7 @@ typedef struct{
   PROC_STACK* stack;
   REGISTERS* regs;
   CACHE *i_cache, *d_cache;
+  PROCESS* proc;
   int drain_pipline;
   int pc_src;
   int ex_begin;

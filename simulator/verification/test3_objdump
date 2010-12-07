@@ -170,6 +170,7 @@ Disassembly of section .text:
  2000494:	70ef000c 	stw	ip, [sp-], #12
  2000498:	70eec010 	stw	fp, [sp-], #16
  200049c:	24ef4010 	sub	sp, sp, #16	; 0x10
+          001 1010 0 11101 11101 00000 000010000
  20004a0:	24e6c004 	sub	fp, ip, #4	; 0x4
  20004a4:	3a000003 	mov	r0, #3	; 0x3
  20004a8:	bdffffdc 	b.l	200041c <func>

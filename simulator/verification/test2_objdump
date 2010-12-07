@@ -150,6 +150,7 @@ Disassembly of section .text:
  2000454:	a2000002 	bne	2000460 <Factorial+0x44>
  2000458:	3a03c001 	mov	r15, #1	; 0x1
  200045c:	bc000007 	b	200047c <Factorial+0x60>
+          101 1110 0 000000000000000000000111
  2000460:	71dbc010 	ldw	r15, [fp-], #16
  2000464:	247bc001 	sub	r15, r15, #1	; 0x1
  2000468:	1a00000f 	mov	r0, r15

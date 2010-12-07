@@ -20,5 +20,7 @@ extern void debugger_set_break_point(CPU_d* cpu, uint32_t addr);
 extern void debugger_remove_break_point(CPU_d* cpu, uint32_t addr);
 extern void debugger_list_break_point(CPU_d* cpu, uint32_t addr);
 extern void debugger_list_codes(CPU_d* cpu, uint32_t addr, int lines);
+extern int debugger_search_symtbl(PROCESS* proc, uint32_t addr, char* result,
+                                  int type);
 
 #endif

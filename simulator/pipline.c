@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <stdlib.h>
 
+#include "interpret.h"
 #include "instEx.h"
 #include "debugger.h"
 
@@ -64,7 +65,6 @@ int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
 }
 
 int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
-  //printf("--Fetching Instruction.--\n");
   PIPLINE_DATA* data = malloc(sizeof(PIPLINE_DATA));
   CACHE_RETURN cache_return;
   uint32_t addr = pipline->regs->REG_PC;
@@ -89,6 +89,13 @@ int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
   if(cpu_info->cycles_work < 1)
     cpu_info->cycles_work = 1;
   cpu_info->cache_visit ++;
+
+  /*
+  char ass_code[100];
+  interpret_inst(data->inst_code, data->inst_addr, ass_code);
+  printf("Pipline #0 : IF - addr:0x%.8x  code:0x%.8x  %s.\n",
+	 data->inst_addr, data->inst_code, ass_code);
+  */
   return 1;
 }
 
@@ -99,7 +106,6 @@ int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info){
   pipline->pipline_data[1] = pipline->pipline_data[0];
   pipline_IF(pipline, cpu_info);
   if(pipline->block_reg != -1){
-    //printf("aaaaaaaaaaaaaaaa\n");
     int inst_type = pipline->pipline_data[1]->inst_type;
     if(inst_type == D_IMM_SHIFT || inst_type == D_REG_SHIFT ||
        inst_type == MULTIPLY || inst_type == D_IMMEDIATE ||
@@ -130,7 +136,7 @@ int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info){
 
 int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   if(pipline->block != 0){
-    printf("--Inst Execuation Level Blocked.--\n");
+    printf("Pipline #2 : Ex - Inst Execuation Level Blocked.\n");
     pipline->block --;
     cpu_info->bubbles ++;
     if(pipline->block == 0)
@@ -150,9 +156,16 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   }
   
   if(pipline->pipline_data[2] == NULL)
-    printf("--Inst Execuation Level Empty.--\n");
-  else
-    printf("--Ececuating Instruction - addr : 0x%.8x - code : 0x%.8x--\n", pipline->pipline_data[2]->inst_addr, pipline->pipline_data[2]->inst_code);
+    printf("Pipline #2 : Ex - Inst Execuation Level Empty.\n");
+  else{
+    PIPLINE_DATA* data = pipline->pipline_data[2];
+    char ass_code[100];
+    interpret_inst(data->inst_code, data->inst_addr,
+		   ass_code, pipline->proc);
+    printf("Pipline #2 : Ex - addr:0x%.8x  code:0x%.8x  %s.\n",
+	   data->inst_addr, data->inst_code, ass_code);
+  }
+  //    printf("--Ececuating Instruction - addr : 0x%.8x - code : 0x%.8x--\n", pipline->pipline_data[2]->inst_addr, pipline->pipline_data[2]->inst_code);
   
   return 1;
 }

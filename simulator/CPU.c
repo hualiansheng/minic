@@ -37,6 +37,7 @@ int CPU_load_process(CPU_d* cpu, PROCESS* proc){
   cpu->regs->REG_PC = proc->entry;
   cpu->regs->REG_SP = (uint32_t)proc->stack->vaddr_offset + (uint32_t)(proc->stack->size);
   cpu->pipline->stack = proc->stack;
+  cpu->pipline->proc = proc;
   return 1;
 }
 
