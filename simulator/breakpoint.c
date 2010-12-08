@@ -40,17 +40,23 @@ void bp_add(BP_LIST* bp_list, uint32_t addr){
   bp_list->count ++;
 }
 
-void bp_del(BP_LIST* bp_list, int bp_id){
+int bp_del(BP_LIST* bp_list, int bp_id){
   int i;
   for(i = 0; i < bp_list->capacity; i++)
     if((bp_list->data[i]).bp_id == bp_id){
       (bp_list->data[i]).bp_id = 0;
-      break;
+      bp_list->num --;
+      return 1;
     }
+  return 0;
 }
 
 void bp_show(BP_LIST* bp_list){
   int i;
+  if(bp_list->num == 0){
+    printf("No breakpoint.\n");
+    return;
+  }
   printf("Breakpoint list:==================\n");
   for(i = 0; i < bp_list->capacity; i++)
     if((bp_list->data[i]).bp_id != 0)
@@ -66,7 +72,7 @@ int bp_search(BP_LIST* bp_list, uint32_t addr){
   for(i = 0; i < bp_list->capacity; i++)
     if((bp_list->data[i]).addr == addr){
       (bp_list->data[i]).visit_times ++;
-      return 1;
+      return (bp_list->data[i]).visit_times;
     }
   return 0;
 }

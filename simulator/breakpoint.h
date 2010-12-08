@@ -21,8 +21,8 @@ typedef struct{
 extern BP_LIST* bp_initial();
 extern void bp_destroy(BP_LIST* bp_list);
 extern void bp_add(BP_LIST* bp_list, uint32_t addr);
-extern void bp_del(BP_LIST* bp_list, int bp_id);
+extern int bp_del(BP_LIST* bp_list, int bp_id);
 extern void bp_show(BP_LIST* bp_list);
-extern int bp_search(BP_LIST* bp_list, uint32_t addr);
+extern int bp_search(BP_LIST* bp_list, uint32_t addr); // have return visit times, or return 0
 
 #endif

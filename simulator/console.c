@@ -6,6 +6,7 @@
 #include "memory.h"
 #include "console.h"
 #include "interpret.h"
+#include <malloc.h>
 
 typedef struct{
   char command[20];
@@ -74,6 +75,9 @@ int console_next_cmd(CPU_d* cpu, char* filename){
   else if(strcmp(cmd.command, "l") == 0 ||
 	  strcmp(cmd.command, "list") == 0)
     console_list(cpu, cmd);
+  else if(strcmp(cmd.command, "b") == 0 ||
+	  strcmp(cmd.command, "breakpoint") == 0)
+    console_bp(cpu, cmd);
   else
     console_help(cmd);
   return 1;
@@ -182,6 +186,15 @@ int console_run(CPU_d* cpu, char* filename, int mode){
 
 int process_restart(CPU_d* cpu, char* filename){
   PROCESS* proc;
+  BP_LIST* bp_list_tmp;
+  int i;
+  bp_list_tmp = malloc(sizeof(BP_LIST));
+  // save breakpoint list
+  memcpy(bp_list_tmp, cpu->proc->bp_list, sizeof(BP_LIST));
+  bp_list_tmp->data = malloc(cpu->proc->bp_list->capacity*sizeof(BP));
+  memcpy(bp_list_tmp->data, cpu->proc->bp_list->data,
+	 cpu->proc->bp_list->capacity*sizeof(BP));
+  // destroy old process
   proc_destroy(cpu->proc);
   proc = proc_initial(filename);
   reg_destroy(cpu->regs);
@@ -196,7 +209,11 @@ int process_restart(CPU_d* cpu, char* filename){
   pipline_destroy(cpu->pipline);
   cpu->pipline = pipline_initial(cpu->regs, cpu->i_cache, cpu->d_cache);
   CPU_load_process(cpu, proc);
-
+  // restore breakpoint list
+  bp_destroy(cpu->proc->bp_list);
+  cpu->proc->bp_list = bp_list_tmp;
+  for(i=0; i<bp_list_tmp->capacity; i++)
+    (bp_list_tmp->data[i]).visit_times = 0;
   return 1;
 }
 
@@ -479,33 +496,114 @@ void console_help_list(){
   printf("Format   : list/l [addr] [lines]\n");
   printf("\t[addr]  : the address of codes to display, \"i\" is the begining of program, \"c\" is the current position, \"c\" is default.\n");
   printf("\t[lines] : number of lines to list, 10 is default.\n");
-  printf("Another usage is l f <func_name> <lines>, which can list from the given function.");
+  printf("Another usage is l f <func_name> <lines>, \n\twhich can list from the given function.\n");
 }
 
 void console_help_modify(){
   printf("Usage command modify:\n");
+  printf("Function : modify memory or register.\n");
+  printf("Format   : modify/m [memory addr]|r[reg_num] [value]\n");
 }
 
 void console_help_breakpoint(){
   printf("Usage command breakpoint:\n");
+  printf("Function : set/list/delete breakpoint\n");
+  printf("Format   : b [address] - add breakpoint of address.\n");
+  printf("           b [a/add] [address] - the same as b [address].\n");
+  printf("           b [del/delete] [breakpoint_id] - delete breakpoint.\n");
+  printf("           b [l/list] - list all breakpoints.\n");
 }
 
-//-----------------------------------------------------
-// Functions below is to be finished.
+int console_bp(CPU_d* cpu, CMD cmd){
+  int bp_id;
+  uint32_t bp_addr;
+  if(cmd.arg_num == 0){
+    console_help_breakpoint();
+    return 0;
+  }
+  if(strcmp(cmd.args[0], "d") == 0 ||
+     strcmp(cmd.args[0], "del") == 0 ||
+     strcmp(cmd.args[0], "delete") == 0){
+    if(cmd.arg_num < 2){
+      console_help_breakpoint();
+      return 0;
+    }
+    sscanf(cmd.args[1], "%d", &bp_id);
+    if(bp_id <= 0 || bp_del(cpu->proc->bp_list, bp_id) == 0){
+      printf("Invalid breakpoint id : %d\n", bp_id);
+      return 0;
+    }
+    else
+      printf("Delete breakpoint %d.\n", bp_id);
+  }
+  else if(strcmp(cmd.args[0], "l") == 0 ||
+	  strcmp(cmd.args[0], "list") == 0)
+    bp_show(cpu->proc->bp_list);
+  // add breakpoint
+  else{
+    if(strcmp(cmd.args[0], "a") == 0 ||
+       strcmp(cmd.args[0], "add") == 0){
+      if(cmd.arg_num < 2){
+	console_help_breakpoint();
+	return 0;
+      }
+      else{
+	if(cmd.args[1][0] == '0' && cmd.args[1][1] == 'x'){
+	  cmd.args[1][0] = ' ';
+	  cmd.args[1][1] = ' ';
+	  sscanf(cmd.args[1], "%x", &bp_addr);
+	}
+	else
+	  sscanf(cmd.args[1], "%d", &bp_addr);
+      }
+    }
+    else{
+      if(cmd.args[0][0] == '0' && cmd.args[0][1] == 'x'){
+	cmd.args[0][0] = ' ';
+	cmd.args[0][1] = ' ';
+	sscanf(cmd.args[0], "%x", &bp_addr);
+      }
+      else
+	sscanf(cmd.args[0], "%d", &bp_addr);
+    }
+    if(bp_addr % 4 != 0 ||
+       mem_invalid(cpu->proc->mem, bp_addr) == -1){
+      printf("Invalid memory address : 0x%.8x.\n", bp_addr);
+      return 0;
+    }
+    bp_add(cpu->proc->bp_list, bp_addr);
+    printf("Breakpoint added : 0x%.8x\n", bp_addr);
+  }
+  return 1;
+}
+
 int console_next(CPU_d* cpu){
   if(cpu->mode != CPU_TRAP && cpu->mode != CPU_NORMAL){
     printf("Program is not run.\n");
     return 0;
   }
-  printf("console next, to be finished.\n");
   cpu->mode = CPU_NORMAL;
   CMD cmd;
   cmd.arg_num = 0;
-  while(console_step(cpu, cmd) != -1);
-  return 1;
-}
-
-int console_bp(CPU_d* cpu, CMD cmd){
-
+  while(1){
+    if(console_step(cpu, cmd) == -1)
+      break;
+    if(cpu->pipline->pipline_data[2] != NULL){
+      int visit_times;
+      visit_times = bp_search(cpu->proc->bp_list,
+			      cpu->pipline->pipline_data[2]->cur_inst_PC-4);
+      if(visit_times != 0){
+	char ass_code[100];
+	interpret_inst(cpu->pipline->pipline_data[2]->inst_code,
+		       cpu->pipline->pipline_data[2]->inst_addr,
+		       ass_code, cpu->proc);
+	printf("Breakpoint addr:0x%.8x  code:0x%.8x  %s.\nHit %d times.\n",
+	       cpu->pipline->pipline_data[2]->inst_addr,
+	       cpu->pipline->pipline_data[2]->inst_code,
+	       ass_code, visit_times);
+	break;
+      }
+    }
+  }
   return 1;
 }
