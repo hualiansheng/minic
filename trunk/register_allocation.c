@@ -73,6 +73,8 @@ int gen_var_graph(func_block *fb)
 	{
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
+			if (fb->uni_table[i]->rable == 0 || fb->uni_table[j]->rable == 0)
+				continue;
 			if ((fb->live_status[i][j/32] & (1<<(31-j%32))) == (1<<(31-j%32)))
 			{
 				for (l = 0; l < fb->width; l++)
@@ -267,6 +269,12 @@ int color(func_block *fb, int k)
 {
 	int i, j, *flag = (int*)malloc(k*sizeof(int));
 	var_vertex *ptr;
+	for (j = 0, i = 1; j < fb->uni_item_num; j++)
+	{
+		if (fb->uni_table[j]->rable == 0 && fb->uni_table[j]->isGlobal == 0)
+			fb->reg[j] = i++;
+			
+	}
 	while (top--)
 	{
 		i = vex_stack[top];
@@ -274,14 +282,14 @@ int color(func_block *fb, int k)
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
 			if ((var_vexs[i].adj_vexs[j/32] & (1<<(31-j%32))) == (1<<(31-j%32)) && fb->reg[j] != -1)
-				flag[fb->reg[j]] = 1;
+				flag[fb->reg[j]-5] = 1;
 		}
 		for (j = 0; j < k; j++)
 		{
 			if (!flag[j])
 			{
 				for (ptr = &var_vexs[i]; ptr != NULL; ptr = ptr->con_vexs)
-					fb->reg[ptr->n] = j;
+					fb->reg[ptr->n] = j + 5;
 				break;
 			}
 		}

@@ -14,6 +14,7 @@ struct symtbl_hdr
 	symtbl_hdr* rightSibling_tbl;	//rightSibling symtbl
 
 	//ret_type, ret_star, para_num, func are useful only for function's symtbl
+	char* func_name;
 	int ret_type;			//return value's type of a function; default is VOID_T
 	int ret_star;			//indicate whether the return value is a pointer; default is 0
 	int para_num;			//the number of function's parameters
@@ -27,12 +28,15 @@ struct symtbl_hdr
 //items in the symbol table
 struct symtbl_item
 {
+	int isGlobal;
+	int rable;
 	int type;			//the type of the item; if this item is a function, then it's type is FUNCTION_DEF
 	int star_num;			//indicate whether it's a pointer
 	int writable;			//common varibles are writable, but constants, arrays and functions are unwritable
 	char* name;			//name of the item 
 	int size;			//used for arrays only, indicating the number of its elements
 	int addr_off;
+	int offset;
 };
 
 /*struct symtbl_func_para

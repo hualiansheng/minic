@@ -24,6 +24,11 @@ int gen_symtbl(AST_NODE* root)
 	create_symtbl[18] = compound_symtbl;	
 	err_num = 0;	
 	tree_traversal(root,create_symtbl);
+	for (i = 0; i < root->symtbl->item_num; i++)
+	{
+		(root->symtbl->item[i]).isGlobal = 1;
+		(root->symtbl->item[i]).rable = 0;
+	}
 	if (err_num)
 		return -1;
 	return 0;

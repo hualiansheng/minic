@@ -4,3 +4,5 @@ typedef struct var_vertex {
 	int* adj_vexs;
 	int deg;
 }var_vertex;
+
+typedef struct 

@@ -14,6 +14,7 @@ symtbl_hdr* init_tbl()
 	assert(p != NULL);
 	p->leftChild_tbl = NULL;
 	p->rightSibling_tbl = NULL;
+	p->func_name = NULL;
 	p->ret_type = VOID_T;
 	p->ret_star = 0;
 	p->para_num = 0;
@@ -66,6 +67,8 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 			err_num++;
 			return -1;
 		}
+		(p_tbl->item[p_tbl->item_num]).isGlobal = 0;
+		(p_tbl->item[p_tbl->item_num]).rable = 1;
 		(p_tbl->item[p_tbl->item_num]).type = type;
 		(p_tbl->item[p_tbl->item_num]).star_num = 1;
 		(p_tbl->item[p_tbl->item_num]).writable = 0;
@@ -91,6 +94,8 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 				err_num++;
 				return -1;
 			}
+			(p_tbl->item[p_tbl->item_num]).isGlobal = 0;
+			(p_tbl->item[p_tbl->item_num]).rable = 1;
 			(p_tbl->item[p_tbl->item_num]).type = type;
 			(p_tbl->item[p_tbl->item_num]).writable = 1;
 			(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
@@ -125,8 +130,9 @@ int add_func_item(AST_NODE* p, int type, int star)
 	}*/
 	symtbl_hdr* p_tbl = tree_root->symtbl;
 	symtbl_hdr* tmp;
+	char *func_name;
 	if ((p_tbl->item_num+1)*sizeof(symtbl_item) >= p_tbl->maxSize)
-		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize));
+		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize)); 
 	p->symtbl = init_tbl();
 	p->symtbl->parent_tbl = p_tbl;
 	if (p_tbl->leftChild_tbl == NULL)
@@ -137,12 +143,16 @@ int add_func_item(AST_NODE* p, int type, int star)
 			;
 		tmp->rightSibling_tbl = p->symtbl;
 	}
+	func_name = name_address((p->content).s_content);
+	p->symtbl->func_name = func_name;
 	p->symtbl->ret_type = type;
 	p->symtbl->ret_star = star;
+	(p_tbl->item[p_tbl->item_num]).isGlobal = 1;
+	(p_tbl->item[p_tbl->item_num]).rable = 0;
 	(p_tbl->item[p_tbl->item_num]).type = FUNCTION_DEF;
 	(p_tbl->item[p_tbl->item_num]).star_num = 0;
 	(p_tbl->item[p_tbl->item_num]).writable = 0;
-	(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
+	(p_tbl->item[p_tbl->item_num]).name = func_name;
 	(p_tbl->item[p_tbl->item_num]).size = -1;
 	tmp = p->symtbl;
 	p = p->rightSibling->rightSibling->leftChild;
@@ -158,6 +168,11 @@ int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl)
 	if ((p_tbl->item_num+1)*sizeof(symtbl_item) >= p_tbl->maxSize)
 		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize));
 	p = p->leftChild;
+	(p_tbl->item[p_tbl->item_num]).isGlobal = 0;
+	if (p_tbl->item_num < 4)
+		(p_tbl->item[p_tbl->item_num]).rable = 0;
+	else
+		(p_tbl->item[p_tbl->item_num]).rable = 1;
 	(p_tbl->item[p_tbl->item_num]).type = p->leftChild->nodeType;
 	p = p->rightSibling;
 	if (p->nodeType == STAR)

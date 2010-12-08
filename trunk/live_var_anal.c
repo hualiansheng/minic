@@ -87,6 +87,8 @@ int gen_uni_table(func_block *fb)
 int gen_tmp_item(func_block *fb, int i)
 {
 	symtbl_item *new_tmp_item = (symtbl_item*)malloc(sizeof(symtbl_item));
+	new_tmp_item->isGlobal = 0;
+	new_tmp_item->rable = 1;
 	if ((fb->uni_item_num+1)*sizeof(symtbl_item) > fb->uni_table_size)
 	{
 		adjustSize((void**)(&(fb->uni_table)), &(fb->uni_table_size));
