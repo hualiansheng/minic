@@ -491,7 +491,7 @@ int rvalue_code(AST_NODE *p)
 			temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
 			temp_hdr = func_query(tree_root->symtbl, (p->leftChild->content).s_content);
 			if( temp_hdr->ret_type == CHAR_T && temp_hdr->ret_star ==0) add_triple(call,temp_symtbl->addr_off, -1, 0, 1, -1);
-			else add_triple(call,temp_symtbl->addr_off, -1, 1, 1, -1);
+			else add_triple(call,(int)(p->leftChild->content).s_content, -1, 1, 0, -1);
 			return triple_list_index - 1;
 		}
 		else{
@@ -629,8 +629,8 @@ int rvalue_code(AST_NODE *p)
 		}
 		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
 		temp_hdr = func_query(tree_root->symtbl, (p->leftChild->content).s_content);
-		if(temp_hdr -> ret_type == CHAR_T && temp_hdr ->ret_star ==0) add_triple(call,temp_symtbl->addr_off,-1,0, 1, -1);
-		else add_triple(call,temp_symtbl->addr_off,-1,1, 1, -1);
+		if(temp_hdr -> ret_type == CHAR_T && temp_hdr ->ret_star ==0) add_triple(call,(int)(p->leftChild->content).s_content,-1,0, 0, -1);
+		else add_triple(call,(int)(p->leftChild->content).s_content,-1,1,0, -1);
 		return triple_list_index - 1;
 	}//end case 4
 	}
@@ -654,7 +654,7 @@ int lvalue_code(AST_NODE *p)
 			ptr = p->leftChild->rightSibling;
 			temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
 			assert(temp_symtbl != NULL);
-			if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0)	add_triple(add_op, (int)temp_ID,0,1,0,2);
+			if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==1)	add_triple(add_op, (int)temp_ID,0,2,0,2);
 			else 	add_triple(add_op, (int)temp_ID,0,1,0,2);
 			return triple_list_index - 1;
 		}
@@ -828,6 +828,7 @@ int return_code(AST_NODE *p)
 		temp_symtbl = symtbl_query(p->symtbl,temp_ID,  0);
 		assert(temp_symtbl != NULL);
 		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num ==0)	add_triple(return_op,(int)temp_ID, -1, 0, 0,-1);
+		else if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num ==1)	add_triple(return_op,(int)temp_ID, -1, 2, 0,-1);
 		else add_triple(return_op,(int)temp_ID, -1, 1, 0,-1);
 		break;
 	}
@@ -862,6 +863,7 @@ void add_triple_single_op(int temp_rvalue, enum operator op, AST_NODE *ptr)
 		temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
 		if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0)	add_triple(op,(int)temp_ID, -1, 0, 0,-1);
+		else if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==1)	add_triple(op,(int)temp_ID, -1, 2, 0,-1);
 		else add_triple(op,(int)temp_ID, -1, 1, 0,-1);
 		break;
 	}
@@ -900,6 +902,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		temp_symtbl = symtbl_query(ptr1->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
 		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 0) size_type1 = 0;
+		else if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 1) size_type1 = 2;
 		else size_type1 = 1;
 		var_type1 = 0;
 		break;
@@ -918,7 +921,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	}
 	case -4:{
 		var1 = (int)const_string;
-		size_type1 = 1;
+		size_type1 = 2;
 		var_type1 = 2;
 		break;
 	}
@@ -936,6 +939,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		temp_symtbl = symtbl_query(ptr2->symtbl, temp_ID, 0);
 		assert(temp_symtbl != NULL);
 		if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 0) size_type2 = 0;
+		else if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 1) size_type2 = 2;
 		else size_type2 = 1;
 		var_type2 = 0;
 		break;
@@ -954,7 +958,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	}
 	case -4:{
 		var2 = (int)const_string;
-		size_type2 = 1;
+		size_type2 = 2;
 		var_type2 = 2;
 		break;
 	}
@@ -965,14 +969,31 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	}
 	}
 	if(op == add_op || op == minus_op || op == multiply_op || op == assign_op || op == star_assign_op){
-		if(size_type1 == 1 && size_type2 == 0){
+		if(op == assign_op && size_type1 == 0 && (size_type2 == 1 || size_type2 == 0)){
+			add_triple(int_to_char_op, var2, -1, 0, var_type2, -1);
+			temp_index = triple_list_index-1;
+			add_triple(op,var1, temp_index, 1, var_type1, 1);
+		}
+		else if(op == star_assign_op){
+			if(size_type1 == 1 && size_type2 == 0){
+				add_triple(char_to_int_op, var2, -1, 1, var_type2, -1);
+				temp_index = triple_list_index-1;
+				add_triple(op,var1,temp_index,1,var_type1,1);
+			}
+			else if(size_type1 == 2 && (size_type2 == 1 || size_type2 == 2))
+			{
+				add_triple(int_to_char_op, var2, -1 ,1, var_type2, -1);
+				temp_index = triple_list_index - 1;
+				add_triple(op, var1, temp_index, 0, var_type1, 1);
+			}else add_triple(op,var1,var2,(size_type2 == 0)?0:1,var_type1,var_type2);
+		}
+		else if((size_type1 == 1 || size_type1 == 2) && size_type2 == 0){
 			/**Brills modified here: -1 for var_type2??*/
 			add_triple(char_to_int_op, var2,-1,1,var_type2,-1);
-			
 			temp_index = triple_list_index-1;
 			add_triple(op, var1, temp_index, 1, var_type1, 1);	
 		}
-		else if(size_type1 == 0 && size_type2 == 1 && op != assign_op){
+		else if(size_type1 == 0 && (size_type2 == 1 || size_type2 == 2) && op != assign_op){
 			/**Brills modified here: -1 for var_type1??*/			
 			add_triple(char_to_int_op, var1,-1,1,var_type1,-1);
 			temp_index = triple_list_index-1;

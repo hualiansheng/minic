@@ -7,7 +7,7 @@
 
 enum operator{
 	if_op = 3000, if_not_op, goto_op,negative_op,not_op,address_op,star_op,positive_op,assign_op,star_assign_op,add_op,minus_op,multiply_op, char_to_int_op,
-	equal_op, less_op, larger_op, eqlarger_op, eqless_op, noteq_op, or_op, and_op, get_rb, set_rb, call, param, enterF,enterS, leaveF, leaveS , return_op, adds_op
+	equal_op, less_op, larger_op, eqlarger_op, eqless_op, noteq_op, or_op, and_op, get_rb, set_rb, call, param, enterF,enterS, leaveF, leaveS , return_op, adds_op, int_to_char_op
 
 };
 
@@ -23,7 +23,7 @@ typedef struct triple
 	enum operator op;
 	union arg arg1;
 	union arg arg2;
-	int result_type;//0为char 1为int
+	int result_type;//0为char, 1为int, 2为char型指针
 	int arg1_type;//0 var 1 临时变量 2 constant 3 string constant
 	int arg2_type;//0 var 1 临时变量 2 constant 3 string constant
 	//Brills modified here:
