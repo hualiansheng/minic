@@ -35,6 +35,9 @@ void console_help_list();// help doc of list/l
 
 
 int console_next_cmd(CPU_d* cpu, char* filename){
+  //CACHE_RETURN cache_return;
+  //cache_return = cache_search(cpu->d_cache, 0x020087f0);
+  //printf("0x%.8x  0x%.8x\n", cpu->i_cache, cpu->d_cache);
   char input[200]={0};
   CMD cmd;
   printf(">");
@@ -272,7 +275,8 @@ int console_print(CPU_d* cpu, CMD cmd){
     printf("Invalid print format. See \"help p\" for more details.\n");
     return 0;
   }
-  printf("r[%d]  :  0x%.8x\n", num, cpu->regs->r[num]);
+  printf("r[%d]  :  0x%.8x - %d\n", num,
+	 cpu->regs->r[num], cpu->regs->r[num]);
   return 1;
 }
 
@@ -359,8 +363,9 @@ int console_print_pipline(CPU_d* cpu){
 int console_list(CPU_d* cpu, CMD cmd){
   uint32_t addr;
   int line_num;
+  addr = cpu->proc->list_cur_addr;
+  line_num = 10;
   if(cmd.arg_num == 0){
-    addr = cpu->proc->list_cur_addr;
     line_num = 10;
   }
   else if(cmd.arg_num == 1){
@@ -375,7 +380,7 @@ int console_list(CPU_d* cpu, CMD cmd){
       sscanf(cmd.args[0], "  %x", &addr);
     }else
       sscanf(cmd.args[0], "%d", &addr);
-    line_num = 10;
+    //line_num = 10;
   }
   else{
     // parse addr
@@ -383,6 +388,25 @@ int console_list(CPU_d* cpu, CMD cmd){
       addr = cpu->proc->list_cur_addr;
     else if(cmd.args[0][0] == 'i')
       addr = cpu->proc->entry;
+    // list function
+    else if(cmd.args[0][0] == 'f'){
+      addr = debugger_search_symtbl_func(cpu->proc, cmd.args[1]);
+      // printf("0x%.8x aaaaa\n", addr);
+      if(addr == 0){
+	printf("Invalid function name : %s\n", cmd.args[1]);
+	return 0;
+      }
+      if(cmd.arg_num >= 3){
+	// parse line number
+	if(cmd.args[2][0] == '0' && cmd.args[2][1] == 'x'){
+	  cmd.args[2][0] = ' ';
+	  cmd.args[2][1] = ' ';
+	  sscanf(cmd.args[2], "  %x", &line_num);
+	}else
+	  sscanf(cmd.args[2], "%d", &line_num);
+      }
+    }
+    // others
     else if(cmd.args[0][0] == '0' && cmd.args[0][1] == 'x'){
       cmd.args[0][0] = ' ';
       cmd.args[0][1] = ' ';
@@ -402,11 +426,11 @@ int console_list(CPU_d* cpu, CMD cmd){
     return 0;
   }
   if(mem_invalid(cpu->proc->mem, addr) != 0){
-    printf("Invalid address : 0x%.8x\n", addr);
+    printf("List curse is to the end of segment : 0x%.8x.\n", addr);
     return 0;
   }
-  if(mem_invalid(cpu->proc->mem, cpu->proc->list_cur_addr) != 0){
-    printf("List curse is to the end of segment.\n");
+  if(mem_invalid(cpu->proc->mem, addr) != 0){
+    printf("Invalid address : 0x%.8x\n", addr);
     return 0;
   }
   int i;
@@ -414,8 +438,9 @@ int console_list(CPU_d* cpu, CMD cmd){
   char name[100];
   char ass_code[100];
   for(i=0; i<line_num; i++){
-    if(mem_invalid(cpu->proc->mem, addr) != 0)
+    if(mem_invalid(cpu->proc->mem, addr + 4*i) != 0){
       break;
+    }
     mem_fetch(cpu->proc->mem, addr + 4*i, &data, sizeof(data), DATA_RD);
     if(debugger_search_symtbl(cpu->proc, addr + 4*i, name, STT_FUNC) == 1)
       printf("<%s>\n", name);
@@ -454,6 +479,7 @@ void console_help_list(){
   printf("Format   : list/l [addr] [lines]\n");
   printf("\t[addr]  : the address of codes to display, \"i\" is the begining of program, \"c\" is the current position, \"c\" is default.\n");
   printf("\t[lines] : number of lines to list, 10 is default.\n");
+  printf("Another usage is l f <func_name> <lines>, which can list from the given function.");
 }
 
 void console_help_modify(){

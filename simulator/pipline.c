@@ -202,6 +202,7 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
       }
       CACHE_RETURN cache_return;
       cache_return = cache_search(pipline->d_cache, data->addr);
+      //printf("addr:%.8x  data:%.8x\n",data->addr,cache_return.data);
       // update cpu info about cache
       cpu_info->cache_visit ++;
       if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)

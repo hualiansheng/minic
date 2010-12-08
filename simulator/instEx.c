@@ -423,6 +423,7 @@ int inst_Ex_L_S_I_offset(PIPLINE* pipline, int level){
     pipline->regs->r[data->Rn] = addr_c;
   pipline->block_reg = data->Rd;
   data->addr = addr;
+  //printf("Memory addr : 0x%.8x\n", addr);
   return 0;
 }
 
@@ -436,7 +437,8 @@ int inst_Ex_Branch_Link(PIPLINE* pipline, int level){
   //printf("Branch imm : %.8x\n", data->imm);
   if(branch_judge(pipline, data->cond) == 1){
     pipline->regs->REG_PC = data->cur_inst_PC + data->imm * 4;
-    pipline->regs->REG_BL = data->cur_inst_PC;
+    if(data->L == 1)
+      pipline->regs->REG_BL = data->cur_inst_PC;
     pipline->pc_src = 1;
     pipline->drain_pipline = 1;
     return 1;
