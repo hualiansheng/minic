@@ -135,6 +135,7 @@ void gen_intermediate_code(AST_NODE *root)
 {
 	AST_NODE* p = root;
 	AST_NODE* ptr;
+	char* func_name;
 	symtbl_item* temp_symtbl;
 	//fprintf(stderr,"processing: %d %s\n",root->nodeType,name[root->nodeType-FUNC_OFFSET]);
 	//initialize();
@@ -144,6 +145,7 @@ void gen_intermediate_code(AST_NODE *root)
 			ptr = ptr->rightSibling;
 		temp_symtbl = symtbl_query(ptr->symtbl, ptr->content.s_content, 0);
 		temp_symtbl->addr_off = triple_list_index;
+		func_name = ptr->content.s_content;
 	}
 	if(p->nodeType == STATEMENT){
 		//do something
@@ -152,7 +154,7 @@ void gen_intermediate_code(AST_NODE *root)
 	}
 	if(root->nodeType == FUNCTION_BODY){
 		push_scope(root->symtbl);
-		add_triple(enterF, -1, -1, -1, -1, -1);		
+		add_triple(enterF, func_name, -1, -1, 0, -1);		
 	}
 	for(p = p->leftChild ; p != NULL; p = p->rightSibling)
 		gen_intermediate_code(p);
