@@ -75,8 +75,8 @@ int mem_fetch(PROC_MEM* mem, unsigned int addr,
       return 0;
     }
   }
-  printf("vaddr_offset : 0x%.8x, size: %d\n", (mem->segments[i]).vaddr_offset, (mem->segments[0]).size);
-  printf("High bound : 0x%.8x\n", (mem->segments[i]).vaddr_offset+ (mem->segments[i]).size);
+  //printf("vaddr_offset : 0x%.8x, size: %d\n", (mem->segments[i]).vaddr_offset, (mem->segments[0]).size);
+  //printf("High bound : 0x%.8x\n", (mem->segments[i]).vaddr_offset+ (mem->segments[i]).size);
   data = NULL;
   fprintf(stderr, "mem_fetch : Not an effective address : 0x%.8x\n", addr);
   exit(1);
@@ -94,7 +94,7 @@ int mem_set(PROC_MEM* mem, unsigned int addr,
     if(((mem->segments[i]).flag & SEG_WR) !=0
        && (mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset + 
-       (mem->segments[i]).size * 4){
+       (mem->segments[i]).size){
       uint8_t *dest_addr = (mem->segments[i]).base;
       unsigned int offset;
       offset = (addr-(unsigned int)(mem->segments[i]).vaddr_offset);
@@ -114,14 +114,14 @@ int mem_type(PROC_MEM* mem, uint32_t addr){
   for(i=0; i<mem->seg_num; i++)
     if((mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset +
-       (mem->segments[i]).size * 4){
+       (mem->segments[i]).size){
       return (mem->segments[i]).flag;
     }
   fprintf(stderr, "mem_type : Not an effective address 0x%.8x\n", addr);
   exit(1);
 }
 
-int mem_invalid(PROC_MEM* mem, uint32_t addr){
+int mem_invalid(PROC_MEM* mem, unsigned int addr){
   if(mem == NULL){
     fprintf(stderr, "Uninitialization of memory.\n");
     exit(1);
@@ -130,7 +130,7 @@ int mem_invalid(PROC_MEM* mem, uint32_t addr){
   for(i=0; i<mem->seg_num; i++)
     if((mem->segments[i]).vaddr_offset <= addr
        && addr <= (mem->segments[i]).vaddr_offset +
-       (mem->segments[i]).size*4)
+       (mem->segments[i]).size)
       return 0;
   return -1;
 }

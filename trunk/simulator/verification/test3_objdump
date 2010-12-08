@@ -163,6 +163,7 @@ Disassembly of section .text:
 0200047c <main>:
  200047c:	1a07001d 	mov	ip, sp
  2000480:	70efc004 	stw	pc, [sp-], #4
+          011 1 0 0 0 0 11101 11111 00000000000100
  2000484:	70ef8008 	stw	lr, [sp-], #8
  2000488:	70ef000c 	stw	ip, [sp-], #12
  200048c:	70ef000c 	stw	ip, [sp-], #12

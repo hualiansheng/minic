@@ -35,7 +35,8 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
   block_addr = (addr >> block_offset) << (block_offset);
 
   //printf("addr : 0x%.8x\n", addr);
-  //printf("block addr init : 0x%.8x\n", block_addr);  
+  //printf("block addr init : 0x%.8x\n", block_addr);
+  //printf("block index : 0x%.8x\n", block_index);
 
   c_r.cpu_cycles = -1;
   cache->mark[block_index] = mark_addr;
@@ -52,10 +53,12 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
 		    CACHE_BLOCK_SIZE-in_block_count, DATA_RD) != 0){
     return c_r;
   }
+  //printf("aaaa : 0x%.8x\n", cache->mem);
   c_r.cpu_cycles = CACHE_MISSED_CYCLE;
   presult = (uint32_t*)&(cache->data[block_index][in_block_index]);
   c_r.data = *presult;
-  //printf("Cache missed! Data : 0x%x\n", c_r.data);
+  //printf("Cache missed! Addr : 0x%.8x  Data : 0x%x\n", addr, c_r.data);
+  //printf("Cache missed block index : 0x%.8x\n", block_index);
   return c_r;
 }
 
@@ -85,14 +88,14 @@ int cache_rewrite(CACHE* cache, uint32_t addr){
     uint32_t block_addr;
     int block_offset;
     int mark_addr;
-    int in_block_index;
+    //int in_block_index;
     int in_block_count = 0;
-    mark_addr = addr >> ((int)(log(CACHE_SIZE)/log(2)));
-    in_block_index = addr % CACHE_BLOCK_SIZE;
-    block_offset = (int)(log(CACHE_BLOCK_SIZE)/log(2));
-    //block_addr = (mark_addr << block_offset)
-    //  + block_index * CACHE_BLOCK_SIZE;
-    block_addr = (addr >> block_offset) << (block_offset);
+    mark_addr = cache->mark[block_index];
+    //in_block_index = addr % CACHE_BLOCK_SIZE;
+    block_offset = (int)(log(CACHE_SIZE)/log(2));
+    block_addr = (mark_addr << block_offset)
+      + block_index * CACHE_BLOCK_SIZE;
+    //block_addr = (addr >> block_offset) << (block_offset);
 
     //printf("addr : 0x%.8x\n", addr);
     //printf("block addr init : 0x%.8x\n", block_addr);
@@ -103,8 +106,8 @@ int cache_rewrite(CACHE* cache, uint32_t addr){
     }
     mem_set(cache->mem, block_addr, (cache->data)[block_index],
 	    CACHE_BLOCK_SIZE-in_block_count);
-    //printf("Rewrite NO. %d block.\n", block_index);
-    //printf("block addr : 0x%.8x\n", block_addr);
+    //printf("Rewrite block index : 0x%.8x.\n", block_index);
+    //printf("Rewrite block addr : 0x%.8x\n", block_addr);
     return 0;
   }
   else if(type != -1){

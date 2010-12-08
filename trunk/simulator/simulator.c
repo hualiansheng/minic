@@ -28,7 +28,6 @@ int main(int argc, char **argv){
     if(sig == 0)
       break;
   }
-  printf("=================================\n");
   printf("Simulator end.\n");
   process_end(cpu);
   

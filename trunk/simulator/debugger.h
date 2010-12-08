@@ -22,5 +22,6 @@ extern void debugger_list_break_point(CPU_d* cpu, uint32_t addr);
 extern void debugger_list_codes(CPU_d* cpu, uint32_t addr, int lines);
 extern int debugger_search_symtbl(PROCESS* proc, uint32_t addr, char* result,
                                   int type);
+extern uint32_t debugger_search_symtbl_func(PROCESS* proc, char* func_name);
 
 #endif

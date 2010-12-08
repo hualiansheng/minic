@@ -139,6 +139,19 @@ int debugger_search_symtbl(PROCESS* proc, uint32_t addr, char* result,
   return 0;
 }
 
+uint32_t debugger_search_symtbl_func(PROCESS* proc, char* func_name){
+  PROC_SYMTBL symtbl = proc->symtbl;
+  int i;
+  for(i=0; i<symtbl.sym_num; i++){
+    //printf("%d  %s 0x%.8x", i, symtbl.name[i], symtbl.addr[i]);
+    if(strcmp(symtbl.name[i], func_name) == 0 && 
+       ELF32_ST_TYPE(symtbl.st_info[i]) == STT_FUNC){
+      return symtbl.addr[i];
+    }
+  }
+  return 0;
+}
+
 void debugger_set_break_point(CPU_d* cpu, uint32_t addr){
   
 }
