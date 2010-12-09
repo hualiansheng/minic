@@ -115,8 +115,18 @@ int inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
   result = data_Ex(operand1, operand2, data->opcodes, carry);
   // Some opcodes will not write back
   if(data->opcodes != CAND && data->opcodes != CXOR
-     && data->opcodes != CSUB && data->opcodes != CADD)
+     && data->opcodes != CSUB && data->opcodes != CADD
+     && data->opcodes != MOV && data->opcodes != MVN)
     pipline->regs->r[data->Rd] = result;
+  else if(data->opcodes == MOV || data->opcodes == MVN){
+    if((data->Rn & 0x10) != 0){
+      data->Rn = data->Rn &0x0F;
+      if(branch_judge(pipline, data->Rn) == 1)
+        pipline->regs->r[data->Rd] = result;
+    }
+    else
+      pipline->regs->r[data->Rd] = result;
+  }
   // Set CMSR when S bit is 1 and Rd is not PC
   if(data->S == 1 && data->Rd != 31)
     set_CMSR(pipline->regs, operand1, operand2,
@@ -158,8 +168,18 @@ int inst_Ex_D_Reg_Shift(PIPLINE* pipline, int level){
   result = data_Ex(operand1, operand2, data->opcodes, carry);
   // Some opcodes will not write back
   if(data->opcodes != CAND && data->opcodes != CXOR
-     && data->opcodes != CSUB && data->opcodes != CADD)
+     && data->opcodes != CSUB && data->opcodes != CADD
+     && data->opcodes != MOV && data->opcodes != MVN)
     pipline->regs->r[data->Rd] = result;
+  else if(data->opcodes == MOV || data->opcodes == MVN){
+    if((data->Rn & 0x10) != 0){
+      data->Rn = data->Rn &0x0F;
+      if(branch_judge(pipline, data->Rn) == 1)
+        pipline->regs->r[data->Rd] = result;
+    }
+    else
+      pipline->regs->r[data->Rd] = result;
+  }
   // Set CMSR when S bit is 1 and Rd is not PC
   if(data->S == 1 && data->Rd != 31)
     set_CMSR(pipline->regs, operand1, operand2,
@@ -267,8 +287,18 @@ int inst_Ex_D_Immediate(PIPLINE* pipline, int level){
   result = data_Ex(operand1, operand2, data->opcodes, carry);
   // Some opcodes will not write back
   if(data->opcodes != CAND && data->opcodes != CXOR
-     && data->opcodes != CSUB && data->opcodes != CADD)
+     && data->opcodes != CSUB && data->opcodes != CADD
+     && data->opcodes != MOV && data->opcodes != MVN)
     pipline->regs->r[data->Rd] = result;
+  else if(data->opcodes == MOV || data->opcodes == MVN){
+    if((data->Rn & 0x10) != 0){
+      data->Rn = data->Rn &0x0F;
+      if(branch_judge(pipline, data->Rn) == 1)
+        pipline->regs->r[data->Rd] = result;
+    }
+    else
+      pipline->regs->r[data->Rd] = result;
+  }
   // Set CMSR when S bit is 1 and Rd is not PC
   if(data->S == 1 && data->Rd != 31)
     set_CMSR(pipline->regs, operand1, operand2,

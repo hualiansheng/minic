@@ -55,11 +55,42 @@ int interpret_D(PIPLINE_DATA data, char* result){
   case CSUB : strcpy(opcode, "cmpsub");break;
   case CADD : strcpy(opcode, "cmpadd");break;
   case ORR  : strcpy(opcode, "orr");break;
-  case MOV  : strcpy(opcode, "mov");break;
   case CLB  : strcpy(opcode, "clb");break;
-  case MVN  : strcpy(opcode, "mvn");break;
+  case MOV  : 
+              if((data.Rn & 0x10) == 0)
+                 strcpy(opcode, "mov");
+              else
+                strcpy(opcode, "cmov");
+              break;
+  case MVN  : 
+              if((data.Rn & 0x10) == 0)
+                 strcpy(opcode, "mvn");
+              else
+                strcpy(opcode, "cmov");
+              break;
   default   : strcpy(opcode, "UNKNOWN");break;
   }
+  if(data.opcodes == MOV || data.opcodes == MVN)
+    if((data.Rn & 0x10) != 0){
+      switch(data.Rn & 0x0F){
+      case EQ  : strcat(opcode, "eq");break;
+      case NE  : strcat(opcode, "ne");break;
+      case UGE : strcat(opcode, "uge");break;
+      case ULT : strcat(opcode, "ult");break;
+      case N   : strcat(opcode, "n");break;
+      case NN  : strcat(opcode, "nn");break;
+      case OV  : strcat(opcode, "ov");break;
+      case NV  : strcat(opcode, "nv");break;
+      case UGT : strcat(opcode, "ugt");break;
+      case ULE : strcat(opcode, "ule");break;
+      case SGE : strcat(opcode, "sge");break;
+      case SLT : strcat(opcode, "slt");break;
+      case SGT : strcat(opcode, "sgt");break;
+      case SLE : strcat(opcode, "sle");break;
+      case AL  : strcat(opcode, "");break;
+      default  : break;
+      }
+    }
   if(data.S == 1)
     strcat(opcode, ".s");
   sprintf(operand1, "r%d", data.Rn);
