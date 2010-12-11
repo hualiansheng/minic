@@ -38,7 +38,10 @@ typedef struct func_block {
 	unsigned int **use;
 	map_table* mapping;
 	int map_table_size;
-	int *reg;
+	int *reg_alloc;
+	int reg_used;
+	int reg_var[32];
+	int min_stack_size;
 }func_block;
 
 #endif
