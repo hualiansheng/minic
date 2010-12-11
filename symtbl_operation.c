@@ -68,7 +68,7 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 			return -1;
 		}
 		(p_tbl->item[p_tbl->item_num]).isGlobal = 0;
-		(p_tbl->item[p_tbl->item_num]).rable = 1;
+		//(p_tbl->item[p_tbl->item_num]).rable = 1;
 		(p_tbl->item[p_tbl->item_num]).type = type;
 		(p_tbl->item[p_tbl->item_num]).star_num = 1;
 		(p_tbl->item[p_tbl->item_num]).writable = 0;
@@ -95,7 +95,7 @@ int add_var_item(AST_NODE* p, symtbl_hdr* p_tbl, int type)
 				return -1;
 			}
 			(p_tbl->item[p_tbl->item_num]).isGlobal = 0;
-			(p_tbl->item[p_tbl->item_num]).rable = 1;
+			//(p_tbl->item[p_tbl->item_num]).rable = 1;
 			(p_tbl->item[p_tbl->item_num]).type = type;
 			(p_tbl->item[p_tbl->item_num]).writable = 1;
 			(p_tbl->item[p_tbl->item_num]).name = name_address((p->content).s_content);
@@ -148,7 +148,7 @@ int add_func_item(AST_NODE* p, int type, int star)
 	p->symtbl->ret_type = type;
 	p->symtbl->ret_star = star;
 	(p_tbl->item[p_tbl->item_num]).isGlobal = 1;
-	(p_tbl->item[p_tbl->item_num]).rable = 0;
+	//(p_tbl->item[p_tbl->item_num]).rable = 0;
 	(p_tbl->item[p_tbl->item_num]).type = FUNCTION_DEF;
 	(p_tbl->item[p_tbl->item_num]).star_num = 0;
 	(p_tbl->item[p_tbl->item_num]).writable = 0;
@@ -169,10 +169,7 @@ int add_para_item(AST_NODE* p, symtbl_hdr* p_tbl)
 		adjustSize((void**)(&(p_tbl->item)), &(p_tbl->maxSize));
 	p = p->leftChild;
 	(p_tbl->item[p_tbl->item_num]).isGlobal = 0;
-	if (p_tbl->item_num < 4)
-		(p_tbl->item[p_tbl->item_num]).rable = 0;
-	else
-		(p_tbl->item[p_tbl->item_num]).rable = 1;
+	//(p_tbl->item[p_tbl->item_num]).rable = 1;
 	(p_tbl->item[p_tbl->item_num]).type = p->leftChild->nodeType;
 	p = p->rightSibling;
 	if (p->nodeType == STAR)

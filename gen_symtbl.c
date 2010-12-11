@@ -27,7 +27,7 @@ int gen_symtbl(AST_NODE* root)
 	for (i = 0; i < root->symtbl->item_num; i++)
 	{
 		(root->symtbl->item[i]).isGlobal = 1;
-		(root->symtbl->item[i]).rable = 0;
+		//(root->symtbl->item[i]).rable = 0;
 	}
 	if (err_num)
 		return -1;

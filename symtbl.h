@@ -29,7 +29,7 @@ struct symtbl_hdr
 struct symtbl_item
 {
 	int isGlobal;
-	int rable;
+	//int rable;
 	int type;			//the type of the item; if this item is a function, then it's type is FUNCTION_DEF
 	int star_num;			//indicate whether it's a pointer
 	int writable;			//common varibles are writable, but constants, arrays and functions are unwritable
@@ -37,6 +37,7 @@ struct symtbl_item
 	int size;			//used for arrays only, indicating the number of its elements
 	int addr_off;
 	int offset;
+	int reg;
 };
 
 /*struct symtbl_func_para

@@ -28,7 +28,7 @@ int register_allocation(int k)
 
 int register_allocation_func(func_block *fb, int k)
 {
-	fb->reg = (int*)malloc(fb->uni_item_num*sizeof(int));
+	fb->reg_alloc = (int*)malloc(fb->uni_item_num*sizeof(int));
 	var_vexs = (var_vertex*)malloc(fb->uni_item_num*sizeof(var_vertex));
 	gen_var_graph(fb);
 	vex_stack = (int*)malloc(fb->uni_item_num*sizeof(int));
@@ -67,13 +67,13 @@ int gen_var_graph(func_block *fb)
 		var_vexs[i].adj_vexs = (int*)malloc((fb->width)*sizeof(int));
 		for (j = 0; j < fb->width; j++)
 			var_vexs[i].adj_vexs[j] = 0;
-		fb->reg[i] = -1;
+		fb->reg_alloc[i] = -1;
 	}
 	for (i = 0; i < fb->code_num; i++)
 	{
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
-			if (fb->uni_table[i]->rable == 0 || fb->uni_table[j]->rable == 0)
+			if (fb->uni_table[i]->isGlobal == 1 || fb->uni_table[j]->isGloabl == 1)
 				continue;
 			if ((fb->live_status[i][j/32] & (1<<(31-j%32))) == (1<<(31-j%32)))
 			{
@@ -269,32 +269,37 @@ int color(func_block *fb, int k)
 {
 	int i, j, *flag = (int*)malloc(k*sizeof(int));
 	var_vertex *ptr;
-	for (j = 0, i = 1; j < fb->uni_item_num; j++)
-	{
-		if (fb->uni_table[j]->rable == 0 && fb->uni_table[j]->isGlobal == 0)
-			fb->reg[j] = i++;
-			
-	}
+	//for (j = 0, i = 0; i < 4 && j < fb->uni_item_num; j++)
+	//	fb->reg_alloc[j] = i++;
 	while (top--)
 	{
 		i = vex_stack[top];
 		memset(flag, 0, k*sizeof(int));
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
-			if ((var_vexs[i].adj_vexs[j/32] & (1<<(31-j%32))) == (1<<(31-j%32)) && fb->reg[j] != -1)
-				flag[fb->reg[j]-5] = 1;
+			if ((var_vexs[i].adj_vexs[j/32] & (1<<(31-j%32))) == (1<<(31-j%32)) && fb->reg_alloc[j] != -1)
+				flag[fb->reg_alloc[j]-7] = 1;
 		}
 		for (j = 0; j < k; j++)
 		{
 			if (!flag[j])
 			{
 				for (ptr = &var_vexs[i]; ptr != NULL; ptr = ptr->con_vexs)
-					fb->reg[ptr->n] = j + 5;
+					fb->reg_alloc[ptr->n] = j + 7;
 				break;
 			}
 		}
 	}
 	free(flag);
+	for (j = 0, i = 0; j < fb->uni_item_num; j++)
+	{
+		if (fb->reg_alloc[j] > i)
+			i = fb->reg_alloc[j];
+		if (fb->reg_alloc[j] > 15)
+			fb->reg_alloc[j]++;
+		fb->uni_table[j]->reg = fb->reg_alloc[j];
+	}
+	fb->reg_used = i - 6;
 	return 0;
 }
 

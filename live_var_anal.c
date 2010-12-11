@@ -42,7 +42,7 @@ int live_var_func(func_block *fb)
 
 int gen_uni_table(func_block *fb)
 {
-	int begin, end, i;
+	int begin, end, i, k;
 	enum operator tmp_op;
 	begin = fb->start->begin;
 	end = fb->over->end;
@@ -52,6 +52,13 @@ int gen_uni_table(func_block *fb)
 	fb->uni_table_size = INIT_ITEM_NUM*sizeof(symtbl_item);
 	fb->mapping = (map_table*)malloc(INIT_ITEM_NUM*sizeof(map_table));
 	fb->map_table_size = INIT_ITEM_NUM*sizeof(map_table);
+	symtbl_hdr *ptr = triple_list[index_index[i]].symtbl;
+	for (i = 0; i < ptr->para_num; i++)
+	{
+		//if (i >= ptr->para_num-4)
+		//	ptr->item[i].rable = 0;
+		get_uni_item(fb, begin, ptr->item[i].name);
+	}
 	for (i = begin; i <= end; i++)
 	{
 		tmp_op = triple_list[index_index[i]].op;
@@ -88,7 +95,7 @@ int gen_tmp_item(func_block *fb, int i)
 {
 	symtbl_item *new_tmp_item = (symtbl_item*)malloc(sizeof(symtbl_item));
 	new_tmp_item->isGlobal = 0;
-	new_tmp_item->rable = 1;
+	//new_tmp_item->rable = 1;
 	if ((fb->uni_item_num+1)*sizeof(symtbl_item) > fb->uni_table_size)
 	{
 		adjustSize((void**)(&(fb->uni_table)), &(fb->uni_table_size));
