@@ -14,7 +14,7 @@ int const_value;
 char* const_string;
 char* temp_ID;
 //brills modified here:
-int *alist1,*alist2;
+//int *alist1,*alist2;
 int (*gen_triple_code[67])(AST_NODE*);
 
 symtbl_hdr **scope_stack;
@@ -121,8 +121,8 @@ void initialize()
 	scope_stack = malloc(initsize*sizeof(symtbl_hdr*));
 	scope_size = initsize;
 	//temporary workround
-	alist1 = malloc(100*sizeof(int));
-	alist2 = malloc(100*sizeof(int));
+	//alist1 = malloc(100*sizeof(int));
+	//alist2 = malloc(100*sizeof(int));
 }
 
 void intermediate_code(AST_NODE* root)
@@ -561,8 +561,8 @@ int rvalue_code(AST_NODE *p)
 		 *Brills modified here: 
 		 *maybe memory leak?? you should free the malloced memory everytime...
 		 */
-		arg_list = alist1; //malloc(100*sizeof(int));
-		arg_type_list = alist2; //malloc(100*sizeof(int));
+	 	arg_list = malloc(100*sizeof(int));  //arg_list = alist1;
+		arg_type_list = malloc(100*sizeof(int)); //arg_type_list = alist2; 
 		ptr = p -> leftChild -> rightSibling -> rightSibling;
 		while(1){
 			if(ptr->leftChild->nodeType == EXPRESSION){
@@ -588,6 +588,7 @@ int rvalue_code(AST_NODE *p)
 					arg_num ++;
 				}
 				else{
+					temp_rvalue = triple_list_index - 1;
 					arg_list[arg_num] = temp_rvalue;
 					arg_type_list[arg_num] = 1;
 					arg_num++;	
@@ -619,6 +620,7 @@ int rvalue_code(AST_NODE *p)
 					arg_num ++;
 				}
 				else{
+					temp_rvalue = triple_list_index - 1;
 					arg_list[arg_num] = temp_rvalue;
 					arg_type_list[arg_num] = 1;
 					arg_num++;	
@@ -633,6 +635,8 @@ int rvalue_code(AST_NODE *p)
 		temp_hdr = func_query(tree_root->symtbl, (p->leftChild->content).s_content);
 		if(temp_hdr -> ret_type == CHAR_T && temp_hdr ->ret_star ==0) add_triple(call,(int)(p->leftChild->content).s_content,-1,0, 0, -1);
 		else add_triple(call,(int)(p->leftChild->content).s_content,-1,1,0, -1);
+		free(arg_list);
+		free(arg_type_list);
 		return triple_list_index - 1;
 	}//end case 4
 	}
