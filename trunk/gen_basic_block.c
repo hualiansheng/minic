@@ -1,4 +1,5 @@
 #include "basic_block.h"
+#include "gen_intermediate_code.h"
 #include <stdlib.h>
 #include <memory.h>
 extern triple *triple_list;
@@ -62,6 +63,7 @@ int gen_basic_block()
 	{
 		if (isLeader[i] == 1)
 		{
+			cur_block->fb = cur_func;
 			cur_block->end = i-1;
 			cur_block->m = m++;
 			if (triple_list[index_index[i-1]].op != goto_op && triple_list[index_index[i-1]].op != leaveF)
@@ -95,6 +97,7 @@ int gen_basic_block()
 			m = 0;
 		}
 	}
+	cur_block->fb = cur_func;
 	cur_block->end = triple_list_index-1;
 	cur_block->m = m++;
 	cur_block->next = NULL;
