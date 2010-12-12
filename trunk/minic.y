@@ -90,7 +90,8 @@ extern int error_number;
 %left '+' '-'
 %left '*'
 
-%left BOOLEAN_OP REL_OP
+%left BOOLEAN_OP
+%left REL_OP
 %right DOUBLE
 %right DOUBLE_OP
 %right NOT
