@@ -958,13 +958,11 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	}
 	}
 	if(op == or_op){
-		add_triple(set_rb,1,-1, 1,2,-1);
 		add_triple(if_op, var1, 0, 1, var_type1, 1);//if跳转指令 第三个操作数是一个立即数
 		backpatch1 = triple_list_index -1;
 	}
 	else if(op == and_op){
-		add_triple(set_rb,0,-1, 1,2,-1);
-		add_triple(if_not_op, var1, triple_list_index + 3, 1, var_type1, 2);//if_not跳转指令 第三个操作数是一个立即数
+		add_triple(if_not_op, var1, triple_list_index + 3, 1, var_type1, 1);//if_not跳转指令 第三个操作数是一个立即数
 		backpatch1 = triple_list_index -1;
 	}
 //var2
@@ -1047,22 +1045,26 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		 * argument 2 of if-goto should be an index
 		 */
 	//	add_triple(if_op, var1, triple_list_index + 3, 1, var_type1, 1);//if跳转指令 第三个操作数是一个立即数
-		add_triple(if_op, var2, 0, 1, var_type2, 1);
-		backpatch2 = triple_list_index -1;
+		backpatch2 = triple_list_index +3;
+		add_triple(if_op, var2, backpatch2, 1, var_type2, 1);
 		add_triple(set_rb,0,-1,1,2,-1);
-		add_triple(get_rb,-1,-1,1,-1,-1);
+		backpatch2 = triple_list_index +2;
+		add_triple(goto_op,backpatch2,-1,1,1,-1);
+		add_triple(set_rb,1,-1,1,2,-1);
 		triple_list[backpatch1].arg2 = (union arg)(triple_list_index - 1);
-		triple_list[backpatch2].arg2 = (union arg)(triple_list_index - 1);
+		add_triple(get_rb,-1,-1,1,-1,-1);
 	}
 	else if (op == and_op){
 //		add_triple(set_rb,0,-1, 1,2,-1);
 //		add_triple(if_not_op, var1, triple_list_index + 3, 1, var_type1, 2);//if_not跳转指令 第三个操作数是一个立即数
-		add_triple(if_not_op, var2, 0, 1, var_type2, 2);
-		backpatch2 = triple_list_index - 1;
+		backpatch2 = triple_list_index+3;
+		add_triple(if_not_op, var2, backpatch2, 1, var_type2, 1);
 		add_triple(set_rb,1,-1,1,2,-1);
-		add_triple(get_rb,-1,-1,1,-1,-1);
+		backpatch2 = triple_list_index +2;
+		add_triple(goto_op,backpatch2,-1,1,1,-1);
+		add_triple(set_rb,0,-1,1,2,-1);
 		triple_list[backpatch1].arg2 = (union arg)(triple_list_index - 1);
-		triple_list[backpatch2].arg2 = (union arg)(triple_list_index - 1);
+		add_triple(get_rb,-1,-1,1,-1,-1);
 	}
 }
 void resume_doubleop(AST_NODE *p)
