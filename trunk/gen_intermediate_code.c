@@ -919,6 +919,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	int var_type1,var_type2;
 	int temp_index;
 	symtbl_item *temp_symtbl;
+	int backpatch1, backpatch2;
 //var 1;
 	temp_rvalue1 = gen_triple_code[ptr1->nodeType-FUNC_OFFSET](ptr1);
 	switch(temp_rvalue1){
@@ -955,6 +956,16 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		size_type1 = triple_list[temp_rvalue1].result_type;
 		var_type1 = 1;
 	}
+	}
+	if(op == or_op){
+		add_triple(set_rb,1,-1, 1,2,-1);
+		add_triple(if_op, var1, 0, 1, var_type1, 1);//if跳转指令 第三个操作数是一个立即数
+		backpatch1 = triple_list_index -1;
+	}
+	else if(op == and_op){
+		add_triple(set_rb,0,-1, 1,2,-1);
+		add_triple(if_not_op, var1, triple_list_index + 3, 1, var_type1, 2);//if_not跳转指令 第三个操作数是一个立即数
+		backpatch1 = triple_list_index -1;
 	}
 //var2
 	temp_rvalue2 = gen_triple_code[ptr2->nodeType-FUNC_OFFSET](ptr2);
@@ -1030,24 +1041,27 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 		add_triple(op, var1, var2, 1, var_type1, var_type2);
 	}
 	else if (op == or_op){
-		add_triple(set_rb,1,-1, 1,2,-1);
+	//	add_triple(set_rb,1,-1, 1,2,-1);
 		/**
 		 * Brills modified here:
 		 * argument 2 of if-goto should be an index
 		 */
-		add_triple(if_op, var1, triple_list_index + 3, 1, var_type1, 1);//if跳转指令 第三个操作数是一个立即数
-		add_triple(if_op, var2, triple_list_index + 2, 1, var_type2, 1);
+	//	add_triple(if_op, var1, triple_list_index + 3, 1, var_type1, 1);//if跳转指令 第三个操作数是一个立即数
+		add_triple(if_op, var2, 0, 1, var_type2, 1);
+		backpatch2 = triple_list_index -1;
 		add_triple(set_rb,0,-1,1,2,-1);
 		add_triple(get_rb,-1,-1,1,-1,-1);
-		//return triple_list_index - 1;
+		triple_list[backpatch1].arg2 = (union arg)(triple_list_index - 1);
+		triple_list[backpatch2].arg2 = (union arg)(triple_list_index - 1);
 	}
 	else if (op == and_op){
-		add_triple(set_rb,0,-1, 1,2,-1);
-		add_triple(if_not_op, var1, triple_list_index + 3, 1, var_type1, 2);//if_not跳转指令 第三个操作数是一个立即数
+//		add_triple(set_rb,0,-1, 1,2,-1);
+//		add_triple(if_not_op, var1, triple_list_index + 3, 1, var_type1, 2);//if_not跳转指令 第三个操作数是一个立即数
 		add_triple(if_not_op, var2, triple_list_index + 2, 1, var_type2, 2);
 		add_triple(set_rb,1,-1,1,2,-1);
 		add_triple(get_rb,-1,-1,1,-1,-1);
-		//return triple_list_index - 1;
+		triple_list[backpatch1].arg2 = (union arg)(triple_list_index - 1);
+		triple_list[backpatch2].arg2 = (union arg)(triple_list_index - 1);
 	}
 }
 void resume_doubleop(AST_NODE *p)
