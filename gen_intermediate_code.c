@@ -210,19 +210,19 @@ int if_code(AST_NODE *p)
 		 * argument 2 of if-goto should be an index.
 		 */
 		switch(exp){
-		case -1:add_triple(if_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
-		case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-		case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-		case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
-		default: add_triple(if_op, exp, triple_list_index + 2, 0, 1, 1);
+		case -1:add_triple(if_not_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
+		case -2:add_triple(if_not_op, const_value, triple_list_index + 2, 0, 2, 1);break;
+		case -3:add_triple(if_not_op, const_value, triple_list_index + 2, 0, 2, 1);break;
+		case -4:add_triple(if_not_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
+		default: add_triple(if_not_op, exp, triple_list_index + 2, 0, 1, 1);
 		}
-		backpatch = triple_list_index;
-		add_triple(goto_op, -1, -1, 0, 1, -1); //goto 第二个操作数是一个整型常数
+		backpatch = triple_list_index-1;
+	//	add_triple(goto_op, -1, -1, 0, 1, -1); //goto 第二个操作数是一个整型常数
 		resume_doubleop(p);
 		ptr = ptr->rightSibling->rightSibling;
 		gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 		last = triple_list_index - 1;
-		triple_list[backpatch].arg1 = (union arg)(last + 1);
+		triple_list[backpatch].arg2 = (union arg)(last + 1);
 		return triple_list_index - 1;
 	}
 	if(childNum == 7)
@@ -234,19 +234,19 @@ int if_code(AST_NODE *p)
 			 * Brills modified here:
 			 * the argument 2 of if-goto should be an index.
 			 */
-		case -1:add_triple(if_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
-		case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-		case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-		case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
-		default: add_triple(if_op, (int)exp, triple_list_index + 2, 0, 1, 1);
+		case -1:add_triple(if_not_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
+		case -2:add_triple(if_not_op, const_value, triple_list_index + 2, 0, 2, 1);break;
+		case -3:add_triple(if_not_op, const_value, triple_list_index + 2, 0, 2, 1);break;
+		case -4:add_triple(if_not_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
+		default: add_triple(if_not_op, (int)exp, triple_list_index + 2, 0, 1, 1);
 		}
-		backpatch = triple_list_index;
-		add_triple(goto_op, -1, -1, 0, 1, -1);
+		backpatch = triple_list_index-1;
+//		add_triple(goto_op, -1, -1, 0, 1, -1);
 		resume_doubleop(p);
 		ptr = ptr->rightSibling->rightSibling;
 		gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 		last = triple_list_index - 1;
-		triple_list[backpatch].arg1 = (union arg)(last + 2);
+		triple_list[backpatch].arg2 = (union arg)(last + 2);
 		backpatch = triple_list_index;
 		add_triple(goto_op, -1, -1, 0, 1, -1);
 		ptr = ptr->rightSibling->rightSibling;
@@ -297,13 +297,13 @@ int for_code(AST_NODE *p)
 		 * Brills modified here:
 		 * argument 2 of if-goto should be an index
 		 */
-	case -1:add_triple(if_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
-	case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-	case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-	case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
-	default: add_triple(if_op, exp, triple_list_index + 2, 0, 1, 1);
+	case -1:add_triple(if_not_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
+	case -2:add_triple(if_not_op, const_value, triple_list_index + 2, 0, 2, 1);break;
+	case -3:add_triple(if_not_op, const_value, triple_list_index + 2, 0, 2, 1);break;
+	case -4:add_triple(if_not_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
+	default: add_triple(if_not_op, exp, triple_list_index + 2, 0, 1, 1);
 	}
-	add_triple(goto_op, -1, -1, 0, 1, -1);
+	//add_triple(goto_op, -1, -1, 0, 1, -1);
 	backpatch = triple_list_index - 1;
 	ptr = ptr->rightSibling->rightSibling->rightSibling->rightSibling;
 	gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
@@ -312,7 +312,7 @@ int for_code(AST_NODE *p)
 	//printf("%d\n", last);	
 	resume_doubleop(p);
 	last = triple_list_index-1;	
-	triple_list[backpatch].arg1 = (union arg)(last+2);
+	triple_list[backpatch].arg2 = (union arg)(last+2);
 	add_triple(goto_op, begin, -1, 0, 1, -1);
 	return triple_list_index -1;
 }
@@ -332,20 +332,20 @@ int while_code(AST_NODE *p)
 		 * Brills modified here:
 		 * arg2_type of add_triple below should be 1 (temp_var)
 		 */
-	case -1:add_triple(if_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
-	case -2:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-	case -3:add_triple(if_op, const_value, triple_list_index + 2, 0, 2, 1);break;
-	case -4:add_triple(if_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
-	default: add_triple(if_op, exp, triple_list_index + 2, 0, 1, 1);
+	case -1:add_triple(if_not_op, (int)temp_ID, triple_list_index + 2, 0, 0, 1);break;
+	case -2:add_triple(if_not_op, const_value, triple_list_index + 2, 0, 2, 1);break;
+	case -3:add_triple(if_not_op, const_value, triple_list_index + 2, 0, 2, 1);break;
+	case -4:add_triple(if_not_op, (int)const_string, triple_list_index + 2, 0, 3, 1);break;
+	default: add_triple(if_not_op, exp, triple_list_index + 2, 0, 1, 1);
 	}
-	backpatch = triple_list_index;
-	add_triple(goto_op, -1, -1, 0, 1, -1);
+	backpatch = triple_list_index-1;
+//	add_triple(goto_op, -1, -1, 0, 1, -1);
 
 	ptr = ptr->rightSibling->rightSibling;
 	resume_doubleop(p);
 	gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 	last = triple_list_index - 1;
-	triple_list[backpatch].arg1 = (union arg)(last+2);
+	triple_list[backpatch].arg2 = (union arg)(last+2);
 	add_triple(goto_op, begin, -1, 0, 1, -1);
 	return triple_list_index -1;
 }
