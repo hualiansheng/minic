@@ -1,50 +1,22 @@
-	.file	"sb.c"
-	.text
-	.align	2
-	.global	main
-	.type	main,function
-main:
-	@ args = 0, pretend = 0, frame = 12
-	@ frame_needed = 1, uses_anonymous_args = 0
-	mov	ip, sp
-	stw	pc, [sp-], #4;
-	stw	lr, [sp-], #8;
-	stw	ip, [sp-], #12;
-	stw	ip, [sp-], #12;stw	fp, [sp-], #16;
-	stw	ip, [sp-], #12;stw	fp, [sp-], #16;sub	sp, sp, #16;
-	sub	fp, ip, #4
-	sub	sp, sp, #12
-	ldw	r14, [fp+], #-24
-	ldw	r15, [fp+], #-20
-	cmpsub.a	r14, r15
-	bsl	.L2
-	ldw	r14, [fp+], #-24
-	ldw	r15, [fp+], #-20
-	cmpsub.a	r14, r15
-	bel	.L3
-.L2:
-	ldw	r14, [fp+], #-24
-	ldw	r15, [fp+], #-20
-	cmpsub.a	r14, r15
-	beq	.L4
-	ldw	r14, [fp+], #-24
-	ldw	r15, [fp+], #-20
-	cmpsub.a	r14, r15
-	beq	.L3
-.L4:
-	mov	r15, #1
-	stw	r15, [fp+], #-16
-	b	.L5
-.L3:
-	mov	r15, #2
-	stw	r15, [fp+], #-16
-.L5:
-	ldw	r15, [fp+], #-16
-	mov	r0, r15
-	mov	ip, fp
-	ldw	fp,  [fp-], #12
-	ldw	sp,  [ip-], #8
-	ldw	ip,  [ip-], #4
-	jump	ip
-	.size	main, .-main
-	.ident	"GCC: (UC4_1.0_gama_20101126) 4.4.2"
+14
+(0) : enter -1 -1 	-1 -1 -1
+(1) : <= a 1 	1 0 2
+(2) : if,goto 1 4 	0 1 1
+(3) : goto 5 -1 	0 1 -1
+(4) : return 1 -1 	1 2 -1
+(5) : - a 1 	1 0 2
+(6) : param 5 -1 	1 1 -1
+(7) : call f -1 	1036 0 -1
+(8) : - a 2 	1 0 2
+(9) : param 8 -1 	1 1 -1
+(10) : call f -1 	1036 0 -1
+(11) : + 7 10 	1036 1 1
+(12) : return 11 -1 	1036 1 -1
+(13) : leave -1 -1 	-1 -1 -1
+(14) : enter -1 -1 	-1 -1 -1
+(15) : = a 5 	1 0 2
+(16) : param a -1 	1 0 -1
+(17) : call f -1 	1036 0 -1
+(18) : = a 17 	1 0 1
+(19) : return 1 -1 	1 2 -1
+(20) : leave -1 -1 	-1 -1 -1
