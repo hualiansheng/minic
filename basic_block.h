@@ -1,8 +1,6 @@
 #ifndef BASIC_BLOCK_H_
 #define BASIC_BLOCK_H_
 #include "symtbl.h"
-#include "gen_intermediate_code.h"
-
 
 typedef struct basic_block {
 	int begin;
@@ -12,6 +10,7 @@ typedef struct basic_block {
 	struct basic_block* next;
 	struct basic_block* follow;
 	struct basic_block* jump;
+	struct func_block* fb;
 }basic_block;
 
 typedef struct map_table {

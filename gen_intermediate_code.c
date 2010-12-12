@@ -3,6 +3,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+void gen_code_initial();
+void push_scope(symtbl_hdr *scope);
+void pop_scope();
+void push(stack_item a);
+void add_triple(enum operator op, int arg1, int arg2, int result_type, int arg1_type, int arg2_type);
+void initialize();
+int compound_code(AST_NODE *p);
+int if_code(AST_NODE *p);
+int statement_code(AST_NODE *p);
+int null_code(AST_NODE *p);
+int for_code(AST_NODE *p);
+int while_code(AST_NODE *p);
+int expression_code(AST_NODE *p);
+int rvalue_code(AST_NODE *p);
+int lvalue_code(AST_NODE *p);
+int assignment_expression_code(AST_NODE *p);
+int return_code(AST_NODE *p);
+void add_triple_single_op(int temp_rvalue, enum operator op, AST_NODE *ptr);
+void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, AST_NODE *ptr1, AST_NODE *ptr2);//1, 2分别对应两个操作数
 extern char name[][30];
 int adjustSize(void** p_old, int* max);
 
@@ -493,7 +512,7 @@ int rvalue_code(AST_NODE *p)
 			temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
 			temp_hdr = func_query(tree_root->symtbl, (p->leftChild->content).s_content);
 			if( temp_hdr->ret_type == CHAR_T && temp_hdr->ret_star ==0) add_triple(call,temp_symtbl->addr_off, -1, 0, 1, -1);
-			else add_triple(call,(int)(p->leftChild->content).s_content, -1, 1, 0, -1);
+			else add_triple(call,temp_symtbl->addr_off, -1, 1, 1, -1);
 			return triple_list_index - 1;
 		}
 		else{
@@ -633,8 +652,8 @@ int rvalue_code(AST_NODE *p)
 		}
 		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
 		temp_hdr = func_query(tree_root->symtbl, (p->leftChild->content).s_content);
-		if(temp_hdr -> ret_type == CHAR_T && temp_hdr ->ret_star ==0) add_triple(call,(int)(p->leftChild->content).s_content,-1,0, 0, -1);
-		else add_triple(call,(int)(p->leftChild->content).s_content,-1,1,0, -1);
+		if(temp_hdr -> ret_type == CHAR_T && temp_hdr ->ret_star ==0) add_triple(call,temp_symtbl->addr_off,-1,0, 1, -1);
+		else add_triple(call,temp_symtbl->addr_off,-1,1,1, -1);
 		free(arg_list);
 		free(arg_type_list);
 		return triple_list_index - 1;

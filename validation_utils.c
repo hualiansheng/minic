@@ -17,6 +17,10 @@ extern basic_block *bblist;
 extern func_block *fblist;
 extern int block_num;
 
+char *ins_name[] = {"", "ldw", "stw", "b.l", "mov", "add", "sub", "jump"};
+extern assemble *assemble_list;
+extern int assemble_num;
+
 void print_AST_dot_core(AST_NODE* ptr);
 void print_AST(AST_NODE* ptr, int level)
 {
@@ -232,7 +236,7 @@ void print_register_allocation()
 {
 	FILE *out = fopen("register_allocation.debug", "w");
 	func_block *fb;
-	int i, j;
+	int i;
 	for (fb = fblist; fb != NULL; fb = fb->next)
 	{
 		for (i = 0; i < fb->uni_item_num; i++)
@@ -241,10 +245,39 @@ void print_register_allocation()
 				fprintf(out, "(%d)", fb->mapping[i].tmp_k);
 			else
 				fprintf(out, "%s", fb->mapping[i].var_name);
-			fprintf(out, "\t\t%d\n", fb->reg[i]);
+			fprintf(out, "\t\t%d\n", fb->reg_alloc[i]);
 		}
 		fprintf(out, "---------------------------------------------------------------------------------------------------\n");
 	}
 	fclose(out);
+}
+
+void print_target_code()
+{
+	int i;
+	for (i = 0; i < assemble_num; i++)
+	{
+		if (assemble_list[i].ins == label)			
+			printf("%s:\n", assemble_list[i].label);
+		else
+		{
+			if (assemble_list[i].ins == b_l)
+				printf("\t%s\t%s\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].label);
+			else
+			{
+				printf("\t%s\tr%d", ins_name[assemble_list[i].ins-5000], assemble_list[i].Rd);
+				if (assemble_list[i].Rn != -1)
+					printf(", r%d", assemble_list[i].Rn);
+				if (assemble_list[i].Rm_or_Imm == 0)
+				{
+					if (assemble_list[i].Rm_Imm != -1)
+						printf(", r%d", assemble_list[i].Rm_Imm);
+				}
+				else
+					printf(", #%d", assemble_list[i].Rm_Imm);
+				printf("\n");
+			}
+		}
+	}
 }
 

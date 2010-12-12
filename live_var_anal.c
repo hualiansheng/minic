@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <assert.h>
+#include "gen_intermediate_code.h"
 #define INIT_ITEM_NUM 64
 
 extern triple *triple_list;
@@ -20,6 +21,7 @@ int set_prepare(func_block *fb);
 int solve_in_out(func_block *fb);
 int analyze_live(func_block *fb);
 int change_live(func_block *fb, int code_k, int def_or_use, int uni_k);
+int check_para_ptr(func_block *fb, int i, int base);
 
 int live_var_anal()
 {
@@ -42,7 +44,7 @@ int live_var_func(func_block *fb)
 
 int gen_uni_table(func_block *fb)
 {
-	int begin, end, i, k;
+	int begin, end, i;
 	enum operator tmp_op;
 	begin = fb->start->begin;
 	end = fb->over->end;
@@ -52,7 +54,7 @@ int gen_uni_table(func_block *fb)
 	fb->uni_table_size = INIT_ITEM_NUM*sizeof(symtbl_item);
 	fb->mapping = (map_table*)malloc(INIT_ITEM_NUM*sizeof(map_table));
 	fb->map_table_size = INIT_ITEM_NUM*sizeof(map_table);
-	symtbl_hdr *ptr = triple_list[index_index[i]].symtbl;
+	symtbl_hdr *ptr = triple_list[index_index[begin]].symtbl;
 	for (i = 0; i < ptr->para_num; i++)
 	{
 		//if (i >= ptr->para_num-4)
@@ -268,6 +270,16 @@ int analyze_live(func_block *fb)
 				change_live(fb, i-base, 1, tmp);
 			if (arg1 != -1)
 			{
+				if (triple_list[index_index[i]].op == star_op)
+				{
+					for (j = 0; j < fb->uni_item_num; j++)
+					{
+						if (fb->mapping[j].isTmp != 1)
+							change_live(fb, i-base, 0, j);
+					}
+				}
+				if (triple_list[index_index[i]].op == param)
+					check_para_ptr(fb, i, base);
 				if (triple_list[index_index[i]].op == assign_op)
 					change_live(fb, i-base, 1, arg1);
 				else
@@ -296,3 +308,24 @@ int change_live(func_block *fb, int code_k, int def_or_use, int uni_k)
 	return 0;
 }
 
+int check_para_ptr(func_block *fb, int i, int base)
+{
+	int j = 1, l;
+	symtbl_hdr *p;
+	while (1)
+	{
+		if (triple_list[index_index[i+j]].op == call)
+			break;
+		j++;
+	}
+	p = triple_list[index_index[triple_list[index_index[i+j]].arg1.temp_index]].symtbl;
+	if (p->item[p->para_num-j].star_num != 0)
+	{
+		for (l = 0; l < fb->uni_item_num; l++)
+		{
+			if (fb->mapping[l].isTmp != 1)
+				change_live(fb, i+j-base, 0, l);
+		}
+	}
+	return 0;
+}
