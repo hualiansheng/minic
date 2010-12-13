@@ -269,21 +269,21 @@ void print_target_code()
 			else
 			{	printf("\t%s\t", ins_name[inst-5000]);
 				if (assemble_list[i].Rd != -1)
-					printf("r%d", assemble_list[i].Rd);
+					printf("r%d, ", assemble_list[i].Rd);
 				if (assemble_list[i].Rn != -1)
 				{
 					if (assemble_list[i].ins == ldw || assemble_list[i].ins == stw)
-						printf(", [r%d+]", assemble_list[i].Rn);
+						printf("[r%d+], ", assemble_list[i].Rn);
 					else
-						printf(", r%d", assemble_list[i].Rn);
+						printf("r%d, ", assemble_list[i].Rn);
 				}
 				if (assemble_list[i].Rm_or_Imm == 0)
 				{
 					if (assemble_list[i].Rm_Imm != -1)
-						printf(", r%d", assemble_list[i].Rm_Imm);
+						printf("r%d", assemble_list[i].Rm_Imm);
 				}
 				else
-					printf(", #%d", assemble_list[i].Rm_Imm);
+					printf("#%d", assemble_list[i].Rm_Imm);
 				printf("\n");
 			}
 		}

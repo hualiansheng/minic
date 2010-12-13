@@ -1,10 +1,13 @@
+int f(int x)
+{
+	return x * 2;
+}
 int main()
 {
 	int a, b;
-	a = 1;
-	if (a)
-		b = 1;
+	if (!(a || b))
+		f(a);
 	else
-		b = 2;
-	return b;
+		f(b);
+	return 0;
 }
