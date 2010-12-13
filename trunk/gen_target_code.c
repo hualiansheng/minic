@@ -305,7 +305,7 @@ int assign_bool_value(enum instruction ins, func_block *fb, int i)
 
 int search_label(func_block *fb, int i, enum instruction ins, enum instruction _ins, int u1, int u2)
 {
-	enum operator op, tmp_op;
+	enum operator op;
 	int j, flag, r1, r2;
 	r1 = fb->reg_alloc[u1];
 	r1 = load_operator(fb, u1, r1, 1);
@@ -346,7 +346,7 @@ int search_label(func_block *fb, int i, enum instruction ins, enum instruction _
 		while (triple_list[index_index[j]].op != if_op && triple_list[index_index[j]].op != if_not_op)
 			j++;
 	}
-	if (flag == 0)
+	if (flag == 1)
 		add_assemble(triple_list[index_index[j]].label, ins, -1, -1, 0, -1, 0, -1);
 	else
 		add_assemble(triple_list[index_index[j]].label, _ins, -1, -1, 0, -1, 0, -1);
@@ -598,7 +598,7 @@ int and_code(func_block *fb, int i)
 
 int get_rb_code(func_block *fb, int i)
 {
-	int u0, r0;
+	/*int u0, r0;
 	u0 = triple_list[index_index[i]].tmp_uni;
 	r0 = fb->reg_alloc[u0];
 	if (r0 == -1)
@@ -607,7 +607,7 @@ int get_rb_code(func_block *fb, int i)
 	{
 		fb->reg_var[r0] = u0;
 		add_assemble(NULL, mov, -1, r0, 0, -1, 0, 3);
-	}
+	}*/
 	return 0;
 }
 
