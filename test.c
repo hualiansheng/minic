@@ -1,11 +1,10 @@
 int main()
 {
-	int a, b, c;
+	int a, b;
 	a = 1;
-	b = 2;
-	if(a < b < c)
-		c = 1;
+	if (a)
+		b = 1;
 	else
-		c = 2;
-	return 0;
+		b = 2;
+	return b;
 }

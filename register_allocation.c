@@ -286,14 +286,14 @@ int color(func_block *fb, int k)
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
 			if ((var_vexs[i].adj_vexs[j/32] & (1<<(31-j%32))) == (1<<(31-j%32)) && fb->reg_alloc[j] != -1)
-				flag[fb->reg_alloc[j]-7] = 1;
+				flag[fb->reg_alloc[j]-4] = 1;
 		}
 		for (j = 0; j < k; j++)
 		{
 			if (!flag[j])
 			{
 				for (ptr = &var_vexs[i]; ptr != NULL; ptr = ptr->con_vexs)
-					fb->reg_alloc[ptr->n] = j + 7;
+					fb->reg_alloc[ptr->n] = j + 4;
 				break;
 			}
 		}
@@ -307,7 +307,7 @@ int color(func_block *fb, int k)
 			fb->reg_alloc[j]++;
 		fb->uni_table[j]->reg = fb->reg_alloc[j];
 	}
-	fb->reg_used = i - 6;
+	fb->reg_used = i - 3;
 	return 0;
 }
 
