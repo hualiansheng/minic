@@ -266,6 +266,73 @@ int add_imm_assemble(func_block *fb, enum instruction ins, int u0, int u1, int i
 	return 0;
 }
 
+int check_bool_use(func_block *fb, int i)
+{
+	int j, base, l, u1, u2;
+	enum operator op;
+	base = fb->start->begin;
+	l = triple_list[index_index[i]].tmp_uni;
+	for (j = i+1-base; j < fb->code_num; j++)
+	{
+		if ((fb->live_status[j][l/32] >> (31-l%32)) % 2 != 1)
+			break;
+		u1 = triple_list[index_index[j+base]].arg1_uni;
+		u2 = triple_list[index_index[j+base]].arg2_uni;
+		op = triple_list[index_index[j+base]].op;
+		if ((u1 == l || u2 == l) && op != if_op && op != if_not_op)
+			return 1;
+	}
+	return 0;
+}
+
+int assign_bool_value(enum instruction ins, func_block *fb, int i)
+{
+	int u0, u1, u2, r0, r1, r2;
+	u1 = triple_list[index_index[i]].tmp_uni;
+	u1 = triple_list[index_index[i]].arg1_uni;
+	u2 = triple_list[index_index[i]].arg2_uni;
+	r0 = fb->reg_alloc[u0];
+	r1 = fb->reg_alloc[u1];
+	r2 = fb->reg_alloc[u2];
+	if (r1 == -1)
+	{
+		r1 = 4;
+		add_assemble(NULL, ldw, 27, r1, 0, -1, 1, fb->uni_table[u1]->offset);
+	}
+	else
+	{
+		if (fb->reg_var[r1] != u1)
+		{
+			fb->reg_var[r1] = u1;
+			add_assemble(NULL, ldw, 27, r1, 0, -1, 1, fb->uni_table[u1]->offset);
+		}
+	}
+	if (r2 == -1)
+	{
+		r1 = 5;
+		add_assemble(NULL, ldw, 27, r2, 0, -1, 1, fb->uni_table[u2]->offset);
+	}
+	else
+	{
+		if (fb->reg_var[r2] != u2)
+		{
+			fb->reg_var[r2] = u2;
+			add_assemble(NULL, ldw, 27, r2, 0, -1, 1, fb->uni_table[u2]->offset);
+		}
+	}
+	add_assemble(NULL, cmpsub, r1, -1, 0, -1, 0, r2);
+	add_assemble(NULL, mov, -1, 6, 0, -1, 1, 0);
+	add_assemble(NULL, ins, -1, 6, 0, -1, 1, 1);
+	if (r0 == -1)
+		add_assemble(NULL, stw, 27, 6, 0, -1, 1, fb->uni_table[u0]->offset);
+	else
+	{
+		fb->reg_var[r0] = u0;
+		add_assemble(NULL, mov, -1, r0, 0, -1, 0, 6);
+	}
+	return 0;
+}
+
 int ifgoto_code(func_block *fb, int i)
 {
 	return 0;
@@ -300,7 +367,6 @@ int positive_code(func_block *fb, int i)
 }
 int assign_code(func_block *fb, int i)
 {
-	
 	return 0;
 }
 int star_assign_code(func_block *fb, int i)
@@ -326,54 +392,79 @@ int add_code(func_block *fb, int i)
 	}
 	return 0;
 }
+
 int minus_code(func_block *fb, int i)
 {
 	return 0;
 }
+
 int multiply_code(func_block *fb, int i)
 {
 	return 0;
 }
+
 int char_to_int_code(func_block *fb, int i)
 {
 	return 0;
 }
+
 int equal_code(func_block *fb, int i)
 {
+	if (check_bool_use(fb, i))
+		assign_bool_value(cmoveq, fb, i);
 	return 0;
 }
+
 int less_code(func_block *fb, int i)
 {
+	if (check_bool_use(fb, i))
+		assign_bool_value(cmovsl, fb, i);
 	return 0;
 }
+
 int larger_code(func_block *fb, int i)
 {
+	if (check_bool_use(fb, i))
+		assign_bool_value(cmovsg, fb, i);
 	return 0;
 }
+
 int eqlarger_code(func_block *fb, int i)
 {
+	if (check_bool_use(fb, i))
+		assign_bool_value(cmoveg, fb, i);
 	return 0;
 }
+
 int eqless_code(func_block *fb, int i)
 {
+	if (check_bool_use(fb, i))
+		assign_bool_value(cmovel, fb, i);
 	return 0;
 }
+
 int noteq_code(func_block *fb, int i)
 {
+	if (check_bool_use(fb, i))
+		assign_bool_value(cmovne, fb, i);
 	return 0;
 }
+
 int or_code(func_block *fb, int i)
 {
 	return 0;
 }
+
 int and_code(func_block *fb, int i)
 {
 	return 0;
 }
+
 int get_rb_code(func_block *fb, int i)
 {
 	return 0;
 }
+
 int set_rb_code(func_block *fb, int i)
 {
 	return 0;
