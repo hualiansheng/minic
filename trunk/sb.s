@@ -17,11 +17,11 @@ main:
 	ldw	r14, [fp+], #-24
 	ldw	r15, [fp+], #-20
 	cmpsub.a	r14, r15
-	bel	.L2
+	beg	.L2
 	ldw	r14, [fp+], #-24
 	ldw	r15, [fp+], #-20
 	cmpsub.a	r14, r15
-	bsl	.L3
+	bsg	.L3
 .L2:
 	ldw	r14, [fp+], #-24
 	ldw	r15, [fp+], #-20
@@ -32,13 +32,19 @@ main:
 	cmpsub.a	r14, r15
 	beq	.L4
 .L3:
+	ldw	r15, [fp+], #-24
+	cmpsub.a	r15, #0
+	beq	.L5
+	ldw	r15, [fp+], #-20
+	cmpsub.a	r15, #0
+	beq	.L5
 	mov	r15, #1
 	stw	r15, [fp+], #-16
-	b	.L5
-.L4:
+	b	.L4
+.L5:
 	mov	r15, #2
 	stw	r15, [fp+], #-16
-.L5:
+.L4:
 	ldw	r15, [fp+], #-16
 	mov	r0, r15
 	mov	ip, fp

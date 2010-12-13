@@ -265,9 +265,15 @@ void print_target_code()
 				printf("\t%s\t%s\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].label);
 			else
 			{
-				printf("\t%s\tr%d", ins_name[assemble_list[i].ins-5000], assemble_list[i].Rd);
+				if (assemble_list[i].Rd != -1)
+					printf("\t%s\tr%d", ins_name[assemble_list[i].ins-5000], assemble_list[i].Rd);
 				if (assemble_list[i].Rn != -1)
-					printf(", r%d", assemble_list[i].Rn);
+				{
+					if (assemble_list[i].ins == ldw || assemble_list[i].ins == stw)
+						printf(", [r%d+]", assemble_list[i].Rn);
+					else
+						printf(", r%d", assemble_list[i].Rn);
+				}
 				if (assemble_list[i].Rm_or_Imm == 0)
 				{
 					if (assemble_list[i].Rm_Imm != -1)
