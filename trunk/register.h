@@ -1,7 +1,7 @@
 #ifndef REGISTER_H_
 #define REGISTER_H_
 enum instruction {
-	label=5000, ldw, stw, b_l, mov, add, sub, jump
+	label=5000, ldw, stw, b_l, mov, add, sub, jump, cmpsub, bne, beq, bsl, beg, bsg, bel, b, cmoveq, cmovsl, cmoveg, cmovel, cmovne, cmovsg
 };
 
 
