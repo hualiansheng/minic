@@ -1,11 +1,10 @@
-int f(int a)
-{
-	return a;
-}
 int main()
 {
-	int a, b, c;
-	a = f(1);
-	return a;
+	int a, b;
+	if (4 < a)
+		b = 1;
+	else
+		b = 2;
+	return b;
 }
 
