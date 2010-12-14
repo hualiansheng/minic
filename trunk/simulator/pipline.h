@@ -46,8 +46,10 @@ typedef struct{
   int bubbles;//bubbles of pipline
   int rd_mem_times;//times of read memory
   int wr_mem_times;//times of write memory
-  int cache_visit;//times of cache visit
-  int cache_miss;//times of cache miss
+  int i_cache_visit;//times of i cache visit
+  int i_cache_miss;//times of i cache miss
+  int d_cache_visit;//times of d cache visit
+  int d_cache_miss;//times of d cache miss
 }CPU_info;
   
 extern PIPLINE* pipline_initial(REGISTERS* regs, CACHE* i_cache,

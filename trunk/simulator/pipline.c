@@ -49,8 +49,10 @@ int pipline_next_step(PIPLINE* pipline, CPU_info* cpu_info){
   cpu_info->bubbles += pipline_cpu_info->bubbles;
   cpu_info->rd_mem_times += pipline_cpu_info->rd_mem_times;
   cpu_info->wr_mem_times += pipline_cpu_info->wr_mem_times;
-  cpu_info->cache_visit += pipline_cpu_info->cache_visit;
-  cpu_info->cache_miss += pipline_cpu_info->cache_miss;
+  cpu_info->i_cache_visit += pipline_cpu_info->i_cache_visit;
+  cpu_info->i_cache_miss += pipline_cpu_info->i_cache_miss;
+  cpu_info->d_cache_visit += pipline_cpu_info->d_cache_visit;
+  cpu_info->d_cache_miss += pipline_cpu_info->d_cache_miss;
   
   //printf("CPU total cycle : %d\n", pipline_cpu_info->cycles_total);
   //printf("CPU work cycle : %d\n", pipline_cpu_info->cycles_work);
@@ -86,12 +88,12 @@ int pipline_IF(PIPLINE* pipline, CPU_info* cpu_info){
   // save current instruction PC
   data->cur_inst_PC = pipline->regs->REG_PC;
   if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)
-    cpu_info->cache_miss ++;
+    cpu_info->i_cache_miss ++;
   if(cpu_info->cycles_total < cache_return.cpu_cycles)
     cpu_info->cycles_total = cache_return.cpu_cycles;
   if(cpu_info->cycles_work < 1)
     cpu_info->cycles_work = 1;
-  cpu_info->cache_visit ++;
+  cpu_info->i_cache_visit ++;
 
   char ass_code[100];
   interpret_inst(data->inst_code, data->inst_addr, ass_code, pipline->proc);
@@ -207,9 +209,9 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
       cache_return = cache_search(pipline->d_cache, data->addr);
       //printf("addr:%.8x  data:%.8x\n",data->addr,cache_return.data);
       // update cpu info about cache
-      cpu_info->cache_visit ++;
+      cpu_info->d_cache_visit ++;
       if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)
-	cpu_info->cache_miss ++;
+	cpu_info->d_cache_miss ++;
       if(cpu_info->cycles_total < cache_return.cpu_cycles)
 	cpu_info->cycles_total = cache_return.cpu_cycles;
       // update cpu info about mem
@@ -247,9 +249,9 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
       CACHE_RETURN cache_return;
       cache_return = cache_search(pipline->d_cache, data->addr);
       // update cpu info about cache
-      cpu_info->cache_visit ++;
+      cpu_info->d_cache_visit ++;
       if(cache_return.cpu_cycles == CACHE_MISSED_CYCLE)
-	cpu_info->cache_miss ++;
+	cpu_info->d_cache_miss ++;
       if(cpu_info->cycles_total < cache_return.cpu_cycles)
 	cpu_info->cycles_total = cache_return.cpu_cycles;
       // update cpu info about mem
@@ -320,8 +322,10 @@ int pipline_WB(PIPLINE* pipline, CPU_info* cpu_info){
   cpu_info->bubbles = 0;
   cpu_info->rd_mem_times = 0;
   cpu_info->wr_mem_times = 0;
-  cpu_info->cache_visit = 0;
-  cpu_info->cache_miss = 0;
+  cpu_info->i_cache_visit = 0;
+  cpu_info->i_cache_miss = 0;
+  cpu_info->d_cache_visit = 0;
+  cpu_info->d_cache_miss = 0;
 
   if(pipline->pipline_data[4] != NULL)
     free(pipline->pipline_data[4]);
