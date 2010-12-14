@@ -15,7 +15,6 @@ int assemble_num;
 int temp_reg_var[32];
 
 int if_goto_code(func_block *fb, int i);
-int if_not_goto_code(func_block *fb, int i);
 int goto_code(func_block *fb, int i);
 int negative_code(func_block *fb, int i);
 int not_code(func_block *fb, int i);
@@ -60,7 +59,9 @@ int add_std_assemble(func_block *fb, enum instruction ins, int u0, int u1, int u
 int add_imm_assemble(func_block *fb, enum instruction ins, int u0, int u1, int imm);
 int check_bool_use(func_block *fb, int i);
 int assign_bool_value(enum instruction ins, func_block *fb, int i);
-int search_label(func_block *fb, int i, enum instruction ins, enum instruction _ins, int u1, int u2, int not_flag);
+int compare_operation(func_block *fb, int i, int cond, int m);
+int search_label(func_block *fb, int i, int m, int not_flag);
+enum instruction map_ins[6][2] = {{bsl, beg}, {bel, bsg}, {beq, bne}, {bne, beq}, {beg, bsl}, {bsg, bel}};
 
 int gen_target_code()
 {
@@ -283,20 +284,62 @@ int assign_bool_value(enum instruction ins, func_block *fb, int i)
 	return 0;
 }
 
-int search_label(func_block *fb, int i, enum instruction ins, enum instruction _ins, int u1, int u2, int not_flag)
+int compare_operation(func_block *fb, int i, int cond, int m)
+{
+	int u1, u2, r1, r2, t1, t2;
+	if (cond == 1)
+	{
+		u1 = triple_list[index_index[i]].arg1_uni;
+		r1 = fb->reg_alloc[u1];
+		r1 = load_operator(fb, u1, r1, 1);
+		add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, 0);			
+	}
+	if (cond == 2)
+	{
+		t1 = triple_list[index_index[i]].arg1_type;
+		t2 = triple_list[index_index[i]].arg2_type;
+		u1 = triple_list[index_index[i]].arg1_uni;
+		u2 = triple_list[index_index[i]].arg2_uni;
+		if (t1 < 2 && t2 < 2)
+		{
+			r1 = fb->reg_alloc[u1];
+			r2 = fb->reg_alloc[u2];
+			r1 = load_operator(fb, u1, r1, 1);
+			r2 = load_operator(fb, u2, r2, 2);
+			add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 0, r2);
+		}
+		else
+		{
+			if (t1 < 2)
+			{
+				r1 = fb->reg_alloc[u1];
+				r1 = load_operator(fb, u1, r1, 1);
+				add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
+			}
+			if (t2 < 2)
+			{
+				r2 = fb->reg_alloc[u2];
+				r2 = load_operator(fb, u2, r2, 1);
+				add_assemble(NULL, -1, cmpsub, r2, -1, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
+				if (m != 2 && m != 3)
+					m = 5 - m;
+			}
+		}
+	}
+	if (cond == 3)
+	{
+		u1 = triple_list[index_index[i]].tmp_uni;
+		r1 = fb->reg_alloc[u1];
+		r1 = load_operator(fb, u1, r1, 1);
+		add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, 0);			
+	}
+	return m;
+}
+
+int search_label(func_block *fb, int i, int m, int not_flag)
 {
 	enum operator op;
-	int j, flag, r1, r2;
-	r1 = fb->reg_alloc[u1];
-	r1 = load_operator(fb, u1, r1, 1);
-	if (u2 != -1)
-	{
-		r2 = fb->reg_alloc[u2];
-		r2 = load_operator(fb, u2, r2, 2);
-		add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 0, r2);
-	}
-	else
-		add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, 0);
+	int j, flag;
 	op = triple_list[index_index[i]].op;
 	j = i;
 	flag = 0;
@@ -332,25 +375,15 @@ int search_label(func_block *fb, int i, enum instruction ins, enum instruction _
 		}
 	}
 	if (triple_list[index_index[i]].op == if_op)
-	{
-		if (flag == 1)
-			add_assemble(NULL, triple_list[index_index[j]].label, ins, -1, -1, 0, -1, 0, -1);
-		else
-			add_assemble(NULL, triple_list[index_index[j]].label, _ins, -1, -1, 0, -1, 0, -1);
-	}
+		add_assemble(NULL, triple_list[index_index[j]].label, map_ins[m][1-flag], -1, -1, 0, -1, 0, -1);
 	else
-	{
-		if (flag == 0)
-			add_assemble(NULL, triple_list[index_index[j]].label, ins, -1, -1, 0, -1, 0, -1);
-		else
-			add_assemble(NULL, triple_list[index_index[j]].label, _ins, -1, -1, 0, -1, 0, -1);
-	}
+		add_assemble(NULL, triple_list[index_index[j]].label, map_ins[m][flag], -1, -1, 0, -1, 0, -1);
 	return 0;
 }
 
 int if_goto_code(func_block *fb, int i)
 {
-	int j, u1, u2, not_flag;
+	int j, m, cond, not_flag;
 	enum operator op;
 	not_flag = 0;
 	j = i;
@@ -364,91 +397,45 @@ int if_goto_code(func_block *fb, int i)
 	}
 	op = triple_list[index_index[j]].op;
 	if ((op == if_op || op == if_not_op || op == not_op) && triple_list[index_index[j]].arg1_type != 1)
-		search_label(fb, i, bne, beq, triple_list[index_index[j]].arg1_uni, -1, not_flag);
+	{
+		compare_operation(fb, i, 1, 3);
+		search_label(fb, i, 3, not_flag);
+	}
 	else
 	{
 		if (op != get_rb)
 		{
-			u1 = triple_list[index_index[j]].arg1_uni;
-			u2 = triple_list[index_index[j]].arg2_uni;
+			cond = 2;
 			switch (op)
 			{
 				case equal_op:
-					search_label(fb, i, beq, bne, u1, u2, not_flag);
+					m = 2;
 					break;
 				case less_op:
-					search_label(fb, i, bsl, beg, u1, u2, not_flag);
+					m = 0;
 					break;
 				case larger_op:
-					search_label(fb, i, bsg, bel, u1, u2, not_flag);
+					m = 5;
 					break;
 				case eqlarger_op:
-					search_label(fb, i, beg, bsl, u1, u2, not_flag);
+					m = 4;
 					break;
 				case eqless_op:
-					search_label(fb, i, bel, bsg, u1, u2, not_flag);
+					m = 1;
 					break;
 				case noteq_op:
-					search_label(fb, i, bne, beq, u1, u2, not_flag);
+					m = 3;
 					break;
 				default:
-					search_label(fb, i, bne, beq, triple_list[index_index[j]].tmp_uni, -1, not_flag);
+					m = 3;
+					cond = 3;
 			}
+			m = compare_operation(fb, j, cond, m);
+			search_label(fb, i, m, not_flag);
 		}
 	}
 	return 0;
 }
-
-/*int if_not_goto_code(func_block *fb, int i)
-{
-	int j, u1, u2, not_flag;
-	enum operator op;
-	not_flag = 0;
-	if (triple_list[index_index[i]].arg1_type != 1)
-		search_label(fb, i, beq, bne, triple_list[index_index[i]].arg1_uni, -1, not_flag);
-	else
-	{
-		j = triple_list[index_index[i]].arg1.temp_index;
-		op = triple_list[index_index[j]].op;
-		if (op != get_rb)
-		{
-			if (op == not_op)
-			{
-				while (triple_list[index_index[j]].op == not_op)
-				{
-					not_flag = 1 - not_flag;
-					j--;
-				}
-			}
-			u1 = triple_list[index_index[j]].arg1_uni;
-			u2 = triple_list[index_index[j]].arg2_uni;
-			switch (op)
-			{
-				case equal_op:
-					search_label(fb, i, bne, beq, u1, u2, not_flag);
-					break;
-				case less_op:
-					search_label(fb, i, beg, bsl, u1, u2, not_flag);
-					break;
-				case larger_op:
-					search_label(fb, i, bel, bsg, u1, u2, not_flag);
-					break;
-				case eqlarger_op:
-					search_label(fb, i, bsl, beg, u1, u2, not_flag);
-					break;
-				case eqless_op:
-					search_label(fb, i, bsg, bel, u1, u2, not_flag);
-					break;
-				case noteq_op:
-					search_label(fb, i, beq, bne, u1, u2, not_flag);
-					break;
-				default:
-					search_label(fb, i, beq, bne, triple_list[index_index[j]].tmp_uni, -1, not_flag);
-			}
-		}
-	}
-	return 0;
-}*/
 
 int goto_code(func_block *fb, int i)
 {
@@ -547,13 +534,13 @@ int add_code(func_block *fb, int i)
 	tmp_uni = triple_list[index_index[i]].tmp_uni;
 	arg1_uni = triple_list[index_index[i]].arg1_uni;
 	arg2_uni = triple_list[index_index[i]].arg2_uni;
-	if (type1 == 0 && type2 == 0)
+	if (type1 < 2 && type2 < 2)
 		add_std_assemble(fb, add, tmp_uni, arg1_uni, arg2_uni);
 	else
 	{
-		if (type1 == 0)
+		if (type1 < 2)
 			add_imm_assemble(fb, add, tmp_uni, arg1_uni, triple_list[index_index[i]].arg2.imm_value);
-		if (type2 == 0)
+		if (type2 < 2)
 			add_imm_assemble(fb, add, tmp_uni, arg2_uni, triple_list[index_index[i]].arg1.imm_value);
 	}
 	return 0;
