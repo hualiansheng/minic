@@ -515,12 +515,22 @@ int assign_code(func_block *fb, int i)
 	u2 = triple_list[index_index[i]].arg2_uni;
 	r0 = fb->reg_alloc[u0];
 	r1 = fb->reg_alloc[u1];
-	r2 = fb->reg_alloc[u2];
-	r2 = load_operator(fb, u2, r2, 2);
-	if ((fb->live_status[i+1-base][u1/32] >> (31-u1%32)) % 2 == 1)
-		store_result(fb, mov, u1, -1, r1, 0, -1, 0, r2);
-	if ((fb->live_status[i+1-base][u0/32] >> (31-u0%32)) % 2 == 1)
-		store_result(fb, mov, u0, -1, r0, 0, -1, 0, r2);	
+	if (u2 != -1)
+	{
+		r2 = fb->reg_alloc[u2];
+		r2 = load_operator(fb, u2, r2, 2);
+		if ((fb->live_status[i+1-base][u1/32] >> (31-u1%32)) % 2 == 1 && r1 != r2)
+			store_result(fb, mov, u1, -1, r1, 0, -1, 0, r2);
+		if ((fb->live_status[i+1-base][u0/32] >> (31-u0%32)) % 2 == 1 && r0 != r2)
+			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r2);
+	}
+	else
+	{
+		if ((fb->live_status[i+1-base][u1/32] >> (31-u1%32)) % 2 == 1)
+			store_result(fb, mov, u1, -1, r1, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
+		if ((fb->live_status[i+1-base][u0/32] >> (31-u0%32)) % 2 == 1)
+			store_result(fb, mov, u0, -1, r0, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
+	}
 	return 0;
 }
 
@@ -660,14 +670,28 @@ int call_code(func_block *fb, int i)
 		add_assemble(NULL, -1, sub, 29, 29, 0, -1, 1, m);
 	for (j = ptr->para_num-1, k = 0; j >= 0; j--)
 	{
-		tmp = fb->reg_alloc[triple_list[index_index[i-ptr->para_num+j]].arg1_uni];
-		tmp = load_operator(fb, triple_list[index_index[i-ptr->para_num+j]].arg1_uni, tmp, 2);
-		if (j >= ptr->para_num-4)
-			add_assemble(NULL, -1, mov, -1, ptr->para_num-1-j, 0, -1, 0, tmp);
+		if (triple_list[index_index[i-ptr->para_num+j]].arg1_uni != -1)
+		{
+			tmp = fb->reg_alloc[triple_list[index_index[i-ptr->para_num+j]].arg1_uni];
+			tmp = load_operator(fb, triple_list[index_index[i-ptr->para_num+j]].arg1_uni, tmp, 2);
+			if (j >= ptr->para_num-4)
+				add_assemble(NULL, -1, mov, -1, ptr->para_num-1-j, 0, -1, 0, tmp);
+			else
+			{
+				add_assemble(NULL, -1, stw, 29, tmp, 0, -1, 1, k);
+				k += 4;
+			}
+		}
 		else
 		{
-			add_assemble(NULL, -1, stw, 29, tmp, 0, -1, 1, k);
-			k += 4;
+			if (j >= ptr->para_num-4)
+				add_assemble(NULL, -1, mov, -1, ptr->para_num-1-j, 0, -1, 1, triple_list[index_index[i-ptr->para_num+j]].arg1.imm_value);
+			else
+			{
+				add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, triple_list[index_index[i-ptr->para_num+j]].arg1.imm_value);
+				add_assemble(NULL, -1, stw, 29, 3, 0, -1, 1, k);
+				k += 4;
+			}
 		}
 	}
 	add_assemble(ptr->func_name, -1, b_l, -1, -1, 0, -1, 0, -1);
@@ -682,16 +706,17 @@ int call_code(func_block *fb, int i)
 			add_assemble(NULL, -1, ldw, 29, j, 0, -1, 1, -k*4);
 		}
 	}
-	rtn_reg = fb->reg_alloc[triple_list[index_index[i]].tmp_uni];
-	if ((fb->live_status[i+1-fb->start->begin][rtn_reg/32] >> (31-rtn_reg%32)) % 2 == 1)
+	tmp = triple_list[index_index[i]].tmp_uni;
+	rtn_reg = fb->reg_alloc[tmp];
+	if ((fb->live_status[i+1-fb->start->begin][tmp/32] >> (31-tmp%32)) % 2 == 1)
 	{
 		if (rtn_reg != -1)
 		{
-			fb->reg_var[rtn_reg] = triple_list[index_index[i]].tmp_uni;
+			fb->reg_var[rtn_reg] = tmp;
 			add_assemble(NULL, -1, mov, -1, rtn_reg, 0, -1, 0, 0);
 		}
 		else
-			add_assemble(NULL, -1, stw, 27, 0, 0, -1, 1, fb->uni_table[triple_list[index_index[i]].tmp_uni]->offset);
+			add_assemble(NULL, -1, stw, 27, 0, 0, -1, 1, fb->uni_table[tmp]->offset);
 	}
 	return 0;
 }
@@ -751,10 +776,13 @@ int rtn_code(func_block *fb, int i)
 {
 	int j;
 	j = triple_list[index_index[i]].arg1_uni;
-	if (fb->reg_alloc[j] != -1)
-		add_assemble(NULL, -1, mov, -1, 0, 0, -1, 0, fb->reg_alloc[j]);
-	else
-		add_assemble(NULL, -1, ldw, 27, 0, 0, -1, 1, fb->uni_table[j]->offset);
+	if (j != -1)
+	{
+		if (fb->reg_alloc[j] != -1)
+			add_assemble(NULL, -1, mov, -1, 0, 0, -1, 0, fb->reg_alloc[j]);
+		else
+			add_assemble(NULL, -1, ldw, 27, 0, 0, -1, 1, fb->uni_table[j]->offset);
+	}
 	return 0;
 }
 
