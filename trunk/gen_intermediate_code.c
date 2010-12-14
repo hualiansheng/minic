@@ -405,8 +405,9 @@ int rvalue_code(AST_NODE *p)
         case 2: {
                 if(p->leftChild->rightSibling->nodeType != DOUBLE_OP_T && p->leftChild->nodeType != DOUBLE_OP_T){
                         ptr = p->leftChild->rightSibling;
-                        temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
-                        switch(p->leftChild->nodeType){
+                        //temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+                        temp_rvalue = 0;
+						switch(p->leftChild->nodeType){
                         case POSITIVE_SIGN:
                         {
                                 add_triple_single_op(temp_rvalue,positive_op,ptr);
