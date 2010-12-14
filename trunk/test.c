@@ -1,5 +1,10 @@
+#include<stdlib.h>
+#include<memory.h>
 int main()
 {
-	int a, b, c;
-	a = ! ( b && c);
+	char a[][3];
+	char**c = (char**)malloc(15*sizeof(char));
+	c[1][1];
+
 }
+
