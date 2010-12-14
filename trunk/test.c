@@ -1,10 +1,11 @@
-#include<stdlib.h>
-#include<memory.h>
+int fib(int n)
+{
+	if (n == 0 || n == 1)
+		return 1;
+	return fib(n-1) + fib(n-2);
+}
 int main()
 {
-	char a[][3];
-	char**c = (char**)malloc(15*sizeof(char));
-	c[1][1];
-
+	return fib(10);
 }
 
