@@ -1,7 +1,7 @@
 #ifndef REGISTER_H_
 #define REGISTER_H_
 enum instruction {
-	label=5000, ldw, stw, b_l, mov, add, sub, jump, cmpsub, bne, beq, bsl, beg, bsg, bel, b, cmoveq, cmovsl, cmoveg, cmovel, cmovne, cmovsg
+	func = 5000, label, ldw, stw, b_l, mov, add, sub, jump, cmpsub, bne, beq, bsl, beg, bsg, bel, b, cmoveq, cmovsl, cmoveg, cmovel, cmovne, cmovsg
 };
 
 
@@ -14,7 +14,8 @@ typedef struct var_vertex {
 }var_vertex;
 
 typedef struct assemble {
-	char* label;
+	char* func_name;
+	int label;
 	enum instruction ins;
 	int Rn;
 	int Rd;

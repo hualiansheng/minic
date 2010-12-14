@@ -17,7 +17,7 @@ extern basic_block *bblist;
 extern func_block *fblist;
 extern int block_num;
 
-char *ins_name[] = {"", "ldw", "stw", "b.l", "mov", "add", "sub", "jump","cmpsub", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
+char *ins_name[] = {"", ".L", "ldw", "stw", "b.l", "mov", "add", "sub", "jump","cmpsub", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
 };
 extern assemble *assemble_list;
 extern int assemble_num;
@@ -259,13 +259,23 @@ void print_target_code()
 	enum instruction inst;
 	for (i = 0; i < assemble_num; i++)
 	{
-		if (assemble_list[i].ins == label)			
-			printf("%s:\n", assemble_list[i].label);
+		if (assemble_list[i].ins == func || assemble_list[i].ins == label)
+		{
+			if (assemble_list[i].ins == func)
+				printf("%s:\n", assemble_list[i].func_name);
+			else
+				printf(".L%d:\n", assemble_list[i].label);
+		}
 		else
 		{
 			inst = assemble_list[i].ins;
 			if (inst == b_l || inst == beq || inst == bsl || inst == beg || inst == bsg ||inst == bel || inst == b || inst == bne)
-				printf("\t%s\t%s\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].label);
+			{
+				if (inst == b_l)
+					printf("\t%s\t%s\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].func_name);
+				else
+					printf("\t%s\t.L%d\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].label);
+			}
 			else
 			{	printf("\t%s\t", ins_name[inst-5000]);
 				if (assemble_list[i].Rd != -1)
