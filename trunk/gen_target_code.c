@@ -54,6 +54,7 @@ int memory_allocation();
 int setLabel();
 int convert();
 int add_assemble(char *func_name, int label, enum instruction ins, int Rn, int Rd, int Rs_or_Imm, int Rs_Imm, int Rm_or_Imm, int Rm_Imm);
+int check_live(func_block *fb, int i, int isTmp);
 int load_operator(func_block *fb, int u, int r, int _r);
 int add_std_assemble(func_block *fb, enum instruction ins, int u0, int u1, int u2);
 int add_imm_assemble(func_block *fb, enum instruction ins, int u0, int u1, int imm);
@@ -183,12 +184,13 @@ int add_assemble(char *func_name, int label, enum instruction ins, int Rn, int R
 
 int check_live(func_block *fb, int i, int isTmp)
 {
-	int u;
+	int u, base = fb->start->begin;
 	if (isTmp == 1)
 		u = triple_list[index_index[i]].tmp_uni;
 	else
 		u = triple_list[index_index[i]].arg1_uni;
-	if (fb->live_status[])
+	if ((fb->live_status[i+1-base][u/32] >> (31-u%32)) % 2 == 1)
+		return 1;
 	return 0;
 }
 
@@ -281,7 +283,7 @@ int assign_bool_value(enum instruction ins, func_block *fb, int i)
 	if (r0 == -1)
 	{
 		add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, 0);
-		add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 0, r2);
+		add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 0, r2);
 		add_assemble(NULL, -1, ins, -1, 3, 0, -1, 1, 1);
 		add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[u0]->offset);
 	}
@@ -289,7 +291,7 @@ int assign_bool_value(enum instruction ins, func_block *fb, int i)
 	{
 		fb->reg_var[r0] = u0;
 		add_assemble(NULL, -1, mov, -1, r0, 0, -1, 1, 0);
-		add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 0, r2);
+		add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 0, r2);
 		add_assemble(NULL, -1, ins, -1, r0, 0, -1, 1, 1);
 	}
 	return 0;
@@ -303,7 +305,7 @@ int compare_operation(func_block *fb, int i, int cond, int m)
 		u1 = triple_list[index_index[i]].arg1_uni;
 		r1 = fb->reg_alloc[u1];
 		r1 = load_operator(fb, u1, r1, 1);
-		add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, 0);			
+		add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, 0);			
 	}
 	if (cond == 2)
 	{
@@ -317,7 +319,7 @@ int compare_operation(func_block *fb, int i, int cond, int m)
 			r2 = fb->reg_alloc[u2];
 			r1 = load_operator(fb, u1, r1, 1);
 			r2 = load_operator(fb, u2, r2, 2);
-			add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 0, r2);
+			add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 0, r2);
 		}
 		else
 		{
@@ -325,13 +327,13 @@ int compare_operation(func_block *fb, int i, int cond, int m)
 			{
 				r1 = fb->reg_alloc[u1];
 				r1 = load_operator(fb, u1, r1, 1);
-				add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
+				add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
 			}
 			if (t2 < 2)
 			{
 				r2 = fb->reg_alloc[u2];
 				r2 = load_operator(fb, u2, r2, 1);
-				add_assemble(NULL, -1, cmpsub, r2, -1, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
+				add_assemble(NULL, -1, cmpsub_a, r2, -1, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
 				if (m != 2 && m != 3)
 					m = 5 - m;
 			}
@@ -342,7 +344,7 @@ int compare_operation(func_block *fb, int i, int cond, int m)
 		u1 = triple_list[index_index[i]].tmp_uni;
 		r1 = fb->reg_alloc[u1];
 		r1 = load_operator(fb, u1, r1, 1);
-		add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, 0);			
+		add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, 0);			
 	}
 	return m;
 }
@@ -474,7 +476,7 @@ int not_code(func_block *fb, int i)
 		if (r0 == -1)
 		{
 			add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, 0);
-			add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, 0);
+			add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, 0);
 			add_assemble(NULL, -1, cmoveq, -1, 3, 0, -1, 1, 1);
 			add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[u0]->offset);
 		}
@@ -482,7 +484,7 @@ int not_code(func_block *fb, int i)
 		{
 			fb->reg_var[r0] = u0;
 			add_assemble(NULL, -1, mov, -1, r0, 0, -1, 1, 0);
-			add_assemble(NULL, -1, cmpsub, r1, -1, 0, -1, 1, 0);
+			add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, 0);
 			add_assemble(NULL, -1, cmoveq, -1, r0, 0, -1, 1, 1);
 		}
 	}*/
@@ -540,25 +542,46 @@ int star_assign_code(func_block *fb, int i)
 int add_code(func_block *fb, int i)
 {
 	int type1, type2, tmp_uni, arg1_uni, arg2_uni;
-	type1 = triple_list[index_index[i]].arg1_type;
-	type2 = triple_list[index_index[i]].arg2_type;
-	tmp_uni = triple_list[index_index[i]].tmp_uni;
-	arg1_uni = triple_list[index_index[i]].arg1_uni;
-	arg2_uni = triple_list[index_index[i]].arg2_uni;
-	if (type1 < 2 && type2 < 2)
-		add_std_assemble(fb, add, tmp_uni, arg1_uni, arg2_uni);
-	else
+	if (check_live(fb, i, 1))
 	{
-		if (type1 < 2)
-			add_imm_assemble(fb, add, tmp_uni, arg1_uni, triple_list[index_index[i]].arg2.imm_value);
-		if (type2 < 2)
-			add_imm_assemble(fb, add, tmp_uni, arg2_uni, triple_list[index_index[i]].arg1.imm_value);
+		type1 = triple_list[index_index[i]].arg1_type;
+		type2 = triple_list[index_index[i]].arg2_type;
+		tmp_uni = triple_list[index_index[i]].tmp_uni;
+		arg1_uni = triple_list[index_index[i]].arg1_uni;
+		arg2_uni = triple_list[index_index[i]].arg2_uni;
+		if (type1 < 2 && type2 < 2)
+			add_std_assemble(fb, add, tmp_uni, arg1_uni, arg2_uni);
+		else
+		{
+			if (type1 < 2)
+				add_imm_assemble(fb, add, tmp_uni, arg1_uni, triple_list[index_index[i]].arg2.imm_value);
+			if (type2 < 2)
+				add_imm_assemble(fb, add, tmp_uni, arg2_uni, triple_list[index_index[i]].arg1.imm_value);
+		}
 	}
 	return 0;
 }
 
 int minus_code(func_block *fb, int i)
 {
+	int type1, type2, tmp_uni, arg1_uni, arg2_uni;
+	if (check_live(fb, i, 1))
+	{
+		type1 = triple_list[index_index[i]].arg1_type;
+		type2 = triple_list[index_index[i]].arg2_type;
+		tmp_uni = triple_list[index_index[i]].tmp_uni;
+		arg1_uni = triple_list[index_index[i]].arg1_uni;
+		arg2_uni = triple_list[index_index[i]].arg2_uni;
+		if (type1 < 2 && type2 < 2)
+			add_std_assemble(fb, sub, tmp_uni, arg1_uni, arg2_uni);
+		else
+		{
+			if (type1 < 2)
+				add_imm_assemble(fb, sub, tmp_uni, arg1_uni, triple_list[index_index[i]].arg2.imm_value);
+			if (type2 < 2)
+				add_imm_assemble(fb, rsub, tmp_uni, arg2_uni, triple_list[index_index[i]].arg1.imm_value);
+		}
+	}
 	return 0;
 }
 
