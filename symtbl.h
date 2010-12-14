@@ -19,7 +19,6 @@ struct symtbl_hdr
 	int ret_star;			//indicate whether the return value is a pointer; default is 0
 	int para_num;			//the number of function's parameters
 	int func_def;			//record whether the function body is defined
-	
 	int item_num;			//the number of items in the symtbl
 	int maxSize;			//the max memory size for symtbl items currently, noticing that it's calculated by byte!
 	symtbl_item* item;		//the list of the items

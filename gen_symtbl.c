@@ -13,7 +13,7 @@ int err_num;
 int gen_symtbl(AST_NODE* root)
 {	
 	int i;
-	name_size = 64;
+	name_size = 255;
 	name_off = 0;
 	name_pool = (char*)malloc(name_size);
 	assert(name_pool != NULL);
