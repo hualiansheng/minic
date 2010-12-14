@@ -181,6 +181,17 @@ int add_assemble(char *func_name, int label, enum instruction ins, int Rn, int R
 	return 0;
 }
 
+int check_live(func_block *fb, int i, int isTmp)
+{
+	int u;
+	if (isTmp == 1)
+		u = triple_list[index_index[i]].tmp_uni;
+	else
+		u = triple_list[index_index[i]].arg1_uni;
+	if (fb->live_status[])
+	return 0;
+}
+
 int load_operator(func_block *fb, int u, int r, int _r)
 {
 	if (r == -1)

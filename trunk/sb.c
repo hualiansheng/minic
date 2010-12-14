@@ -1,10 +1,8 @@
 int main()
 {
-	int a, b;
-	if (4 < a)
-		b = 1;
-	else
-		b = 2;
-	return b;
+	int i, a[10];
+	for (i = 0; i < 10; i++)
+		a[i] = i;
+	return a[5];
 }
 
