@@ -5,9 +5,7 @@ int f(int a)
 int main()
 {
 	int a, b, c;
-		
-		a=b;
-		f(b);
+	a = f(1);
 	return a;
 }
 
