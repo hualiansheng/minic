@@ -597,6 +597,7 @@ void set_CMSR(REGISTERS* regs, int32_t operand1, int32_t operand2,
       else
 	reg_setV(regs, 0);
     }
+    //printf("aaa : %d\n", result);
     //set CMSR N bit
     if(result < 0)
       reg_setN(regs, 1);

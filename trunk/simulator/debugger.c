@@ -42,7 +42,7 @@ void debugger_print_register(REGISTERS* regs, int reg_num){
       printf("\t");
   }
   printf("\n");
-  printf("CMSR : N 0x%.8x Z 0x%.8x C 0x%.8x V 0x%.8x\n",
+  printf("CMSR : N = %d ; Z = %d ; C = %d ; V = %d\n",
 	 reg_getN(regs), reg_getZ(regs),
 	 reg_getC(regs), reg_getV(regs));
   printf("====================================\n");

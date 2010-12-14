@@ -26,7 +26,10 @@ int reg_setN(REGISTERS *regs, int n){
     return 0;
   if(n!=0)
     n = 1;
-  regs->flag = regs->flag | (n<<31);
+  if(n == 1)
+    regs->flag = regs->flag | (1<<31);
+  else
+    regs->flag = regs->flag & ~(1<<31);
   return 1;
 }
 
@@ -42,7 +45,10 @@ int reg_setZ(REGISTERS *regs, int z){
     return 0;
   if(z!=0)
     z = 1;
-  regs->flag = regs->flag | (z<<30);
+  if(z == 1)
+    regs->flag = regs->flag | (1<<30);
+  else
+    regs->flag = regs->flag & ~(1<<30);
   return 1;
 }
 
@@ -58,7 +64,10 @@ int reg_setC(REGISTERS *regs, int c){
     return 0;
   if(c!=0)
     c = 1;
-  regs->flag = regs->flag | (c<<29);
+  if(c == 1)
+    regs->flag = regs->flag | (1<<29);
+  else
+    regs->flag = regs->flag & ~(1<<29);
   return 1;
 }
 
@@ -74,7 +83,10 @@ int reg_setV(REGISTERS *regs, int v){
     return 0;
   if(v!=0)
     v = 1;
-  regs->flag = regs->flag | (v<<28);
+  if(v == 1)
+    regs->flag = regs->flag | (1<<28);
+  else
+    regs->flag = regs->flag | ~(1<<28);
   return 1;
 }
 
