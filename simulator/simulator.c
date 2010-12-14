@@ -4,9 +4,7 @@
 //#include <curses.h>
 
 #include "console.h"
-
-int pipline_output_invalid[PIPLINE_LEVEL]={0,0,0,0,0};
-int v_mode = 1;
+#include "config.h"
 
 int main(int argc, char **argv){
   if(argc !=2){
