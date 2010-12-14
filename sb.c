@@ -1,8 +1,10 @@
 int main()
 {
-	int i, a[10];
-	for (i = 0; i < 10; i++)
-		a[i] = i;
-	return a[5];
+	int i,sum;
+	sum = 0;
+	for(i = 1; i <= 100; i++)
+		sum = sum + i;
+
+	return sum;
 }
 

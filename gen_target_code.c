@@ -751,17 +751,17 @@ int enterS_code(func_block *fb, int i)
 
 int leaveF_code(func_block *fb, int i)
 {
-	int j;
-	//symtbl_hdr *ptr = triple_list[index_index[i]].symtbl;
-	for (j = 0; j < fb->reg_used-12; j++)
-	{
-		fb->reg_var[17+j] = temp_reg_var[17+j];
-		add_assemble(NULL, -1, ldw, 27, 17+j, 0, -1, 1, -(16+j*4));
-	}
-	add_assemble(NULL, -1, ldw, 27, 30, 0, -1, 1, -4);
-	add_assemble(NULL, -1, ldw, 27, 29, 0, -1, 1, -8);
-	add_assemble(NULL, -1, ldw, 27, 27, 0, -1, 1, -12);
-	add_assemble(NULL, -1, jump, -1, -1, 0, -1, 0, 30);
+//	int j;
+//	//symtbl_hdr *ptr = triple_list[index_index[i]].symtbl;
+//	for (j = 0; j < fb->reg_used-12; j++)
+//	{
+//		fb->reg_var[17+j] = temp_reg_var[17+j];
+//		add_assemble(NULL, -1, ldw, 27, 17+j, 0, -1, 1, -(16+j*4));
+//	}
+//	add_assemble(NULL, -1, ldw, 27, 30, 0, -1, 1, -4);
+//	add_assemble(NULL, -1, ldw, 27, 29, 0, -1, 1, -8);
+//	add_assemble(NULL, -1, ldw, 27, 27, 0, -1, 1, -12);
+//	add_assemble(NULL, -1, jump, -1, -1, 0, -1, 0, 30);
 	return 0;
 }
 
@@ -773,14 +773,28 @@ int leaveS_code(func_block *fb, int i)
 int rtn_code(func_block *fb, int i)
 {
 	int j;
-	j = triple_list[index_index[i]].arg1_uni;
-	if (j != -1)
+	if (triple_list[index_index[i]].arg1_type < 2)
 	{
-		if (fb->reg_alloc[j] != -1)
-			add_assemble(NULL, -1, mov, -1, 0, 0, -1, 0, fb->reg_alloc[j]);
-		else
-			add_assemble(NULL, -1, ldw, 27, 0, 0, -1, 1, fb->uni_table[j]->offset);
+		j = triple_list[index_index[i]].arg1_uni;
+		if (j != -1)
+		{
+			if (fb->reg_alloc[j] != -1)
+				add_assemble(NULL, -1, mov, -1, 0, 0, -1, 0, fb->reg_alloc[j]);
+			else
+				add_assemble(NULL, -1, ldw, 27, 0, 0, -1, 1, fb->uni_table[j]->offset);
+		}
 	}
+	else
+		add_assemble(NULL, -1, mov, -1, 0, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
+	for (j = 0; j < fb->reg_used-12; j++)
+	{
+		fb->reg_var[17+j] = temp_reg_var[17+j];
+		add_assemble(NULL, -1, ldw, 27, 17+j, 0, -1, 1, -(16+j*4));
+	}
+	add_assemble(NULL, -1, ldw, 27, 30, 0, -1, 1, -4);
+	add_assemble(NULL, -1, ldw, 27, 29, 0, -1, 1, -8);
+	add_assemble(NULL, -1, ldw, 27, 27, 0, -1, 1, -12);
+	add_assemble(NULL, -1, jump, -1, -1, 0, -1, 0, 30);
 	return 0;
 }
 
