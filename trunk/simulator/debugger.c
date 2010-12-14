@@ -34,14 +34,24 @@ void debugger_print_register(REGISTERS* regs, int reg_num){
   int i;
   printf("Register Heap Info:=================\n");
   for(i=0; i<32; i++){
-    if(i % 2 == 0 && i != 0)
+    if(i % 2 == 0 && i != 0){
       printf("\n");
+    }
     printf("Reg%d : 0x%.8x", i, regs->r[i]);
     if(i % 4 != 3)
       printf("\t");
   }
   printf("\n");
+  printf("CMSR : N 0x%.8x Z 0x%.8x C 0x%.8x V 0x%.8x\n",
+	 reg_getN(regs), reg_getZ(regs),
+	 reg_getC(regs), reg_getV(regs));
   printf("====================================\n");
+}
+
+void debugger_print_CMSR(REGISTERS* regs){
+    printf("CMSR : N 0x%.8x Z 0x%.8x C 0x%.8x V 0x%.8x\n",
+	 reg_getN(regs), reg_getZ(regs),
+	 reg_getC(regs), reg_getV(regs));
 }
 
 void debugger_modify_register(REGISTERS* regs, int reg_num, int32_t content){

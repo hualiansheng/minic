@@ -14,6 +14,9 @@ typedef struct{
   char args[30][30];
 }CMD;
 
+extern int pipline_output_invalid[PIPLINE_LEVEL];
+extern int v_mode;
+
 int console_step(CPU_d* cpu, CMD cmd);// command step/s
 int console_next(CPU_d* cpu);// command next/s
 int console_run(CPU_d* cpu, char* filename, int mode);// command r/rt
@@ -143,9 +146,15 @@ int console_step(CPU_d* cpu, CMD cmd){
     if(pipline_next_step(cpu->pipline, cpu->cpu_info) == 0){
       cpu->mode = CPU_STOP;
       //printf("CPU STOP\n");
+      // verification mode
+      if(v_mode == 1)
+	debugger_print_register(cpu->regs, -1);
       return -1;
     }
     console_print_pipline(cpu);
+    // verification mode
+    if(v_mode == 1)
+      debugger_print_CMSR(cpu->regs);
   }
   return 1;
 }
@@ -371,9 +380,15 @@ int console_modify(CPU_d* cpu, CMD cmd){
 
 int console_print_pipline(CPU_d* cpu){
   int i;
-  for(i=0; i<PIPLINE_LEVEL; i++)
-    printf("%s", cpu->pipline->pipline_info[i]);
-  printf("\n");
+  int flag = 0;
+  for(i=0; i<PIPLINE_LEVEL; i++){
+    if(pipline_output_invalid[i] == 1){
+      printf("%s", cpu->pipline->pipline_info[i]);
+      flag = 1;
+    }
+  }
+  if(flag == 1)
+    printf("\n");
   return 1;
 }
 

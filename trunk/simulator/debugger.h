@@ -10,6 +10,7 @@
 
 extern void debugger_print_cpu_info(CPU_info* cpu_info);
 extern void debugger_print_register(REGISTERS* regs, int reg_num);
+extern void debugger_print_CMSR(REGISTERS* regs);
 extern void debugger_modify_register(REGISTERS* regs, int reg_num, int32_t content);
 extern void debugger_print_mem(PROC_MEM* mem, uint32_t addr);
 extern void debugger_modify_mem(PROC_MEM* mem, uint32_t addr, int32_t content);

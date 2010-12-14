@@ -5,6 +5,9 @@
 
 #include "console.h"
 
+int pipline_output_invalid[PIPLINE_LEVEL]={0,0,0,0,0};
+int v_mode = 1;
+
 int main(int argc, char **argv){
   if(argc !=2){
     fprintf(stderr, "usage: %s file-name\n", argv[0]);
