@@ -534,7 +534,7 @@ int32_t data_Ex(int32_t operand1, int32_t operand2, int opcodes, int carry){
   case CXOR: return op1 ^ op2;
   case SUB:
   case CSUB: return op1 - op2;
-  case RSB:  return op2 - op2;
+  case RSB:  return op2 - op1;
   case ADD:
   case CADD: return op1 + op2;
   case ADC:  return op1 + op2 + carry;
