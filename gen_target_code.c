@@ -108,7 +108,7 @@ int memory_allocation()
 				if (fb->uni_table[i]->size == -1)
 					off -= 4;
 				else
-					off -= 4*fb->uni_table[i]->size;
+					off -= 4*(fb->uni_table[i]->size+1);
 			}
 		}
 		fb->min_stack_size = -off;
@@ -844,7 +844,7 @@ int enterF_code(func_block *fb, int i)
 		temp_reg_var[17+j] = fb->reg_var[17+j];
 	}
 	for (j = 0; j < 4 && j < ptr->para_num; j++)
-		add_assemble(NULL, -1, stw, 27, j, 0, -1, 1, ptr->item[ptr->para_num-1-j].offset);
+		add_assemble(NULL, -1, stw, 27, j, 0, -1, 1, ptr->item[ptr->para_num-1-j].offset-4);
 	for (j = ptr->para_num; j < fb->uni_item_num; j++)
 	{
 		if (fb->uni_table[j]->size != -1)
