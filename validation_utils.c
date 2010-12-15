@@ -294,6 +294,10 @@ void print_target_code()
 				}
 				else
 					printf("#%d", assemble_list[i].Rm_Imm);
+				if (assemble_list[i].Rs_or_Imm == 1)
+				{
+					printf("<<#%d",assemble_list[i].Rs_Imm);
+				}
 				printf("\n");
 			}
 		}
