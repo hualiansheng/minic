@@ -2,6 +2,6 @@ int main()
 {
 	int i;
 	int *p;
-	p[i] = 1;
+	p[i] = 1000;
 }
 
