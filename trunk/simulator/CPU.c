@@ -1,6 +1,4 @@
 #include "CPU.h"
-#include "register.h"
-#include "pipline.h"
 #include <malloc.h>
 #include <memory.h>
 
