@@ -1,10 +1,10 @@
 int main()
 {
-	int i, j, a[10], temp;
-	for (i = 0; i < 10; i++)
-		a[i] = 10 - i;
-	for (i = 0; i < 10; i++)
-		for (j = i+1; j < 10; j++)
+	int i, j, a[128], temp;
+	for (i = 0; i < 128; i++)
+		a[i] = 128 - i;
+	for (i = 0; i < 128; i++)
+		for (j = i+1; j < 128; j++)
 			if(a[j] < a[i])
 			{
 				temp = a[i];
