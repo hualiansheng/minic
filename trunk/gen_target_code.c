@@ -511,6 +511,7 @@ int star_code(func_block *fb, int i)
 		r1 = load_operator(fb, u1, r1, 1);
 		if (u2 != -1)
 		{
+			r2 = fb->reg_alloc[u2];
 			r2 = load_operator(fb, u2, r2, 2);
 			add_assemble(NULL, -1, ldw, r1, 3, 1, 2, 0, r2);
 		}
@@ -536,7 +537,6 @@ int positive_code(func_block *fb, int i)
 
 int assign_code(func_block *fb, int i)
 {
-	int base = fb->start->begin;
 	int u0, u1, u2, r0, r1, r2;
 	u0 = triple_list[index_index[i]].tmp_uni;
 	u1 = triple_list[index_index[i]].arg1_uni;
@@ -579,7 +579,7 @@ int star_assign_code(func_block *fb, int i)
 		{
 			u3 = triple_list[index_index[i]].arg2_uni;
 			r3 = fb->reg_alloc[u3];
-			r3 = load_operator(fb, u3, r3, 3)
+			r3 = load_operator(fb, u3, r3, 3);
 		}
 		else
 		{
