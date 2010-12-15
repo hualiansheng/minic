@@ -4,7 +4,8 @@
 //int pipline_output_invalid[PIPLINE_LEVEL]={1,1,1,1,1};
 //int v_mode = 0;
 
-int pipline_output_invalid[PIPLINE_LEVEL]={0,0,0,0,0};
-int v_mode = 1;
+int pipline_output_invalid[PIPLINE_LEVEL]={1,1,1,1,1};
+int v_mode = 0;
+int auto_run_mode = 0;
 
 #endif

@@ -1,9 +1,9 @@
 #include "debugger.h"
-#include "string.h"
+#include <string.h>
 #include "breakpoint.h"
 #include "pipline.h"
 #include "process.h"
-#include "memory.h"
+#include <memory.h>
 #include "console.h"
 #include "interpret.h"
 #include <malloc.h>
@@ -153,8 +153,20 @@ int console_step(CPU_d* cpu, CMD cmd){
     }
     console_print_pipline(cpu);
     // verification mode
-    if(v_mode == 1)
-      debugger_print_CMSR(cpu->regs);
+    if(v_mode == 1){
+      if(cpu->pipline->pipline_data[2] == NULL)
+        printf("Inst Execation Level Empty.\n");
+      else{
+        char ass_code[100];
+        interpret_inst(cpu->pipline->pipline_data[2]->inst_code,
+                       cpu->pipline->pipline_data[2]->inst_addr,
+		       ass_code, cpu->proc);
+        printf("inst : 0x%.8x  ass_code : %s\n\t",
+               cpu->pipline->pipline_data[2]->inst_code,
+               ass_code);
+        debugger_print_CMSR(cpu->regs);
+      }
+    }
   }
   return 1;
 }
