@@ -630,15 +630,15 @@ int rvalue_code(AST_NODE *p)
                                         arg_num ++;             
                                 }
                                 else if(temp_rvalue == -2){
-                                        if(ptr->leftChild->rightSibling->leftChild->leftChild->leftChild->nodeType == ICONSTANT_T){
+                                        if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->leftChild->nodeType == ICONSTANT_T){
                                                 arg_list[arg_num] = const_value;
                                                 arg_type_list[arg_num] = 2;
                                         }
-                                        else if(ptr->leftChild->rightSibling->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
+                                        else if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
                                                 arg_list[arg_num] = const_value;
                                                 arg_type_list[arg_num] = 2;
                                         }
-                                        else if(ptr->leftChild->rightSibling->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
+                                        else if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
                                                 arg_list[arg_num] = (int)const_string;
                                                 arg_type_list[arg_num] = 3;
                                         }

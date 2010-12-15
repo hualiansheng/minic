@@ -1,7 +1,4 @@
-int data[128];
-unsigned int a = 0;
-
-void qsort(int begin, int end){
+void qsort(int *data,int begin, int end){
   if(end <= begin + 1)
     return;
   int i, j, tmp;
@@ -17,15 +14,15 @@ void qsort(int begin, int end){
   tmp = data[begin];
   data[begin] = data[j-1];
   data[j-1] = tmp;
-  qsort(begin, j-1);
-  qsort(j, end);
+  qsort(data,begin, j-1);
+  qsort(data,j, end);
 }
 
 int main(){
   int i;
-  a = (unsigned int)data;
-  for(i=0; i<128; i++)
-    data[i] = 128-i;
-  qsort(0, 128);
+  int data[20];
+  for(i=0; i<20; i++)
+    data[i] = 20-i;
+  qsort(data,0, 20);
   return 0;
 }
