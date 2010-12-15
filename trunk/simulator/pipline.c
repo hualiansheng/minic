@@ -202,7 +202,7 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
     if(data->inst_type == L_S_R_OFFSET
        || data->inst_type == L_S_I_OFFSET){
       if(data->B == 0 && data->addr % 4 != 0){
-	fprintf(stderr, "Error : Data Transprotation Error.\n");
+	fprintf(stderr, "Error : Data Transportation Error, Address not Aligned.\n");
 	exit(1);
       }
       CACHE_RETURN cache_return;
