@@ -257,7 +257,7 @@ int check_bool_use(func_block *fb, int i)
 	l = triple_list[index_index[i]].tmp_uni;
 	for (j = i+1-base; j < fb->code_num; j++)
 	{
-		if (!check_live(fb, j, 1))
+		if ((fb->live_status[j][l/32] >> (31-l%32)) % 2 == 0)
 			break;
 		u1 = triple_list[index_index[j+base]].arg1_uni;
 		u2 = triple_list[index_index[j+base]].arg2_uni;
@@ -547,7 +547,7 @@ int assign_code(func_block *fb, int i)
 		r2 = load_operator(fb, u2, r2, 2);
 		if (check_live(fb, i, 0) && r1 != r2)
 			store_result(fb, mov, u1, -1, r1, 0, -1, 0, r2);
-		if (check_live(fb, i, 1) && r0 != r2)
+		if (check_live(fb, i, 1) && fb->reg_alloc[u0] != r2)
 		{
 			r0 = fb->reg_alloc[u0];
 			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r2);

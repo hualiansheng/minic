@@ -1,7 +1,7 @@
 #ifndef REGISTER_H_
 #define REGISTER_H_
 enum instruction {
-	func = 5000, label, ldw, stw, b_l, mov, add, sub, rsub, jump, cmpsub_a, bne, beq, bsl, beg, bsg, bel, b, cmoveq, cmovsl, cmoveg, cmovel, cmovne, cmovsg
+	func = 5000, label, ldw, stw, b_l, mov, add, sub, rsub, mul, jump, cmpsub_a, bne, beq, bsl, beg, bsg, bel, b, cmoveq, cmovsl, cmoveg, cmovel, cmovne, cmovsg
 };
 
 
