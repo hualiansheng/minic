@@ -540,7 +540,6 @@ int assign_code(func_block *fb, int i)
 	u0 = triple_list[index_index[i]].tmp_uni;
 	u1 = triple_list[index_index[i]].arg1_uni;
 	u2 = triple_list[index_index[i]].arg2_uni;
-	r0 = fb->reg_alloc[u0];
 	r1 = fb->reg_alloc[u1];
 	if (u2 != -1)
 	{
@@ -549,14 +548,20 @@ int assign_code(func_block *fb, int i)
 		if (check_live(fb, i, 0) && r1 != r2)
 			store_result(fb, mov, u1, -1, r1, 0, -1, 0, r2);
 		if (check_live(fb, i, 1) && r0 != r2)
+		{
+			r0 = fb->reg_alloc[u0];
 			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r2);
+		}
 	}
 	else
 	{
 		if (check_live(fb, i, 0))
 			store_result(fb, mov, u1, -1, r1, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
 		if (check_live(fb, i, 1))
+		{
+			r0 = fb->reg_alloc[u0];
 			store_result(fb, mov, u0, -1, r0, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
+		}
 	}
 	return 0;
 }
@@ -566,7 +571,6 @@ int star_assign_code(func_block *fb, int i)
 	int u0, u1, u2, u3, r0, r1, r2, r3;
 	triple temp;
 	u0 = triple_list[index_index[i]].tmp_uni;
-	r0 = fb->reg_alloc[u0];
 	if (triple_list[index_index[i]].arg1_type == 1 && triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]].op == adds_op)
 	{
 		temp = triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]];
@@ -594,7 +598,10 @@ int star_assign_code(func_block *fb, int i)
 		else
 			add_assemble(NULL, -1, stw, r1, r3, 1, 2, 1, temp.arg2.imm_value);
 		if (check_live(fb, i, 1))
+		{
+			r0 = fb->reg_alloc[u0];
 			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r3);
+		}
 	}
 	else
 	{
@@ -614,7 +621,10 @@ int star_assign_code(func_block *fb, int i)
 		}
 		add_assemble(NULL, -1, stw, r1, r2, 0, -1, 1, 0);
 		if (check_live(fb, i, 1))
+		{
+			r0 = fb->reg_alloc[u0];
 			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r2);
+		}
 	}
 	return 0;
 }
@@ -667,6 +677,24 @@ int minus_code(func_block *fb, int i)
 
 int multiply_code(func_block *fb, int i)
 {
+	int type1, type2, tmp_uni, arg1_uni, arg2_uni;
+	if (check_live(fb, i, 1))
+	{
+		type1 = triple_list[index_index[i]].arg1_type;
+		type2 = triple_list[index_index[i]].arg2_type;
+		tmp_uni = triple_list[index_index[i]].tmp_uni;
+		arg1_uni = triple_list[index_index[i]].arg1_uni;
+		arg2_uni = triple_list[index_index[i]].arg2_uni;
+		if (type1 < 2 && type2 < 2)
+			add_std_assemble(fb, mul, tmp_uni, arg1_uni, arg2_uni);
+		else
+		{
+			if (type1 < 2)
+				add_imm_assemble(fb, mul, tmp_uni, arg1_uni, triple_list[index_index[i]].arg2.imm_value);
+			if (type2 < 2)
+				add_imm_assemble(fb, mul, tmp_uni, arg2_uni, triple_list[index_index[i]].arg1.imm_value);
+		}
+	}
 	return 0;
 }
 
