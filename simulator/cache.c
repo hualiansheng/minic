@@ -44,8 +44,8 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
     block_addr += 4;
     in_block_count += 4;
   }
-  if(in_block_count > 32){
-    fprintf(stderr, "Address invalid.\n");
+  if(in_block_count > CACHE_BLOCK_SIZE){
+    fprintf(stderr, "Address invalid, addr 0x%.8x.\n", addr);
     exit(1);
   }
   else if(mem_fetch(cache->mem, block_addr,
@@ -111,10 +111,9 @@ int cache_rewrite(CACHE* cache, uint32_t addr){
     return 0;
   }
   else if(type != -1){
-    fprintf(stderr,
-	    "Warning : Read only address, NO. %d block rewrite ignored.\n",
-	    block_index);
-    return 1;
+    printf("Read only address, cache NO. %d block rewrite ignored, addr 0x%.8x.\n",
+	    block_index, addr);
+    return 0;
   }
   return -1;
 }

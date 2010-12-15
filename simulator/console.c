@@ -151,6 +151,7 @@ int console_step(CPU_d* cpu, CMD cmd){
 	debugger_print_register(cpu->regs, -1);
       return -1;
     }
+    printf("Step %d:\n", cpu->proc->step);
     console_print_pipline(cpu);
     // verification mode
     if(v_mode == 1){
@@ -167,6 +168,7 @@ int console_step(CPU_d* cpu, CMD cmd){
         debugger_print_CMSR(cpu->regs);
       }
     }
+    cpu->proc->step ++;
   }
   return 1;
 }
@@ -181,7 +183,7 @@ int console_run(CPU_d* cpu, char* filename, int mode){
     if(strcmp(tmp, "Y") == 0 || strcmp(tmp, "y") == 0 ||
        strcmp(tmp, "yes") == 0 || strcmp(tmp, "YES") == 0){
       process_restart(cpu, filename);
-      console_run(cpu, filename, 0);
+      console_run(cpu, filename, mode);
       return 1;
     }
     else
@@ -320,6 +322,8 @@ int console_print(CPU_d* cpu, CMD cmd){
 
 int console_x(CPU_d* cpu, CMD cmd){
   uint32_t addr;
+  int num = 1;
+  int i;
   if(cmd.arg_num == 0){
     console_help_x();
     return 0;
@@ -330,7 +334,16 @@ int console_x(CPU_d* cpu, CMD cmd){
     sscanf(cmd.args[0], "  %x", &addr);
   }else
     sscanf(cmd.args[0], "%d", &addr);
-  debugger_print_mem(cpu->proc->mem, addr);
+  if(cmd.arg_num >=2){
+    if(cmd.args[1][0] == '0' && cmd.args[1][1] == 'x'){
+      cmd.args[1][0] = ' ';
+      cmd.args[1][1] = ' ';
+      sscanf(cmd.args[1], "  %x", &num);
+    }else
+      sscanf(cmd.args[1], "%d", &num);
+  }
+  for(i=0; i<num; i++)
+    debugger_print_mem(cpu->proc->mem, addr + 4*i);
   return 1;
 }
 

@@ -11,7 +11,7 @@
 #define PROC_TRAP	2
 #define PROC_DEAD	3
 #define PROC_INITIAL	4
-#define STACK_SIZE	8192
+#define STACK_SIZE	4*1024*1024
 
 typedef struct{
   int status;
@@ -21,6 +21,7 @@ typedef struct{
   PROC_SYMTBL symtbl;
   BP_LIST* bp_list;
   uint32_t list_cur_addr;
+  int step;
 }PROCESS;
 
 extern PROCESS* proc_initial(char* filename);
