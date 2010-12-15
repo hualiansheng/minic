@@ -282,16 +282,8 @@ void print_target_code()
 					printf("r%d, ", assemble_list[i].Rd);
 				if (assemble_list[i].Rn != -1)
 				{
-					/**
-					 * Workaround: fp+ / fp-
-					 *
-					 */
-					if (assemble_list[i].ins == ldw || assemble_list[i].ins == stw){
-						if(assemble_list[i].Rs_or_Imm == 1)
-							printf("[r%d-], ", assemble_list[i].Rn);
-						else
+					if (assemble_list[i].ins == ldw || assemble_list[i].ins == stw)
 							printf("[r%d+], ", assemble_list[i].Rn);
-					}
 					else
 						printf("r%d, ", assemble_list[i].Rn);
 				}

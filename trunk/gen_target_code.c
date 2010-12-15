@@ -104,11 +104,10 @@ int memory_allocation()
 		{
 			if (!(fb->mapping[i].isTmp == 1 && fb->reg_alloc[i] != -1))
 			{
+				if (fb->uni_table[i]->size != -1)
+					off -= 4*fb->uni_table[i]->size;
 				fb->uni_table[i]->offset = off;
-				if (fb->uni_table[i]->size == -1)
-					off -= 4;
-				else
-					off -= 4*(fb->uni_table[i]->size+1);
+				off -= 4;
 			}
 		}
 		fb->min_stack_size = -off;
@@ -849,7 +848,7 @@ int enterF_code(func_block *fb, int i)
 	{
 		if (fb->uni_table[j]->size != -1)
 		{
-			add_assemble(NULL, -1, add, 27, 3, 0, -1, 1, fb->uni_table[j]->offset-4);
+			add_assemble(NULL, -1, add, 27, 3, 0, -1, 1, fb->uni_table[j]->offset+4);
 			add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[j]->offset);
 		}
 	}
