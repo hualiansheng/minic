@@ -86,12 +86,12 @@ extern int error_number;
 %type <ptr> argument_list
 
 
+%left BOOLEAN_OP
+%left REL_OP
 %right '='
 %left '+' '-'
 %left '*'
 
-%left BOOLEAN_OP
-%left REL_OP
 %right DOUBLE
 %right DOUBLE_OP
 %right NOT
