@@ -258,7 +258,7 @@ int check_bool_use(func_block *fb, int i)
 	l = triple_list[index_index[i]].tmp_uni;
 	for (j = i+1-base; j < fb->code_num; j++)
 	{
-		if ((fb->live_status[j][l/32] >> (31-l%32)) % 2 != 1)
+		if (!check_live(fb, j, 1))
 			break;
 		u1 = triple_list[index_index[j+base]].arg1_uni;
 		u2 = triple_list[index_index[j+base]].arg2_uni;
@@ -498,6 +498,34 @@ int address_code(func_block *fb, int i)
 
 int star_code(func_block *fb, int i)
 {
+	int u0, u1, u2, r0, r1, r2;
+	triple temp;
+	u0 = triple_list[index_index[i]].tmp_uni;
+	r0 = fb->reg_alloc[u0];
+	if (triple_list[index_index[i]].arg1_type == 1 && triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]].op == adds_op)
+	{
+		temp = triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]];
+		u1 = temp.arg1_uni;
+		u2 = temp.arg2_uni;
+		r1 = fb->reg_alloc[u1];
+		r1 = load_operator(fb, u1, r1, 1);
+		if (u2 != -1)
+		{
+			r2 = load_operator(fb, u2, r2, 2);
+			add_assemble(NULL, -1, ldw, r1, 3, 1, 2, 0, r2);
+		}
+		else
+			add_assemble(NULL, -1, ldw, r1, 3, 1, 2, 1, temp.arg2.imm_value);
+		store_result(fb, mov, u0, -1, r0, 0, -1, 0, 3);
+	}
+	else
+	{
+		u1 = triple_list[index_index[i]].arg1_uni;
+		r1 = fb->reg_alloc[u1];
+		r1 = load_operator(fb, u1, r1, 1);
+		add_assemble(NULL, -1, ldw, r1, 3, 0, -1, 1, 0);
+		store_result(fb, mov, u0, -1, r0, 0, -1, 0, 3);
+	}
 	return 0;
 }
 
@@ -519,16 +547,16 @@ int assign_code(func_block *fb, int i)
 	{
 		r2 = fb->reg_alloc[u2];
 		r2 = load_operator(fb, u2, r2, 2);
-		if ((fb->live_status[i+1-base][u1/32] >> (31-u1%32)) % 2 == 1 && r1 != r2)
+		if (check_live(fb, i, 0) && r1 != r2)
 			store_result(fb, mov, u1, -1, r1, 0, -1, 0, r2);
-		if ((fb->live_status[i+1-base][u0/32] >> (31-u0%32)) % 2 == 1 && r0 != r2)
+		if (check_live(fb, i, 1) && r0 != r2)
 			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r2);
 	}
 	else
 	{
-		if ((fb->live_status[i+1-base][u1/32] >> (31-u1%32)) % 2 == 1)
+		if (check_live(fb, i, 0))
 			store_result(fb, mov, u1, -1, r1, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
-		if ((fb->live_status[i+1-base][u0/32] >> (31-u0%32)) % 2 == 1)
+		if (check_live(fb, i, 1))
 			store_result(fb, mov, u0, -1, r0, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
 	}
 	return 0;
@@ -536,6 +564,59 @@ int assign_code(func_block *fb, int i)
 
 int star_assign_code(func_block *fb, int i)
 {
+	int u0, u1, u2, u3, r0, r1, r2, r3;
+	triple temp;
+	u0 = triple_list[index_index[i]].tmp_uni;
+	r0 = fb->reg_alloc[u0];
+	if (triple_list[index_index[i]].arg1_type == 1 && triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]].op == adds_op)
+	{
+		temp = triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]];
+		u1 = temp.arg1_uni;
+		u2 = temp.arg2_uni;
+		r1 = fb->reg_alloc[u1];
+		r1 = load_operator(fb, u1, r1, 1);
+		if (triple_list[index_index[i]].arg2_type < 2)
+		{
+			u3 = triple_list[index_index[i]].arg2_uni;
+			r3 = fb->reg_alloc[u3];
+			r3 = load_operator(fb, u3, r3, 3)
+		}
+		else
+		{
+			r3 = 3;
+			add_assemble(NULL, -1, mov, -1, r3, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
+		}
+		if (u2 != -1)
+		{
+			r2 = fb->reg_alloc[u2];
+			r2 = load_operator(fb, u2, r2, 2);
+			add_assemble(NULL, -1, stw, r1, r3, 1, 2, 0, r2);
+		}
+		else
+			add_assemble(NULL, -1, stw, r1, r3, 1, 2, 1, temp.arg2.imm_value);
+		if (check_live(fb, i, 1))
+			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r3);
+	}
+	else
+	{
+		u1 = triple_list[index_index[i]].arg1_uni;
+		u2 = triple_list[index_index[i]].arg2_uni;
+		r1 = fb->reg_alloc[u1];
+		r1 = load_operator(fb, u1, r1, 1);
+		if (u2 != -1)
+		{
+			r2 = fb->reg_alloc[u2];
+			r2 = load_operator(fb, u2, r2, 3);
+		}
+		else
+		{
+			r2 = 3;
+			add_assemble(NULL, -1, mov, -1, r2, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
+		}
+		add_assemble(NULL, -1, stw, r1, r2, 0, -1, 1, 0);
+		if (check_live(fb, i, 1))
+			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r2);
+	}
 	return 0;
 }
 
@@ -729,7 +810,7 @@ int call_code(func_block *fb, int i)
 	}
 	tmp = triple_list[index_index[i]].tmp_uni;
 	rtn_reg = fb->reg_alloc[tmp];
-	if ((fb->live_status[i+1-fb->start->begin][tmp/32] >> (31-tmp%32)) % 2 == 1)
+	if (check_live(fb, i, 1))
 	{
 		if (rtn_reg != -1)
 		{
