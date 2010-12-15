@@ -269,7 +269,7 @@ int inst_Ex_D_Immediate(PIPLINE* pipline, int level){
   int32_t result;
   int carry, shift_carry;
   // extend immediate
-  data->imm = sign_extend(data->imm, 9);
+  //data->imm = sign_extend(data->imm, 9);
   //printf("Sign extend imm : %.8x\n", data->imm);
   // fetch operands
   if(data->Rn == 31)

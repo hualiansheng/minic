@@ -102,44 +102,31 @@ main:
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
-	sub	r29, r29, #540
-	add	r3, r27, #-532
-	stw	r3, [r27+], #-536
+	sub	r29, r29, #536
+	add	r3, r27, #-528
+	stw	r3, [r27+], #-532
 	mov	r7, #0
-.L13:
-	cmpsub.a	r7, #8
+.L10:
+	cmpsub.a	r7, #128
 	beg	.L9
 .L8:
-	mov	r6, #0
-.L12:
-	cmpsub.a	r6, #16
-	beg	.L11
-.L10:
-	mov r1,#16
-	mul	r4, r7, r1
-	add	r4, r4, r6
-	ldw	r5, [r27+], #-536
-	stw	r6, [r5+], r4<<#2
-	add	r4, r6, #1
-	mov	r6, r4
-	b	.L12
-.L11:
+	rsub	r4, r7, #128
+	ldw	r5, [r27+], #-532
+	stw	r4, [r5+], r7<<#2
 	add	r4, r7, #1
 	mov	r7, r4
-	b	.L13
+	b	.L10
 .L9:
 	stw	r5, [r29+], #-4
-	stw	r6, [r29+], #-8
-	stw	r7, [r29+], #-12
-	sub	r29, r29, #12
+	stw	r7, [r29+], #-8
+	sub	r29, r29, #8
 	mov	r0, r5
 	mov	r1, #0
 	mov	r2, #128
 	b.l	qsort
-	add	r29, r29, #12
+	add	r29, r29, #8
 	ldw	r5, [r29+], #-4
-	ldw	r6, [r29+], #-8
-	ldw	r7, [r29+], #-12
+	ldw	r7, [r29+], #-8
 	mov	r0, #0
 	ldw	r30, [r27+], #-4
 	ldw	r29, [r27+], #-8

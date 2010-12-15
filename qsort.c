@@ -20,11 +20,10 @@ void qsort(int *data,int begin, int end){
 }
 
 int main(){
-  int i, j;
+  int i;
   int data[128];
-  for(i=0; i<8; i++)
-    for(j=0; j<16;j++)
-		data[i*16+j] = j;
+  for(i=0; i<128; i++)
+		data[i] =128-i;
   qsort(data,0, 128);
   return 0;
 }
