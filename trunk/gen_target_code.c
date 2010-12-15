@@ -845,6 +845,14 @@ int enterF_code(func_block *fb, int i)
 	}
 	for (j = 0; j < 4 && j < ptr->para_num; j++)
 		add_assemble(NULL, -1, stw, 27, j, 0, -1, 1, ptr->item[ptr->para_num-1-j].offset);
+	for (j = ptr->para_num; j < fb->uni_item_num; j++)
+	{
+		if (fb->uni_table[j]->size != -1)
+		{
+			add_assemble(NULL, -1, add, 27, 3, 0, -1, 1, fb->uni_table[j]->offset);
+			add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[j]->offset);
+		}
+	}
 	return 0;
 }
 
