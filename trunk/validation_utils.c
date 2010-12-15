@@ -17,7 +17,7 @@ extern basic_block *bblist;
 extern func_block *fblist;
 extern int block_num;
 
-char *ins_name[] = {"", ".L", "ldw", "stw", "b.l", "mov", "add", "sub", "jump","cmpsub.a", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
+char *ins_name[] = {"", ".L", "ldw", "stw", "b.l", "mov", "add", "sub", "rsub","jump","cmpsub.a", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
 };
 extern assemble *assemble_list;
 extern int assemble_num;
