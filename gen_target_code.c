@@ -674,7 +674,7 @@ int call_code(func_block *fb, int i)
 	symtbl_hdr *ptr = triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]].symtbl;
 	func_block *q = (triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]].block)->fb;
 	unsigned int *live = fb->live_status[i-fb->start->begin];
-	for (j = 7, k = 0; j <= 15 && j <= q->reg_used+3; j++)
+	for (j = 4, k = 0; j <= 15 && j <= q->reg_used+3; j++)
 	{
 		if (fb->reg_var[j] != -1 && (live[fb->reg_var[j]/32] >> (31-fb->reg_var[j]%32)) % 2 == 1)
 		{
@@ -718,7 +718,7 @@ int call_code(func_block *fb, int i)
 	add_assemble(ptr->func_name, -1, b_l, -1, -1, 0, -1, 0, -1);
 	if (m != 0)
 		add_assemble(NULL, -1, add, 29, 29, 0, -1, 1, m);
-	for (j = 7, k = 0; j <= 15 && j <= q->reg_used+3; j++)
+	for (j = 4, k = 0; j <= 15 && j <= q->reg_used+3; j++)
 	{
 		fb->reg_var[j] = tmp_reg_var[j];
 		if (fb->reg_var[j] != -1 && (live[fb->reg_var[j]/32] >> (31-fb->reg_var[j]%32)) % 2 == 1)

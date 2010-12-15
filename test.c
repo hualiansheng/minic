@@ -6,6 +6,6 @@ int fib(int n)
 }
 int main()
 {
-	return fib(10);
+	printf("%x\n",fib(10));
 }
 
