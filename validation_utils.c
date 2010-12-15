@@ -253,7 +253,7 @@ void print_register_allocation()
 	fclose(out);
 }
 
-void print_target_code()
+void print_target_code(FILE* target_file)
 {
 	int i;
 	enum instruction inst;
@@ -262,9 +262,9 @@ void print_target_code()
 		if (assemble_list[i].ins == func || assemble_list[i].ins == label)
 		{
 			if (assemble_list[i].ins == func)
-				printf("%s:\n", assemble_list[i].func_name);
+				fprintf(target_file,"%s:\n", assemble_list[i].func_name);
 			else
-				printf(".L%d:\n", assemble_list[i].label);
+				fprintf(target_file,".L%d:\n", assemble_list[i].label);
 		}
 		else
 		{
@@ -272,33 +272,33 @@ void print_target_code()
 			if (inst == b_l || inst == beq || inst == bsl || inst == beg || inst == bsg ||inst == bel || inst == b || inst == bne)
 			{
 				if (inst == b_l)
-					printf("\t%s\t%s\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].func_name);
+					fprintf(target_file, "\t%s\t%s\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].func_name);
 				else
-					printf("\t%s\t.L%d\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].label);
+					fprintf(target_file, "\t%s\t.L%d\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].label);
 			}
 			else
-			{	printf("\t%s\t", ins_name[inst-5000]);
+			{	fprintf(target_file,"\t%s\t", ins_name[inst-5000]);
 				if (assemble_list[i].Rd != -1)
-					printf("r%d, ", assemble_list[i].Rd);
+					fprintf(target_file,"r%d, ", assemble_list[i].Rd);
 				if (assemble_list[i].Rn != -1)
 				{
 					if (assemble_list[i].ins == ldw || assemble_list[i].ins == stw)
-							printf("[r%d+], ", assemble_list[i].Rn);
+							fprintf(target_file,"[r%d+], ", assemble_list[i].Rn);
 					else
-						printf("r%d, ", assemble_list[i].Rn);
+						fprintf(target_file,"r%d, ", assemble_list[i].Rn);
 				}
 				if (assemble_list[i].Rm_or_Imm == 0)
 				{
 					if (assemble_list[i].Rm_Imm != -1)
-						printf("r%d", assemble_list[i].Rm_Imm);
+						fprintf(target_file,"r%d", assemble_list[i].Rm_Imm);
 				}
 				else
-					printf("#%d", assemble_list[i].Rm_Imm);
+					fprintf(target_file,"#%d", assemble_list[i].Rm_Imm);
 				if (assemble_list[i].Rs_or_Imm == 1)
 				{
-					printf("<<#%d",assemble_list[i].Rs_Imm);
+					fprintf(target_file,"<<#%d",assemble_list[i].Rs_Imm);
 				}
-				printf("\n");
+				fprintf(target_file,"\n");
 			}
 		}
 	}
