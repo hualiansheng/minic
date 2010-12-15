@@ -15,6 +15,7 @@ int pipline_ID(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_WB(PIPLINE* pipline, CPU_info* cpu_info);
+void sim_print(PIPLINE* pipline, int32_t data, int type);
 
 PIPLINE* pipline_initial(REGISTERS* regs, CACHE* i_cache,
 			 CACHE* d_cache){
@@ -162,10 +163,38 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
   }
   if(pipline->pipline_data[1] != NULL){
     pipline->ex_begin = 1;
-    inst_Ex(pipline, cpu_info, 1);
+    // Handle print functions
+    if(pipline->pipline_data[1]->inst_type == BRANCH_LINK &&
+       pipline->pipline_data[1]->cond == AL){
+      int32_t offset = sign_extend(pipline->pipline_data[1]->imm, 24) * 4;
+      uint32_t addr = pipline->pipline_data[1]->inst_addr + offset + 4;
+      char func_name[100];
+      if(debugger_search_symtbl(pipline->proc, addr,
+				func_name, STT_FUNC) != 0){
+	if(strcmp(func_name, "print_int") == 0){
+	  //printf("print int\n");
+	  sim_print(pipline, pipline->regs->r[0], INT);
+	}
+	else if(strcmp(func_name, "print_char") == 0){
+	  //printf("print char\n");
+	  sim_print(pipline, pipline->regs->r[0], CHAR);
+	}
+	else if(strcmp(func_name, "print_string") == 0){
+	  //printf("print string");
+	  sim_print(pipline, pipline->regs->r[0], STRING);
+	}
+	// Normal Function
+	else
+	  inst_Ex(pipline, cpu_info, 1);
+      }
+    }
+    // Normal jump
+    else
+      inst_Ex(pipline, cpu_info, 1);
   }
   pipline->pipline_data[2] = pipline->pipline_data[1];
   pipline_ID(pipline, cpu_info);
+  // drain pipline
   if(pipline->drain_pipline == 1){
     drain_pipline(pipline, 2);
     pipline->drain_pipline = 0;
@@ -366,4 +395,47 @@ void drain_pipline(PIPLINE* pipline, int level){
 
 int sign_extend(int imm, int size){
   return (imm << (32-size)) >> (32-size);
+}
+
+// Handle simulator print function
+void sim_print(PIPLINE* pipline, int32_t data, int type){
+  // print int
+  if(type == INT){
+    printf("%d", data);
+  }
+  // print char
+  else if(type == CHAR){
+    char c = (char)data;
+    printf("%c", c);
+  }
+  // print string
+  else{
+    PROC_MEM* mem =  pipline->proc->mem;
+    uint32_t start_addr = (uint32_t) data;
+    uint32_t end_addr = start_addr;
+    char tmp[4];
+    char* output;
+    while(1){
+      if(mem_invalid(mem, end_addr) == -1){
+	fprintf(stderr, "Print string : address is not an invalid string address, start addr 0x%.8x, error addr 0x%.8x", start_addr, end_addr);
+	exit(-1);
+      }
+      mem_fetch(mem, end_addr, tmp, 4*sizeof(char), DATA_RD);
+      if(tmp[0] == '\0' || tmp[1] == '\0' ||
+	 tmp[2] == '\0' || tmp[3] == '\0'){
+	end_addr += 4;
+	break;
+      }
+      else
+	end_addr += 4;
+    }
+    if(end_addr > start_addr){
+      output = malloc((end_addr - start_addr) * sizeof(char));
+      mem_fetch(mem, start_addr, output,
+		(end_addr - start_addr) * sizeof(char),
+		DATA_RD);
+      printf("%s", output);
+      free(output);
+    }
+  }
 }

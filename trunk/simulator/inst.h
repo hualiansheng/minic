@@ -46,4 +46,8 @@
 #define BRANCH_LINK    9
 #define ST             10
 
+#define INT     0
+#define CHAR    1
+#define STRING  2
+
 #endif
