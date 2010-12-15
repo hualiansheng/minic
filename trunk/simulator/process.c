@@ -51,6 +51,8 @@ PROCESS* proc_initial(char* filename){
   proc->list_cur_addr = proc->entry;
   //build symbal table
   ELF_build_symtbl(&(proc->symtbl));
+  //initial step
+  proc->step = 1;
   /*
   for(i=0; i<(proc->symtbl).sym_num; i++)
     printf("%d  %s  :  %d  :  0x%.8x\n", i, (proc->symtbl).name[i], ELF32_ST_TYPE((proc->symtbl).st_info[i]), (proc->symtbl).addr[i]);
