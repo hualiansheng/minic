@@ -8,12 +8,11 @@ extern triple *triple_list;
 extern int *index_index;
 extern int triple_list_index;
 extern func_block *fblist;
-FILE *out;
+
 assemble *assemble_list;
 int assemble_size;
 int assemble_num;
 int temp_reg_var[32];
-
 int if_goto_code(func_block *fb, int i);
 int goto_code(func_block *fb, int i);
 int negative_code(func_block *fb, int i);
@@ -66,12 +65,10 @@ enum instruction map_ins[6][2] = {{bsl, beg}, {bel, bsg}, {beq, bne}, {bne, beq}
 
 int gen_target_code()
 {
-	out = fopen("assemble_code.s", "w");
 	initial();
 	memory_allocation();
 	setLabel();
 	convert();
-	fclose(out);
 	return 0;
 }
 
@@ -139,6 +136,21 @@ int setLabel()
 			if (triple_list[index_index[j]].op != get_rb && triple_list[index_index[j]].label == 0)		
 				triple_list[index_index[j]].label = l++;
 		}
+		if (triple_list[index_index[i]].op == get_rb || triple_list[index_index[i]].op == not_op)
+		{
+			if (check_bool_use((triple_list[index_index[i]].block)->fb, i))
+			{
+				if (triple_list[index_index[i]].label == 0)
+				{
+					triple_list[index_index[i]].label = l;
+					l += 2;
+				}
+				if (triple_list[index_index[i+1]].label == 0)
+					triple_list[index_index[i+1]].label = l++;
+			}
+		}
+		if (triple_list[index_index[i]].op == leaveF && triple_list[index_index[i]].label == 0)
+			triple_list[index_index[i]].label = l++;
 	}
 	return 0;
 }
@@ -153,7 +165,6 @@ int convert()
 	for (fb = fblist; fb != NULL; fb = fb->next)
 	{
 		add_assemble((triple_list[index_index[fb->start->begin]].symtbl)->func_name, -1, func, -1, -1, 0, -1, 0, -1);
-		//fprintf(out, "%s:\n", (triple_list[index_index[fb->start->begin]].symtbl)->func_name);
 		for (i = fb->start->begin; i <= fb->over->end; i++)
 		{
 			if (triple_list[index_index[i]].label != 0)
@@ -256,6 +267,8 @@ int check_bool_use(func_block *fb, int i)
 	enum operator op;
 	base = fb->start->begin;
 	l = triple_list[index_index[i]].tmp_uni;
+	if (l == -1)
+		return 0;
 	for (j = i+1-base; j < fb->code_num; j++)
 	{
 		if ((fb->live_status[j][l/32] >> (31-l%32)) % 2 == 0)
@@ -282,16 +295,16 @@ int assign_bool_value(enum instruction ins, func_block *fb, int i)
 	r2 = load_operator(fb, u2, r2, 2);
 	if (r0 == -1)
 	{
-		add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, 0);
 		add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 0, r2);
+		add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, 0);
 		add_assemble(NULL, -1, ins, -1, 3, 0, -1, 1, 1);
 		add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[u0]->offset);
 	}
 	else
 	{
+		add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 0, r2);
 		fb->reg_var[r0] = u0;
 		add_assemble(NULL, -1, mov, -1, r0, 0, -1, 1, 0);
-		add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 0, r2);
 		add_assemble(NULL, -1, ins, -1, r0, 0, -1, 1, 1);
 	}
 	return 0;
@@ -303,8 +316,16 @@ int compare_operation(func_block *fb, int i, int cond, int m)
 	if (cond == 1)
 	{
 		u1 = triple_list[index_index[i]].arg1_uni;
-		r1 = fb->reg_alloc[u1];
-		r1 = load_operator(fb, u1, r1, 1);
+		if (u1 != -1)
+		{
+			r1 = fb->reg_alloc[u1];
+			r1 = load_operator(fb, u1, r1, 1);
+		}
+		else
+		{
+			r1 = 1;
+			add_assemble(NULL, -1, mov, -1, r1, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
+		}
 		add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, 0);			
 	}
 	if (cond == 2)
@@ -352,10 +373,11 @@ int compare_operation(func_block *fb, int i, int cond, int m)
 int search_label(func_block *fb, int i, int m, int not_flag)
 {
 	enum operator op;
-	int j, flag;
+	int j, flag, bool_assign_flag, l;
 	op = triple_list[index_index[i]].op;
 	j = i;
 	flag = 0;
+	bool_assign_flag = 0;
 	while (1)
 	{
 		if (!(triple_list[index_index[j+1]].op == set_rb && triple_list[index_index[j+2]].op == get_rb))
@@ -381,16 +403,44 @@ int search_label(func_block *fb, int i, int m, int not_flag)
 			break;
 		while (triple_list[index_index[j]].op != if_op && triple_list[index_index[j]].op != if_not_op)
 		{
-			
 			if (triple_list[index_index[j]].op == not_op)
 				not_flag = 1 - not_flag;
+			if (check_bool_use(fb, j))
+			{
+				bool_assign_flag = 1;
+				break;
+			}			
 			j++;
 		}
+		if (bool_assign_flag)
+			break;
 	}
-	if (triple_list[index_index[i]].op == if_op)
-		add_assemble(NULL, triple_list[index_index[j]].label, map_ins[m][1-flag], -1, -1, 0, -1, 0, -1);
+	if (!bool_assign_flag)
+	{
+		if (triple_list[index_index[i]].op == if_op)
+			add_assemble(NULL, triple_list[index_index[j]].label, map_ins[m][1-flag], -1, -1, 0, -1, 0, -1);
+		else
+			add_assemble(NULL, triple_list[index_index[j]].label, map_ins[m][flag], -1, -1, 0, -1, 0, -1);
+	}
 	else
-		add_assemble(NULL, triple_list[index_index[j]].label, map_ins[m][flag], -1, -1, 0, -1, 0, -1);
+	{
+		l = triple_list[index_index[j]].label;
+		if ((op == if_not_op && not_flag == 0) || (op == if_op && not_flag == 1))
+		{
+			if (op == triple_list[index_index[i]].op)
+				flag = 1;
+			l++;
+		}
+		else
+		{
+			if (flag == 0 && op == triple_list[index_index[i]].op)
+				l++;
+		}
+		if (triple_list[index_index[i]].op == if_op)
+			add_assemble(NULL, l, map_ins[m][1-flag], -1, -1, 0, -1, 0, -1);
+		else
+			add_assemble(NULL, l, map_ins[m][flag], -1, -1, 0, -1, 0, -1);
+	}
 	return 0;
 }
 
@@ -460,39 +510,91 @@ int goto_code(func_block *fb, int i)
 
 int negative_code(func_block *fb, int i)
 {
+	int u0, u1, r0, r1;
+	u0 = triple_list[index_index[i]].tmp_uni;
+	r0 = fb->reg_alloc[u0];
+	u1 = triple_list[index_index[i]].arg1_uni;
+	r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
+	store_result(fb, rsub, u0, r1, r0, 0, -1, 1, 0);
 	return 0;
 }
 
 int not_code(func_block *fb, int i)
 {
-	/*int u0, u1, r0, r1;
+	int j, u0, u1, r0, r1, not_flag, imm, v;
 	if (check_bool_use(fb, i))
 	{
-		u0 = triple_list[index_index[i]].tmp_uni;
-		u1 = triple_list[index_index[i]].arg1_uni;
-		r0 = fb->reg_alloc[u0];
-		r1 = fb->reg_alloc[u1];
-		r1 = load_operator(fb, u1, r1, 1);
-		if (r0 == -1)
+		
+		for (j = i, not_flag = 1; ; )
 		{
-			add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, 0);
-			add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, 0);
-			add_assemble(NULL, -1, cmoveq, -1, 3, 0, -1, 1, 1);
-			add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[u0]->offset);
+			if (!(triple_list[index_index[j]].arg1_type == 1 
+				&& triple_list[index_index[triple_list[index_index[j]].arg1.temp_index]].op == not_op))
+				break;
+			not_flag = 1 - not_flag;
+			j = triple_list[index_index[j]].arg1.temp_index;
+		} 
+		u0 = triple_list[index_index[i]].tmp_uni;
+		r0 = fb->reg_alloc[u0];
+		if (triple_list[index_index[j]].arg1_type == 1 
+				&& triple_list[index_index[triple_list[index_index[j]].arg1.temp_index]].op == get_rb)
+		{
+			store_result(fb, mov, u0, -1, r0, 0, -1, 1, 1);
+			add_assemble(NULL, triple_list[index_index[i+1]].label, b, -1, -1, 0, -1, 0, -1);
+			add_assemble(NULL, triple_list[index_index[i]].label+1, label, -1, -1, 0, -1, 0, -1);
+			store_result(fb, mov, u0, -1, r0, 0, -1, 1, 0);
 		}
 		else
 		{
-			fb->reg_var[r0] = u0;
-			add_assemble(NULL, -1, mov, -1, r0, 0, -1, 1, 0);
-			add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, 0);
-			add_assemble(NULL, -1, cmoveq, -1, r0, 0, -1, 1, 1);
+			if (triple_list[index_index[j]].arg1_type < 2)
+			{
+				u1 = triple_list[index_index[j]].arg1_uni;
+				r1 = fb->reg_alloc[u1];
+				r1 = load_operator(fb, u1, r1, 1);
+				add_assemble(NULL, -1, cmpsub_a, r1, -1, 0, -1, 1, 0);
+				if (r0 == -1)
+				{
+					add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, 0);
+					if (not_flag)
+						add_assemble(NULL, -1, cmoveq, -1, 3, 0, -1, 1, 1);
+					else
+						add_assemble(NULL, -1, cmovne, -1, 3, 0, -1, 1, 1);
+					add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[u0]->offset);
+				}
+				else
+				{
+					fb->reg_var[r0] = u0;
+					if (not_flag)
+						add_assemble(NULL, -1, cmoveq, -1, r0, 0, -1, 1, 1);
+					else
+						add_assemble(NULL, -1, cmovne, -1, r0, 0, -1, 1, 1);
+				}
+			}
+			else
+			{
+				imm = (triple_list[index_index[j]].arg1.imm_value == 0)?0:1;
+				if ((imm + not_flag) % 2 == 1)
+					v = 1;
+				else
+					v = 0;
+				if (r0 == -1)
+				{
+					add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, v);
+					add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[u0]->offset);
+				}
+				else
+				{
+					fb->reg_var[r0] = u0;
+					add_assemble(NULL, -1, mov, -1, r0, 0, -1, 1, v);
+				}
+			}
 		}
-	}*/
+	}
 	return 0;
 }
 
 int address_code(func_block *fb, int i)
 {
+	
 	return 0;
 }
 
@@ -678,22 +780,32 @@ int minus_code(func_block *fb, int i)
 
 int multiply_code(func_block *fb, int i)
 {
-	int type1, type2, tmp_uni, arg1_uni, arg2_uni;
+	int type1, type2, u0, u1, u2, r0, r1, r2;
 	if (check_live(fb, i, 1))
 	{
 		type1 = triple_list[index_index[i]].arg1_type;
 		type2 = triple_list[index_index[i]].arg2_type;
-		tmp_uni = triple_list[index_index[i]].tmp_uni;
-		arg1_uni = triple_list[index_index[i]].arg1_uni;
-		arg2_uni = triple_list[index_index[i]].arg2_uni;
+		u0 = triple_list[index_index[i]].tmp_uni;
+		u1 = triple_list[index_index[i]].arg1_uni;
+		u2 = triple_list[index_index[i]].arg2_uni;
+		r0 = fb->reg_alloc[u0];
 		if (type1 < 2 && type2 < 2)
-			add_std_assemble(fb, mul, tmp_uni, arg1_uni, arg2_uni);
+			add_std_assemble(fb, mul, u0, u1, u2);
 		else
 		{
 			if (type1 < 2)
-				add_imm_assemble(fb, mul, tmp_uni, arg1_uni, triple_list[index_index[i]].arg2.imm_value);
+			{
+				r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
+				r2 = 2;
+				add_assemble(NULL, -1, mov, -1, r2, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
+			}
 			if (type2 < 2)
-				add_imm_assemble(fb, mul, tmp_uni, arg2_uni, triple_list[index_index[i]].arg1.imm_value);
+			{
+				r1 = 1;
+				r2 = load_operator(fb, u1, fb->reg_alloc[u2], 2);
+				add_assemble(NULL, -1, mov, -1, r1, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
+			}
+			store_result(fb, mul, u0, r1, r0, 0, -1, 0, r2);
 		}
 	}
 	return 0;
@@ -758,16 +870,16 @@ int and_code(func_block *fb, int i)
 
 int get_rb_code(func_block *fb, int i)
 {
-	/*int u0, r0;
-	u0 = triple_list[index_index[i]].tmp_uni;
-	r0 = fb->reg_alloc[u0];
-	if (r0 == -1)
-		add_assemble(NULL, -1, stw, 27, 3, 0, -1, 1, fb->uni_table[u0]->offset);
-	else
+	int u0, r0;
+	if (check_bool_use(fb, i))
 	{
-		fb->reg_var[r0] = u0;
-		add_assemble(NULL, -1, mov, -1, r0, 0, -1, 0, 3);
-	}*/
+		u0 = triple_list[index_index[i]].tmp_uni;
+		r0 = fb->reg_alloc[u0];
+		store_result(fb, mov, u0, -1, r0, 0, -1, 1, 1);
+		add_assemble(NULL, triple_list[index_index[i+1]].label, b, -1, -1, 0, -1, 0, -1);
+		add_assemble(NULL, triple_list[index_index[i]].label+1, label, -1, -1, 0, -1, 0, -1);
+		store_result(fb, mov, u0, -1, r0, 0, -1, 1, 0);
+	}
 	return 0;
 }
 
@@ -891,17 +1003,16 @@ int enterS_code(func_block *fb, int i)
 
 int leaveF_code(func_block *fb, int i)
 {
-//	int j;
-//	//symtbl_hdr *ptr = triple_list[index_index[i]].symtbl;
-//	for (j = 0; j < fb->reg_used-12; j++)
-//	{
-//		fb->reg_var[17+j] = temp_reg_var[17+j];
-//		add_assemble(NULL, -1, ldw, 27, 17+j, 0, -1, 1, -(16+j*4));
-//	}
-//	add_assemble(NULL, -1, ldw, 27, 30, 0, -1, 1, -4);
-//	add_assemble(NULL, -1, ldw, 27, 29, 0, -1, 1, -8);
-//	add_assemble(NULL, -1, ldw, 27, 27, 0, -1, 1, -12);
-//	add_assemble(NULL, -1, jump, -1, -1, 0, -1, 0, 30);
+	int j;
+	for (j = 0; j < fb->reg_used-12; j++)
+	{
+		fb->reg_var[17+j] = temp_reg_var[17+j];
+		add_assemble(NULL, -1, ldw, 27, 17+j, 0, -1, 1, -(16+j*4));
+	}
+	add_assemble(NULL, -1, ldw, 27, 30, 0, -1, 1, -4);
+	add_assemble(NULL, -1, ldw, 27, 29, 0, -1, 1, -8);
+	add_assemble(NULL, -1, ldw, 27, 27, 0, -1, 1, -12);
+	add_assemble(NULL, -1, jump, -1, -1, 0, -1, 0, 30);
 	return 0;
 }
 
@@ -926,15 +1037,12 @@ int rtn_code(func_block *fb, int i)
 	}
 	else
 		add_assemble(NULL, -1, mov, -1, 0, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
-	for (j = 0; j < fb->reg_used-12; j++)
+	if (triple_list[index_index[i+1]].op != leaveF)
 	{
-		fb->reg_var[17+j] = temp_reg_var[17+j];
-		add_assemble(NULL, -1, ldw, 27, 17+j, 0, -1, 1, -(16+j*4));
+		for (j = i+1; triple_list[index_index[j]].op != leaveF; j++)
+			;
+		add_assemble(NULL, triple_list[index_index[j]].label, b, -1, -1, 0, -1, 0, -1);
 	}
-	add_assemble(NULL, -1, ldw, 27, 30, 0, -1, 1, -4);
-	add_assemble(NULL, -1, ldw, 27, 29, 0, -1, 1, -8);
-	add_assemble(NULL, -1, ldw, 27, 27, 0, -1, 1, -12);
-	add_assemble(NULL, -1, jump, -1, -1, 0, -1, 0, 30);
 	return 0;
 }
 

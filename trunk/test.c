@@ -1,7 +1,9 @@
-int a = 0xffffffff;
-int main()
+int* main()
 {
-	printf("%x\n",fib(10));
-	return a + 1;
+	int *p, a[10];
+	a[5] = 1;
+	p = &a[5];
+	printf("%d\n", *p);
+	return p;
 }
 

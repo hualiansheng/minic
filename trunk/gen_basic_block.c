@@ -86,6 +86,8 @@ int gen_basic_block()
 			cur_block = triple_list[index_index[i]].block;
 			cur_block->begin = i;
 		}
+		else
+			triple_list[index_index[i]].block = cur_block;
 		if (triple_list[index_index[i]].op == enterF)
 		{
 			cur_func->bb_num = m;
