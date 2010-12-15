@@ -172,7 +172,7 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
       char func_name[100];
       if(debugger_search_symtbl(pipline->proc, addr,
 				func_name, STT_FUNC) != 0){
-	printf("%s\n", func_name);
+	//printf("%s\n", func_name);
 	if(strcmp(func_name, "print_int") == 0){
 	  //printf("print int\n");
 	  sim_print(pipline, pipline->regs->r[0], INT);
