@@ -166,11 +166,13 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
     // Handle print functions
     if(pipline->pipline_data[1]->inst_type == BRANCH_LINK &&
        pipline->pipline_data[1]->cond == AL){
+      //printf("branch link al.\n");
       int32_t offset = sign_extend(pipline->pipline_data[1]->imm, 24) * 4;
       uint32_t addr = pipline->pipline_data[1]->inst_addr + offset + 4;
       char func_name[100];
       if(debugger_search_symtbl(pipline->proc, addr,
 				func_name, STT_FUNC) != 0){
+	printf("%s\n", func_name);
 	if(strcmp(func_name, "print_int") == 0){
 	  //printf("print int\n");
 	  sim_print(pipline, pipline->regs->r[0], INT);
@@ -187,6 +189,8 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
 	else
 	  inst_Ex(pipline, cpu_info, 1);
       }
+      else
+        inst_Ex(pipline, cpu_info, 1);
     }
     // Normal jump
     else
