@@ -4,7 +4,6 @@ extern int instruction_block_num;
 extern assamble *assamble_list;
 extern int assemble_num;
 int **data_dep_graph;// for each block
-int *key_path; // lenth of longest key_path
 int *assamble_dispatch_index; // array of dispatch
 int inst_num_block; //instruction number in current block
 int *dispatch_block; // array of dispatch in current block
@@ -23,8 +22,12 @@ void instruction_dispatch()
 	for(i = 0 ; i < assemble_num ; i++)	assamble_dispatch_index[i] = i;
 	for(i = 0 ; i < instruction_block_num ; i++){
 		create_dep_graph(instruction_blocks[i*2], instruction_blocks[i*2+1]);
-		find_key_path();
 		topo_sort(instruction_blocks[i*2],instruction_blocks[i*2+1]);
+		free(in_degree);
+		for(i = 0 ; i < inst_num_block ; i ++){
+			free(data_dep_graph[i]);
+		}
+		free(data_dep_graph);
 	}
 }
 
@@ -146,6 +149,8 @@ void topo_sort(int begin , int end)
 			}
 		}
 	}
+	for(i = 0 ; i < inst_num_block ; i ++) assamble_dispatch_index[begin+i] = dispatch_block[i];
+	free(dispatch_block);
 }
 
 void do_first(int x)
