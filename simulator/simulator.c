@@ -14,6 +14,7 @@ Usage: simulator [options] execuation_file\n\
 Options:\n\
 \t-v verification mode\n\
 \t-r auto run and exit to get final result\n\
+\t-s silent mode, only output the final result\n\
 \n");
 }
 
@@ -21,7 +22,7 @@ int main(int argc, char **argv){
   CPU_d* cpu;
   int sig;
   int oc;
-  while((oc = getopt(argc, argv, "vr?")) != -1){
+  while((oc = getopt(argc, argv, "vrs?")) != -1){
     switch(oc){
     case 'v':
       memset(pipline_output_invalid, 0, PIPLINE_LEVEL*sizeof(int));
@@ -29,6 +30,9 @@ int main(int argc, char **argv){
       break;
     case 'r':
       auto_run_mode = 1;
+      break;
+    case 's':
+      memset(pipline_output_invalid, 0, PIPLINE_LEVEL*sizeof(int));
       break;
     case '?':
       usage();

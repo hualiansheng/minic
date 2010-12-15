@@ -36,6 +36,7 @@ void console_help_breakpoint();// help doc of command breakpoint/b
 void console_help_x();// help doc of command x
 void console_help_print();// help doc of command print/p
 void console_help_list();// help doc of list/l
+void console_set(CMD cmd);
 
 
 int console_next_cmd(CPU_d* cpu, char* filename){
@@ -81,6 +82,8 @@ int console_next_cmd(CPU_d* cpu, char* filename){
   else if(strcmp(cmd.command, "b") == 0 ||
 	  strcmp(cmd.command, "breakpoint") == 0)
     console_bp(cpu, cmd);
+  else if(strcmp(cmd.command, "set") == 0)
+    console_set(cmd);
   else
     console_help(cmd);
   return 1;
@@ -108,18 +111,19 @@ int console_help(CMD cmd){
     console_help_list();
   else{
     printf("Simulator Debugger Command List:\n");
-    printf("h  :  show help message\n");
-    printf("q  :  quit simulator\n");
-    printf("r  :  run simulator\n");
-    printf("rt :  run in trap mode\n");
-    printf("s  :  step next instruction\n");
-    printf("n  :  step until next breakpoint or the end of program\n");
-    printf("x  :  show the value of the given address, see details \"help x\"\n");
-    printf("p  :  print the value, see details \"help p\" or \"help print\"\n");
-    printf("l  :  list codes, see details \"help l\" or \"help list\"\n");
-    printf("i  :  show informations, see details \"help i\" or \"help info\"\n");
-    printf("m  :  modify memory or registers, see details \"help m\" or \"help modify\"\n");
-    printf("b  :  breakpoint handling, see details \"help b\" or \"help breakpoint\"\n");
+    printf("h   :  show help message\n");
+    printf("q   :  quit simulator\n");
+    printf("r   :  run simulator\n");
+    printf("rt  :  run in trap mode\n");
+    printf("s   :  step next instruction\n");
+    printf("n   :  step until next breakpoint or the end of program\n");
+    printf("x   :  show the value of the given address, see details \"help x\"\n");
+    printf("p   :  print the value, see details \"help p\" or \"help print\"\n");
+    printf("l   :  list codes, see details \"help l\" or \"help list\"\n");
+    printf("i   :  show informations, see details \"help i\" or \"help info\"\n");
+    printf("m   :  modify memory or registers, see details \"help m\" or \"help modify\"\n");
+    printf("b   :  breakpoint handling, see details \"help b\" or \"help breakpoint\"\n");
+    printf("set :  usage - set mode [silent/s/normal/n]\n");
     printf("\n");
   }
   return 1;
@@ -151,7 +155,6 @@ int console_step(CPU_d* cpu, CMD cmd){
 	debugger_print_register(cpu->regs, -1);
       return -1;
     }
-    printf("Step %d:\n", cpu->proc->step);
     console_print_pipline(cpu);
     // verification mode
     if(v_mode == 1){
@@ -359,6 +362,12 @@ int console_info(CPU_d* cpu, CMD cmd){
   else if(strcmp(cmd.args[0], "stack") == 0 ||
 	  strcmp(cmd.args[0], "s") == 0)
     debugger_print_stack(cpu->proc->mem, cpu->regs->REG_SP);
+  else if(strcmp(cmd.args[0], "CMSR") == 0 ||
+          strcmp(cmd.args[0], "C") == 0)
+    debugger_print_CMSR(cpu->regs);
+  else if(strcmp(cmd.args[0], "cpu") == 0 ||
+          strcmp(cmd.args[0], "c") == 0)
+    debugger_print_cpu_info(cpu->cpu_info);
   else
     console_help_info();
   return 1;
@@ -408,12 +417,20 @@ int console_print_pipline(CPU_d* cpu){
   int flag = 0;
   for(i=0; i<PIPLINE_LEVEL; i++){
     if(pipline_output_invalid[i] == 1){
-      printf("%s", cpu->pipline->pipline_info[i]);
       flag = 1;
+      break;
     }
   }
-  if(flag == 1)
+  if(flag == 1){
+    printf("Step %d:\n", cpu->proc->step);
+    for(i=0; i<PIPLINE_LEVEL; i++){
+      if(pipline_output_invalid[i] == 1){
+        printf("%s", cpu->pipline->pipline_info[i]);
+        flag = 1;
+      }
+    }
     printf("\n");
+  }
   return 1;
 }
 
@@ -510,8 +527,10 @@ int console_list(CPU_d* cpu, CMD cmd){
 
 void console_help_info(){
   printf("Usage command info:\n");
-  printf("info registers : print register heap infomation\n");
-  printf("info stack     : printstack infomatio\n");
+  printf("info registers/r : print register heap infomation\n");
+  printf("info stack/s     : print stack infomation\n");
+  printf("info CMSR/C      : print CMSR infomation\n");
+  printf("info cpu/c       : print cpu infomation\n");
 }
 
 void console_help_x(){
@@ -647,3 +666,31 @@ int console_next(CPU_d* cpu){
   }
   return 1;
 }
+
+void console_set(CMD cmd){
+  if(cmd.arg_num <2)
+    printf("Usage - set mode [silent/s/normal/n]\n");
+  else{
+    if(strcmp(cmd.args[0], "mode") == 0 ||
+       strcmp(cmd.args[0], "m") == 0){
+      if(strcmp(cmd.args[1], "silent") == 0 ||
+         strcmp(cmd.args[1], "s") == 0){
+        memset(pipline_output_invalid, 0, PIPLINE_LEVEL*sizeof(int));
+        printf("Mode : silent.\n");
+      }
+      else if(strcmp(cmd.args[1], "normal") == 0 ||
+              strcmp(cmd.args[1], "n") == 0){
+        pipline_output_invalid[0] = 1;
+        pipline_output_invalid[1] = 1;
+        pipline_output_invalid[2] = 1;
+        pipline_output_invalid[3] = 1;
+        pipline_output_invalid[4] = 1;
+        printf("Mode : normal.\n");
+      }
+    }
+    else
+      printf("Usage - set mode [silent/s/normal/n]\n");
+  }
+
+}
+

@@ -111,8 +111,8 @@ int cache_rewrite(CACHE* cache, uint32_t addr){
     return 0;
   }
   else if(type != -1){
-    printf("Read only address, cache NO. %d block rewrite ignored, addr 0x%.8x.\n",
-	    block_index, addr);
+    //printf("Read only address, cache NO. %d block rewrite ignored, addr 0x%.8x.\n",
+    //        block_index, addr);
     return 0;
   }
   return -1;

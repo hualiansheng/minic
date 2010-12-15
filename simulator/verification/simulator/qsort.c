@@ -1,4 +1,4 @@
-int data[20];
+int data[128];
 unsigned int a = 0;
 
 void qsort(int begin, int end){
@@ -24,8 +24,8 @@ void qsort(int begin, int end){
 int main(){
   int i;
   a = (unsigned int)data;
-  for(i=0; i<20; i++)
-    data[i] = 20-i;
-  qsort(0, 20);
+  for(i=0; i<128; i++)
+    data[i] = 128-i;
+  qsort(0, 128);
   return 0;
 }
