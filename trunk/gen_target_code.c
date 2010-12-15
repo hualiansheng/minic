@@ -222,7 +222,8 @@ int store_result(func_block *fb, enum instruction ins, int u, int Rs, int Rd, in
 	else
 	{
 		fb->reg_var[Rd] = u;
-		add_assemble(NULL, -1, ins, Rs, Rd, Rs_or_Imm, Rs_Imm, Rm_or_Imm, Rm_Imm);
+		if (!(ins == mov && Rd == Rm_Imm))
+			add_assemble(NULL, -1, ins, Rs, Rd, Rs_or_Imm, Rs_Imm, Rm_or_Imm, Rm_Imm);
 	}
 	return 0;
 }
@@ -545,9 +546,9 @@ int assign_code(func_block *fb, int i)
 	{
 		r2 = fb->reg_alloc[u2];
 		r2 = load_operator(fb, u2, r2, 2);
-		if (check_live(fb, i, 0) && r1 != r2)
+		if (check_live(fb, i, 0))
 			store_result(fb, mov, u1, -1, r1, 0, -1, 0, r2);
-		if (check_live(fb, i, 1) && fb->reg_alloc[u0] != r2)
+		if (check_live(fb, i, 1))
 		{
 			r0 = fb->reg_alloc[u0];
 			store_result(fb, mov, u0, -1, r0, 0, -1, 0, r2);
