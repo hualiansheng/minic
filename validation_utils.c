@@ -11,7 +11,7 @@ int counter[100];
 extern triple* triple_list;
 extern int triple_list_size;
 extern int triple_list_index;
-char *operator_name[]={"if,goto","if_not,goto","goto","-","not","bit_and","!*","+","=","*=","+","-","*","char to int","eq","lt","gt","geq","leq","neq","or","and","get rb","set rb","call", "param", "enter function", "enter statements", "leave function", "leave statements","return","add_shift","int_to_char", "Imm"};
+char *operator_name[]={"if,goto","if_not,goto","goto","-","not","bit_and","!*","+","=","*=","+","-","*","char to int","eq","lt","gt","geq","leq","neq","or","and","get rb","set rb","call", "param", "enter function", "enter statements", "leave function", "leave statements","return","add_shift","int_to_char", "Imm", "minus_shift", "right_shift"};
 
 extern basic_block *bblist;
 extern func_block *fblist;

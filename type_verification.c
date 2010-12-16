@@ -81,6 +81,10 @@ data_type check_type_lvalue(AST_NODE* lvalue)
 			printf("%s is not a variable\n",(lvalue->leftChild->content).s_content);
 			return check_wrong();		
 		}
+		else if(temp_item->type == VOID_T && temp_item->star_num == 0){
+			printf("Type of %s is void\n", (lvalue->leftChild->content).s_content);
+			return check_wrong();
+		}
 		return child_type[0];
 	}
 	else if(i == 2){
