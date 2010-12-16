@@ -390,11 +390,11 @@ int rvalue_code(AST_NODE *p)
 				   else{
 					   if(p->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
 						   const_string = p->leftChild->leftChild->content.s_content;
-						   return -4;//return -4: 替换成一个string constant
+						   return -3;//return -3: 替换成一个string constant
 					   }
 					   else if(p->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
 						   const_value = p->leftChild->leftChild->content.c_content;
-						   return -3;//return -3 : rvalue 应该被替换成一个constant
+						   return -2;//return -2 : rvalue 应该被替换成一个constant
 					   }
 					   else if(p->leftChild->leftChild->nodeType == ICONSTANT_T){
 						   const_value = p->leftChild->leftChild->content.i_content;
@@ -615,6 +615,11 @@ int rvalue_code(AST_NODE *p)
 							   arg_num ++;             
 						   }
 						   else if(temp_rvalue == -2){
+
+							arg_list[arg_num] = const_value;
+							arg_type_list[arg_num] = 2;
+							arg_num ++;
+/*
 							   if(ptr->leftChild->leftChild->leftChild->leftChild->nodeType == ICONSTANT_T){
 								   arg_list[arg_num] = const_value;
 								   arg_type_list[arg_num] = 2;
@@ -628,7 +633,14 @@ int rvalue_code(AST_NODE *p)
 								   arg_type_list[arg_num] = 3;
 							   }
 							   arg_num ++;
+*/
 						   }
+ 							else if(temp_rvalue == -3){
+								   arg_list[arg_num] = (int)const_string;
+								   arg_type_list[arg_num] = 3;
+									arg_num ++;
+							   }
+							   
 						   else{
 							   temp_rvalue = triple_list_index - 1;
 							   arg_list[arg_num] = temp_rvalue;
@@ -647,6 +659,10 @@ int rvalue_code(AST_NODE *p)
 							   arg_num ++;             
 						   }
 						   else if(temp_rvalue == -2){
+							arg_list[arg_num] = const_value;
+							arg_type_list[arg_num] = 2;
+							arg_num ++;
+/*
 							   if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->leftChild->nodeType == ICONSTANT_T){
 								   arg_list[arg_num] = const_value;
 								   arg_type_list[arg_num] = 2;
@@ -660,7 +676,13 @@ int rvalue_code(AST_NODE *p)
 								   arg_type_list[arg_num] = 3;
 							   }
 							   arg_num ++;
+*/
 						   }
+							else if(temp_rvalue == -3){
+								   arg_list[arg_num] = (int)const_string;
+								   arg_type_list[arg_num] = 3;
+									arg_num ++;
+							   }
 						   else{
 							   temp_rvalue = triple_list_index - 1;
 							   arg_list[arg_num] = temp_rvalue;
