@@ -1,3 +1,5 @@
+void print_int(int a);
+void print_blank();
 void qsort(int *data,int begin, int end){
   int i, j, tmp;
   if(end <= begin + 1)
@@ -23,7 +25,12 @@ int main(){
   int i;
   int data[128];
   for(i=0; i<128; i++)
-    data[i] =128-i;
+    data[i] = 128-i;
   qsort(data,0, 128);
+  for(i = 0 ; i<128 ;i++)
+  {
+	  print_int(data[i]);
+  	  print_blank();
+  }
   return 0;
 }

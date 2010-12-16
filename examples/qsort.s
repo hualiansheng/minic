@@ -1,5 +1,5 @@
-	.global qsort
-	.type qsort , function
+	.global	qsort
+	.type qsort, function
 qsort:
 	stw	r31, [r29+], #-4
 	stw	r30, [r29+], #-8
@@ -51,12 +51,11 @@ qsort:
 	mov	r11, r9
 	sub	r9, r5, #1
 	ldw	r3, [r6+], r9<<#2
-	mov	r4, r3
-	stw	r4, [r6+], r7<<#2
-	sub	r4, r5, #1
-	stw	r11, [r6+], r4<<#2
-	sub	r4, r5, #1
-	ldw	r4, [r27+], #-32
+	mov	r9, r3
+	stw	r9, [r6+], r7<<#2
+	sub	r9, r5, #1
+	stw	r11, [r6+], r9<<#2
+	sub	r9, r5, #1
 	stw	r4, [r29+], #-4
 	stw	r5, [r29+], #-8
 	stw	r6, [r29+], #-12
@@ -66,7 +65,7 @@ qsort:
 	sub	r29, r29, #24
 	mov	r0, r6
 	mov	r1, r7
-	mov	r2, r4
+	mov	r2, r9
 	b.l	qsort
 	add	r29, r29, #24
 	ldw	r4, [r29+], #-4
@@ -98,7 +97,7 @@ qsort:
 	ldw	r29, [r27+], #-8
 	ldw	r27, [r27+], #-12
 	jump	r30
-	.global main
+	.global	main
 	.type main, function
 main:
 	stw	r31, [r29+], #-4
@@ -115,7 +114,14 @@ main:
 	cmpsub.a	r7, #128
 	beg	.L10
 .L9:
-	rsub	r4, r7, #128
+	stw	r5, [r29+], #-4
+	stw	r7, [r29+], #-8
+	sub	r29, r29, #8
+	b.l	gen_rand
+	add	r29, r29, #8
+	ldw	r5, [r29+], #-4
+	ldw	r7, [r29+], #-8
+	mov	r4, r0
 	stw	r4, [r5+], r7<<#2
 	add	r4, r7, #1
 	mov	r7, r4
@@ -131,10 +137,35 @@ main:
 	add	r29, r29, #8
 	ldw	r5, [r29+], #-4
 	ldw	r7, [r29+], #-8
-	mov	r0, #0
+	mov	r7, #0
+.L14:
+	cmpsub.a	r7, #128
+	beg	.L13
 .L12:
+	ldw	r3, [r5+], r7<<#2
+	mov	r4, r3
+	stw	r5, [r29+], #-4
+	stw	r7, [r29+], #-8
+	sub	r29, r29, #8
+	mov	r0, r4
+	b.l	print_int
+	add	r29, r29, #8
+	ldw	r5, [r29+], #-4
+	ldw	r7, [r29+], #-8
+	stw	r5, [r29+], #-4
+	stw	r7, [r29+], #-8
+	sub	r29, r29, #8
+	b.l	print_blank
+	add	r29, r29, #8
+	ldw	r5, [r29+], #-4
+	ldw	r7, [r29+], #-8
+	add	r4, r7, #1
+	mov	r7, r4
+	b	.L14
+.L13:
+	mov	r0, #0
+.L15:
 	ldw	r30, [r27+], #-4
 	ldw	r29, [r27+], #-8
 	ldw	r27, [r27+], #-12
 	jump	r30
-
