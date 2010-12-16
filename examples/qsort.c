@@ -1,5 +1,6 @@
 void print_int(int a);
 void print_blank();
+void print_char(char c);
 void qsort(int *data,int begin, int end){
   int i, j, tmp;
   if(end <= begin + 1)
@@ -30,7 +31,7 @@ int main(){
   for(i = 0 ; i<128 ;i++)
   {
 	  print_int(data[i]);
-  	  print_blank();
+  	  print_char(',');
   }
   return 0;
 }

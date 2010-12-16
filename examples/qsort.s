@@ -114,14 +114,7 @@ main:
 	cmpsub.a	r7, #128
 	beg	.L10
 .L9:
-	stw	r5, [r29+], #-4
-	stw	r7, [r29+], #-8
-	sub	r29, r29, #8
-	b.l	gen_rand
-	add	r29, r29, #8
-	ldw	r5, [r29+], #-4
-	ldw	r7, [r29+], #-8
-	mov	r4, r0
+	rsub	r4, r7, #128
 	stw	r4, [r5+], r7<<#2
 	add	r4, r7, #1
 	mov	r7, r4
@@ -155,7 +148,8 @@ main:
 	stw	r5, [r29+], #-4
 	stw	r7, [r29+], #-8
 	sub	r29, r29, #8
-	b.l	print_blank
+	mov	r0, #44
+	b.l	print_char
 	add	r29, r29, #8
 	ldw	r5, [r29+], #-4
 	ldw	r7, [r29+], #-8
