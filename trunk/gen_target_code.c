@@ -379,7 +379,7 @@ int compare_operation(func_block *fb, int i, int cond, int m)
 			if (t2 < 2)
 			{
 				r2 = fb->reg_alloc[u2];
-				r2 = load_operator(fb, u2, r2, 1);
+				r2 = load_operator(fb, u2, r2, 2);
 				add_assemble(NULL, -1, cmpsub_a, r2, -1, 0, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
 				if (m != 2 && m != 3)
 					m = 5 - m;

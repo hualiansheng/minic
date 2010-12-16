@@ -15,16 +15,19 @@ main:
 	cmpsub.a	r5, #128
 	beg	.L2
 .L1:
+	add	r7, r4, r5<<#2
 	stw	r4, [r29+], #-4
 	stw	r5, [r29+], #-8
-	sub	r29, r29, #8
+	stw	r7, [r29+], #-12
+	sub	r29, r29, #12
 	mov	r0, #128
 	b.l	rand_int
-	add	r29, r29, #8
+	add	r29, r29, #12
 	ldw	r4, [r29+], #-4
 	ldw	r5, [r29+], #-8
+	ldw	r7, [r29+], #-12
 	mov	r6, r0
-	stw	r6, [r4+], r5<<#2
+	stw	r6, [r7+], #0
 	add	r5, r5, #1
 	b	.L3
 .L2:
@@ -35,8 +38,8 @@ main:
 	ldw	r9, [r27+], #-536
 	ldw	r8, [r27+], #-540
 .L4:
-	ldw	r3, [r4+], r5<<#2
-	mov	r6, r3
+	add	r6, r4, r5<<#2
+	ldw	r6, [r6+], #0
 	stw	r4, [r29+], #-4
 	stw	r5, [r29+], #-8
 	sub	r29, r29, #8
@@ -79,20 +82,22 @@ main:
 	cmpsub.a	r9, #128
 	beg	.L10
 .L9:
-	ldw	r3, [r4+], r9<<#2
-	mov	r7, r3
-	ldw	r3, [r4+], r5<<#2
-	mov	r6, r3
+	add	r6, r4, r9<<#2
+	ldw	r7, [r6+], #0
+	add	r6, r4, r5<<#2
+	ldw	r6, [r6+], #0
 	cmpsub.a	r7, r6
 	beg	.L12
 .L11:
-	ldw	r3, [r4+], r5<<#2
-	mov	r6, r3
+	add	r6, r4, r5<<#2
+	ldw	r6, [r6+], #0
 	mov	r8, r6
-	ldw	r3, [r4+], r9<<#2
-	mov	r6, r3
-	stw	r6, [r4+], r5<<#2
-	stw	r8, [r4+], r9<<#2
+	add	r7, r4, r5<<#2
+	add	r6, r4, r9<<#2
+	ldw	r6, [r6+], #0
+	stw	r6, [r7+], #0
+	add	r6, r4, r9<<#2
+	stw	r8, [r6+], #0
 .L12:
 	add	r6, r9, #1
 	mov	r9, r6
@@ -106,8 +111,8 @@ main:
 	cmpsub.a	r5, #128
 	beg	.L16
 .L15:
-	ldw	r3, [r4+], r5<<#2
-	mov	r6, r3
+	add	r6, r4, r5<<#2
+	ldw	r6, [r6+], #0
 	stw	r4, [r29+], #-4
 	stw	r5, [r29+], #-8
 	sub	r29, r29, #8
