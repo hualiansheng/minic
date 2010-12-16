@@ -191,6 +191,12 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
 		    //printf("print string");
 		    sim_print(pipline, pipline->regs->r[0], STRING);
 		}
+                else if(strcmp(func_name, "print_blank") == 0){
+                    printf(" ");
+                }
+                else if(strcmp(func_name, "print_ln") == 0){
+                    printf("\n");
+                }
 		// Normal Function
 		else
 		    inst_Ex(pipline, cpu_info, 1);
