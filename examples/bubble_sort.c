@@ -10,10 +10,10 @@ int main()
 		a[i] = rand_int(128);
 	for(i=0; i<128; i++){
 		print_int(a[i]);
-		print_char(10);
+		print_char('\n');
 	}
-	print_char(10);
-	print_char(10);
+	print_char('\n');
+	print_char('\n');
 	for (i = 0; i < 128; i++)
 		for (j = i+1; j < 128; j++)
 			if(a[j] < a[i])
@@ -24,7 +24,7 @@ int main()
 			}
 	for(i=0; i<128; i++){
 		print_int(a[i]);
-		print_char(10);
+		print_char('\n');
 	}
 	print_ln();
 	print_ln();

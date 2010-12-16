@@ -60,7 +60,10 @@ return 			yylval.string_attr.ptr = AST_new_Node(); change_yylloc(); return RETUR
 			}
 {char_constant}		{
 				yylval.char_attr.ptr = AST_new_Node();
-				yylval.char_attr.cval = yytext[1];
+				if(yytext[1] != '\\')
+					yylval.char_attr.cval = yytext[1];
+				else
+					yylval.char_attr.cval = '\n';
 				yylval.char_attr.ptr->content.c_content = yylval.char_attr.cval;
 				change_yylloc();
 				return CHAR_CONSTANT;
