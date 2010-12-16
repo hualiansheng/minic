@@ -430,12 +430,26 @@ int rvalue_code(AST_NODE *p)
 								}
 							case ADDRESS_SIGN:
 								{
+									/*	if(op == address_op){
+										if(temp_rvalue == -1){
+										temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
+										assert(temp_symtbl != NULL);
+										if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0)     add_triple(op,(int)temp_ID, -1, 2, 0,-1);
+										else if(temp_symtbl->type == INT_T && temp_symtbl->star_num == 0)		add_triple(op,(int)temp_ID, -1, 3, 0, -1);
+										}
+										else{
+										add_triple(op, temp_rvalue, -1, triple_list[temp_rvalue].result_type + 2, 1, -1);
+										}
+										}*/
+									temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 									if(temp_rvalue == -1){
-										add_triple_single_op(temp_rvalue,address_op,ptr);
+										temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
+										assert(temp_symtbl != NULL);
+										if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0)     add_triple(address_op,(int)temp_ID, -1, 2, 0,-1);
+										else if(temp_symtbl->type == INT_T && temp_symtbl->star_num == 0)		add_triple(address_op,(int)temp_ID, -1, 3, 0, -1);
 										return triple_list_index - 1;
 									}
 									else{ //& 后面是 *rvalue
-										temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 										return temp_rvalue;                     
 									}
 								}
@@ -616,31 +630,31 @@ int rvalue_code(AST_NODE *p)
 						   }
 						   else if(temp_rvalue == -2){
 
-							arg_list[arg_num] = const_value;
-							arg_type_list[arg_num] = 2;
-							arg_num ++;
-/*
-							   if(ptr->leftChild->leftChild->leftChild->leftChild->nodeType == ICONSTANT_T){
-								   arg_list[arg_num] = const_value;
-								   arg_type_list[arg_num] = 2;
-							   }
-							   else if(ptr->leftChild->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
-								   arg_list[arg_num] = const_value;
-								   arg_type_list[arg_num] = 2;
-							   }
-							   else if(ptr->leftChild->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
-								   arg_list[arg_num] = (int)const_string;
-								   arg_type_list[arg_num] = 3;
-							   }
+							   arg_list[arg_num] = const_value;
+							   arg_type_list[arg_num] = 2;
 							   arg_num ++;
-*/
+							   /*
+								  if(ptr->leftChild->leftChild->leftChild->leftChild->nodeType == ICONSTANT_T){
+								  arg_list[arg_num] = const_value;
+								  arg_type_list[arg_num] = 2;
+								  }
+								  else if(ptr->leftChild->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
+								  arg_list[arg_num] = const_value;
+								  arg_type_list[arg_num] = 2;
+								  }
+								  else if(ptr->leftChild->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
+								  arg_list[arg_num] = (int)const_string;
+								  arg_type_list[arg_num] = 3;
+								  }
+								  arg_num ++;
+								*/
 						   }
- 							else if(temp_rvalue == -3){
-								   arg_list[arg_num] = (int)const_string;
-								   arg_type_list[arg_num] = 3;
-									arg_num ++;
-							   }
-							   
+						   else if(temp_rvalue == -3){
+							   arg_list[arg_num] = (int)const_string;
+							   arg_type_list[arg_num] = 3;
+							   arg_num ++;
+						   }
+
 						   else{
 							   temp_rvalue = triple_list_index - 1;
 							   arg_list[arg_num] = temp_rvalue;
@@ -659,30 +673,30 @@ int rvalue_code(AST_NODE *p)
 							   arg_num ++;             
 						   }
 						   else if(temp_rvalue == -2){
-							arg_list[arg_num] = const_value;
-							arg_type_list[arg_num] = 2;
-							arg_num ++;
-/*
-							   if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->leftChild->nodeType == ICONSTANT_T){
-								   arg_list[arg_num] = const_value;
-								   arg_type_list[arg_num] = 2;
-							   }
-							   else if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
-								   arg_list[arg_num] = const_value;
-								   arg_type_list[arg_num] = 2;
-							   }
-							   else if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
-								   arg_list[arg_num] = (int)const_string;
-								   arg_type_list[arg_num] = 3;
-							   }
+							   arg_list[arg_num] = const_value;
+							   arg_type_list[arg_num] = 2;
 							   arg_num ++;
-*/
+							   /*
+								  if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->leftChild->nodeType == ICONSTANT_T){
+								  arg_list[arg_num] = const_value;
+								  arg_type_list[arg_num] = 2;
+								  }
+								  else if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
+								  arg_list[arg_num] = const_value;
+								  arg_type_list[arg_num] = 2;
+								  }
+								  else if(ptr->leftChild->rightSibling->rightSibling->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
+								  arg_list[arg_num] = (int)const_string;
+								  arg_type_list[arg_num] = 3;
+								  }
+								  arg_num ++;
+								*/
 						   }
-							else if(temp_rvalue == -3){
-								   arg_list[arg_num] = (int)const_string;
-								   arg_type_list[arg_num] = 3;
-									arg_num ++;
-							   }
+						   else if(temp_rvalue == -3){
+							   arg_list[arg_num] = (int)const_string;
+							   arg_type_list[arg_num] = 3;
+							   arg_num ++;
+						   }
 						   else{
 							   temp_rvalue = triple_list_index - 1;
 							   arg_list[arg_num] = temp_rvalue;
@@ -929,19 +943,8 @@ void add_triple_single_op(int temp_rvalue, enum operator op, AST_NODE *ptr)
 {
 	symtbl_item* temp_symtbl;
 	temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
-	if(op == address_op){
-		if(temp_rvalue == -1){
-			temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
-			assert(temp_symtbl != NULL);
-			if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0)     add_triple(op,(int)temp_ID, -1, 2, 0,-1);
-			else if(temp_symtbl->type == INT_T && temp_symtbl->star_num == 0)		add_triple(op,(int)temp_ID, -1, 3, 0, -1);
-		}
-		else{
-			add_triple(op, temp_rvalue, -1, triple_list[temp_rvalue].result_type + 2, 1, -1);
-		}
-	}
-	else {
-		switch(temp_rvalue){
+
+	switch(temp_rvalue){
 			case -1:{
 						temp_symtbl = symtbl_query(ptr->symtbl, temp_ID, 0);
 						assert(temp_symtbl != NULL);
@@ -969,7 +972,7 @@ void add_triple_single_op(int temp_rvalue, enum operator op, AST_NODE *ptr)
 						break;
 					}
 		}
-	}
+	
 }
 void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, AST_NODE *ptr1, AST_NODE *ptr2)//1, 2分别对应两个操作数
 {
