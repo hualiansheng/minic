@@ -95,8 +95,11 @@ int inst_Ex_D_Imm_Shift(PIPLINE* pipline, int level){
   int32_t operand1, operand2;
   int32_t result;
   int carry, shift_carry;
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_d_imm_shift ++;
   // extend immediate
-  data->imm = sign_extend(data->imm, 5);
+  //data->imm = sign_extend(data->imm, 5);
   // fetch operands
   if(data->Rn == 31)
     operand1 = data->cur_inst_PC;
@@ -150,6 +153,9 @@ int inst_Ex_D_Reg_Shift(PIPLINE* pipline, int level){
   int32_t operand1, operand2;
   int32_t result;
   int carry, shift_carry;
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_d_reg_shift ++;
   // fetch operands
   if(data->Rn == 31)
     operand1 = data->cur_inst_PC;
@@ -201,6 +207,9 @@ int inst_Ex_Multiply(PIPLINE* pipline, int level){
   int32_t operand_Rm, operand_Rn, operand_Rs;
   int32_t result;
   PIPLINE_DATA* data = pipline->pipline_data[level];
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_multiply ++;
   // Get operands
   if(data->Rm == 31)
     operand_Rm = data->cur_inst_PC;
@@ -251,6 +260,10 @@ int inst_Ex_Branch_Ex(PIPLINE* pipline, int level){
   //printf("----Execuating Ex_Branch_Ex instruction : 0x%.8x.----\n",
   //       pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_branch_ex ++;
+
   if(data->L == 1)
     pipline->regs->REG_LR = data->cur_inst_PC;
   pipline->regs->REG_PC = pipline->regs->r[data->Rm];
@@ -268,6 +281,9 @@ int inst_Ex_D_Immediate(PIPLINE* pipline, int level){
   int32_t operand1, operand2;
   int32_t result;
   int carry, shift_carry;
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_d_immediate ++;
   // extend immediate
   //data->imm = sign_extend(data->imm, 9);
   //printf("Sign extend imm : %.8x\n", data->imm);
@@ -323,8 +339,11 @@ int inst_Ex_L_S_R_offset(PIPLINE* pipline, int level){
   // addr_c is the address which is calculated
   // offset is the offset of calculation
   int32_t addr, addr_c, offset, operand;
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_l_s_r_offset ++;
   // extend immediate
-  data->imm = sign_extend(data->imm, 5);
+  //data->imm = sign_extend(data->imm, 5);
   offset = pipline->regs->r[data->Rm];
   // shift operation
   shift_Ex(&offset, data->imm, data->shift);
@@ -359,6 +378,9 @@ int inst_Ex_L_S_Hw_Sb_Rof(PIPLINE* pipline, int level){
   // addr_c is the address which is calculated
   // offset is the offset of calculation
   int32_t addr, addr_c, offset, operand;
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_l_s_hw_sb_rof ++;
   // extend immediate
   offset = pipline->regs->r[data->Rm];
   // U
@@ -395,10 +417,13 @@ int inst_Ex_L_S_Hw_Sb_Iof(PIPLINE* pipline, int level){
   // addr_c is the address which is calculated
   // offset is the offset of calculation
   int32_t addr, addr_c, offset, operand;
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_l_s_hw_sb_iof ++;
   // extend immediate
   offset = pipline->regs->r[data->high_offset] << 5;
   offset += pipline->regs->r[data->low_offset];
-  offset = sign_extend(offset, 10);
+  // offset = sign_extend(offset, 10);
   // U
   if(data->Rn == 31)
     operand = data->cur_inst_PC;
@@ -432,8 +457,11 @@ int inst_Ex_L_S_I_offset(PIPLINE* pipline, int level){
   // addr is the final address
   // addr_c is the address which is calculated
   int32_t addr, addr_c, operand;
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_l_s_i_offset ++;
   // extend immediate
-  data->imm = sign_extend(data->imm, 14);
+  // data->imm = sign_extend(data->imm, 14);
   if(data->Rn == 31)
     operand = data->cur_inst_PC;
   else
@@ -462,6 +490,10 @@ int inst_Ex_L_S_I_offset(PIPLINE* pipline, int level){
 int inst_Ex_Branch_Link(PIPLINE* pipline, int level){
   //printf("----Execuating Ex_Branch_Link instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
   PIPLINE_DATA* data = pipline->pipline_data[level];
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_branch_link ++;
+  // immediate sign extend
   data->imm = sign_extend(data->imm, 24);
   //printf("PC of this inst : %.8x\n", data->cur_inst_PC);
   //printf("Branch imm : %.8x\n", data->imm);
@@ -480,14 +512,20 @@ int inst_Ex_Branch_Link(PIPLINE* pipline, int level){
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Ex_ST(PIPLINE* pipline, int level){
   //printf("----Execuating Ex_Ex_ST instruction : 0x%.8x.----\n", pipline->pipline_data[level]->inst_code);
-  fprintf(stderr, "Software Trap, unknown manner.\n");
-  exit(1);
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_st ++;
+  fprintf(stderr, "Software Trap, unknown manner, do nothing : 0x%.8x.\n",
+	  pipline->pipline_data[level]->inst_code);
   return 0;
 }
 
 // The execuation func of
 // return val -- if pipline need be drained, return 1, else 0
 int inst_Unknown(PIPLINE* pipline, int level){
+  // instruction statistic
+  (pipline->proc->inst_static).inst_total ++;
+  (pipline->proc->inst_static).inst_unknown ++;
   fprintf(stderr,
 	  "Warning : Execuating Unknown instruction : 0x%.8x, ignored.\n",
 	  pipline->pipline_data[level]->inst_code);
