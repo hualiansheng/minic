@@ -19,8 +19,8 @@ typedef struct{
   int inst_d_reg_shift;
   int inst_d_immediate;
   int inst_multiply;
-  int inst_branch_ex;
-  int inst_branch_link;
+  int inst_cond_branch;
+  int inst_uncond_branch;
   int inst_l_s_r_offset;
   int inst_l_s_i_offset;
   int inst_l_s_hw_sb_rof;
@@ -38,7 +38,7 @@ typedef struct{
   BP_LIST* bp_list;
   uint32_t list_cur_addr;
   int step;
-  INST_STATISTIC inst_static;
+  INST_STATISTIC inst_statistic;
 }PROCESS;
 
 extern PROCESS* proc_initial(char* filename);
