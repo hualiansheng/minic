@@ -154,6 +154,7 @@ int add_func_item(AST_NODE* p, int type, int star)
 	(p_tbl->item[p_tbl->item_num]).writable = 0;
 	(p_tbl->item[p_tbl->item_num]).name = func_name;
 	(p_tbl->item[p_tbl->item_num]).size = -1;
+	(p_tbl->item[p_tbl->item_num]).func_off = -1;
 	tmp = p->symtbl;
 	p = p->rightSibling->rightSibling->leftChild;
 	if (p->nodeType != EPSILON && p->nodeType != VOID_T)

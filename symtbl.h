@@ -34,7 +34,7 @@ struct symtbl_item
 	int writable;			//common varibles are writable, but constants, arrays and functions are unwritable
 	char* name;			//name of the item 
 	int size;			//used for arrays only, indicating the number of its elements
-	int addr_off;
+	int func_off;
 	int offset;
 	int reg;
 };
