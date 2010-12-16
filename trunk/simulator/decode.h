@@ -5,6 +5,6 @@
 #include "inst.h"
 
 
-extern int decode_inst_decode(PIPLINE_DATA* _pipline_data);
+int decode_inst_decode(PIPLINE_DATA* _pipline_data);
 
 #endif

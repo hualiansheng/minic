@@ -10,19 +10,19 @@
 #define REG_CMSR flag
 
 typedef struct{
-  int32_t r[32];
-  int32_t flag;
+    int32_t r[32];
+    int32_t flag;
 }REGISTERS;
 
-extern REGISTERS* reg_initial();
-extern void reg_destroy(REGISTERS *regs);
-extern int reg_setN(REGISTERS *regs, int n);
-extern int reg_getN(REGISTERS *regs);
-extern int reg_setZ(REGISTERS *regs, int z);
-extern int reg_getZ(REGISTERS *regs);
-extern int reg_setC(REGISTERS *regs, int c);
-extern int reg_getC(REGISTERS *regs);
-extern int reg_setV(REGISTERS *regs, int v);
-extern int reg_getV(REGISTERS *regs);
+REGISTERS* reg_initial();
+void reg_destroy(REGISTERS *regs);
+int reg_setN(REGISTERS *regs, int n);
+int reg_getN(REGISTERS *regs);
+int reg_setZ(REGISTERS *regs, int z);
+int reg_getZ(REGISTERS *regs);
+int reg_setC(REGISTERS *regs, int c);
+int reg_getC(REGISTERS *regs);
+int reg_setV(REGISTERS *regs, int v);
+int reg_getV(REGISTERS *regs);
 
 #endif

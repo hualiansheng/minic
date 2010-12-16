@@ -14,34 +14,34 @@
 #define STACK_SIZE	4*1024*1024
 
 typedef struct{
-  int inst_total;// total instruction number
-  int inst_d_imm_shift;// d_imm_shift instruction number
-  int inst_d_reg_shift;
-  int inst_d_immediate;
-  int inst_multiply;
-  int inst_cond_branch;
-  int inst_uncond_branch;
-  int inst_l_s_r_offset;
-  int inst_l_s_i_offset;
-  int inst_l_s_hw_sb_rof;
-  int inst_l_s_hw_sb_iof;
-  int inst_st;
-  int inst_unknown;
+    int inst_total;// total instruction number
+    int inst_d_imm_shift;// d_imm_shift instruction number
+    int inst_d_reg_shift;
+    int inst_d_immediate;
+    int inst_multiply;
+    int inst_cond_branch;
+    int inst_uncond_branch;
+    int inst_l_s_r_offset;
+    int inst_l_s_i_offset;
+    int inst_l_s_hw_sb_rof;
+    int inst_l_s_hw_sb_iof;
+    int inst_st;
+    int inst_unknown;
 }INST_STATISTIC;
 
 typedef struct{
-  int status;
-  uint32_t entry;
-  PROC_STACK* stack;
-  PROC_MEM* mem;
-  PROC_SYMTBL symtbl;
-  BP_LIST* bp_list;
-  uint32_t list_cur_addr;
-  int step;
-  INST_STATISTIC inst_statistic;
+    int status;
+    uint32_t entry;
+    PROC_STACK* stack;
+    PROC_MEM* mem;
+    PROC_SYMTBL symtbl;
+    BP_LIST* bp_list;
+    uint32_t list_cur_addr;
+    int step;
+    INST_STATISTIC inst_statistic;
 }PROCESS;
 
-extern PROCESS* proc_initial(char* filename);
-extern int proc_destroy(PROCESS* proc);
+PROCESS* proc_initial(char* filename);
+int proc_destroy(PROCESS* proc);
 
 #endif

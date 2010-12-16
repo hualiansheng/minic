@@ -28,18 +28,18 @@
 
 
 typedef struct{
-  int sym_num;
-  unsigned char* st_info;
-  char** name;
-  uint32_t* addr;
+    int sym_num;
+    unsigned char* st_info;
+    char** name;
+    uint32_t* addr;
 }PROC_SYMTBL;
 
-extern int ELF_initial(char *input_file);
-extern int ELF_close();
-extern int ELF_loadable_seg_num();
-extern GElf_Phdr* ELF_next_loadable_phdr();
-extern uint32_t ELF_entry_point();
-extern uint32_t ELF_main_entry();
+int ELF_initial(char *input_file);
+int ELF_close();
+int ELF_loadable_seg_num();
+GElf_Phdr* ELF_next_loadable_phdr();
+uint32_t ELF_entry_point();
+uint32_t ELF_main_entry();
 int ELF_build_symtbl(PROC_SYMTBL* symtbl);
 
 #endif

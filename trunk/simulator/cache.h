@@ -16,24 +16,24 @@
 #define DATA_B      2
 
 typedef struct{
-  int block_num;
-  int sign_bits_num;
-  PROC_MEM* mem;
-  int valid[CACHE_SIZE/CACHE_BLOCK_SIZE];
-  uint8_t data[CACHE_SIZE/CACHE_BLOCK_SIZE][CACHE_BLOCK_SIZE];
-  uint32_t mark[CACHE_SIZE/CACHE_BLOCK_SIZE];
+    int block_num;
+    int sign_bits_num;
+    PROC_MEM* mem;
+    int valid[CACHE_SIZE/CACHE_BLOCK_SIZE];
+    uint8_t data[CACHE_SIZE/CACHE_BLOCK_SIZE][CACHE_BLOCK_SIZE];
+    uint32_t mark[CACHE_SIZE/CACHE_BLOCK_SIZE];
 }CACHE;
 
 typedef struct{
-  int cpu_cycles;
-  int32_t data;
+    int cpu_cycles;
+    int32_t data;
 }CACHE_RETURN;
 
-extern CACHE* cache_initial(PROC_MEM* _mem);
-extern int cache_mem_link(CACHE* cache, PROC_MEM* _mem);
-extern CACHE_RETURN cache_search(CACHE* cache, uint32_t addr);
-extern int cache_write(CACHE* cache, uint32_t addr, uint32_t data, int data_type);
-extern int cache_destroy(CACHE* cache);
-extern int cache_update(CACHE* cache, uint32_t addr);
+CACHE* cache_initial(PROC_MEM* _mem);
+int cache_mem_link(CACHE* cache, PROC_MEM* _mem);
+CACHE_RETURN cache_search(CACHE* cache, uint32_t addr);
+int cache_write(CACHE* cache, uint32_t addr, uint32_t data, int data_type);
+int cache_destroy(CACHE* cache);
+int cache_update(CACHE* cache, uint32_t addr);
 
 #endif

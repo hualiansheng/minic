@@ -3,7 +3,7 @@
 
 #include "process.h"
 
-extern int interpret_inst(uint32_t inst_code, 
-			  uint32_t inst_addr, char* result, PROCESS* proc);
+int interpret_inst(uint32_t inst_code, 
+                   uint32_t inst_addr, char* result, PROCESS* proc);
 
 #endif
