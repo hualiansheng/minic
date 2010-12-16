@@ -3,6 +3,8 @@
 #include <malloc.h>
 #include <memory.h>
 #include <stdlib.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "interpret.h"
 #include "instEx.h"
@@ -16,6 +18,7 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info);
 int pipline_WB(PIPLINE* pipline, CPU_info* cpu_info);
 void sim_print(PIPLINE* pipline, int32_t data, int type);
+void sim_scan(PIPLINE* pipline, int type);
 
 PIPLINE* pipline_initial(REGISTERS* regs, CACHE* i_cache,
 	CACHE* d_cache){
@@ -27,6 +30,7 @@ PIPLINE* pipline_initial(REGISTERS* regs, CACHE* i_cache,
     pipline->d_cache = d_cache;
     pipline->block = 0;
     pipline->block_reg = -1;
+    srand(time(NULL));
     return pipline;
 }
 
@@ -197,6 +201,18 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
                 else if(strcmp(func_name, "print_ln") == 0){
                     printf("\n");
                 }
+		else if(strcmp(func_name, "rand_int") == 0){
+		    pipline->regs->r[0] = rand() % pipline->regs->r[0];
+		}
+		else if(strcmp(func_name, "scan_int") == 0){
+                    sim_scan(pipline, INT);
+		}
+		else if(strcmp(func_name, "scan_char") == 0){
+		    sim_scan(pipline, CHAR);
+		}
+		else if(strcmp(func_name, "scan_string") == 0){
+		    sim_scan(pipline, STRING);
+		}
 		// Normal Function
 		else
 		    inst_Ex(pipline, cpu_info, 1);
@@ -455,3 +471,55 @@ void sim_print(PIPLINE* pipline, int32_t data, int type){
 	}
     }
 }
+
+
+void sim_scan(PIPLINE* pipline, int type){
+	char s[1024];
+	int len;
+    if(type == INT){
+		int num;
+		scanf("%d", &num);
+		if(mem_invalid(pipline->proc->mem, pipline->regs->r[0]) != 0){
+			fprintf(stderr, "Invalid address, 0x%.8x\n",
+					pipline->regs->r[0]);
+			exit(1);
+		}else if((mem_type(pipline->proc->mem,
+					pipline->regs->r[0]) & DATA_WR) == 0){
+			fprintf(stderr, "Read-only address, 0x%.8x\n",
+					pipline->regs->r[0]);
+			exit(1);
+		}
+		mem_set(pipline->proc->mem, pipline->regs->r[0],
+				&num, sizeof(int));
+    }else if(type == CHAR){
+		char c;
+		scanf("%c", &c);
+		if(mem_invalid(pipline->proc->mem, pipline->regs->r[0]) != 0){
+			fprintf(stderr, "Invalid address, 0x%.8x\n",
+					pipline->regs->r[0]);
+			exit(1);
+		}else if((mem_type(pipline->proc->mem,
+					pipline->regs->r[0]) & DATA_WR) == 0){
+			fprintf(stderr, "Read-only address, 0x%.8x\n",
+					pipline->regs->r[0]);
+			exit(1);
+		}
+		mem_set(pipline->proc->mem, pipline->regs->r[0],
+				&c, sizeof(char));
+
+    }else if(type == STRING){
+    	scanf("%s", s);
+		len = strlen(s);
+		if(mem_invalid(pipline->proc->mem, pipline->regs->r[0]) != 0 ||
+				mem_invalid(pipline->proc->mem, pipline->regs->r[0] + len -1) != 0){
+			fprintf(stderr, "Invalid string address, from 0x%.8x to 0x%.8x\n", pipline->regs->r[0], pipline->regs->r[0] + len);
+			exit(1);
+		}
+		if((mem_type(pipline->proc->mem, pipline->regs->r[0]) & DATA_WR) == 0){
+			fprintf(stderr, "Read-only address, from 0x%.8x to 0x%.8x\n", pipline->regs->r[0], pipline->regs->r[0] + len);
+		mem_set(pipline->proc->mem, pipline->regs->r[0], s, len);
+		}
+	}
+}
+
+
