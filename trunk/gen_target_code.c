@@ -912,13 +912,14 @@ int set_rb_code(func_block *fb, int i)
 
 int call_code(func_block *fb, int i)
 {
-	int j, k, tmp, m, rtn_reg;
+	int j, k, tmp, m, rtn_reg, idx, para_num;
 	int tmp_reg_var[32];
-	symtbl_hdr *ptr = triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]].symtbl;
-	func_block *q = (triple_list[index_index[triple_list[index_index[i]].arg1.temp_index]].block)->fb;
 	unsigned int *live = fb->live_status[i-fb->start->begin];
-	for (j = 4, k = 0; j <= 15 && j <= q->reg_used+3; j++)
+	idx = triple_list[index_index[i]].arg1.temp_index;
+	for (j = 4, k = 0; j <= 15; j++)
 	{
+		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+3)
+			break;
 		if (fb->reg_var[j] != -1 && (live[fb->reg_var[j]/32] >> (31-fb->reg_var[j]%32)) % 2 == 1)
 		{
 			k++;
@@ -926,20 +927,22 @@ int call_code(func_block *fb, int i)
 		}
 		tmp_reg_var[j] = fb->reg_var[j];
 	}
-	if (ptr->para_num > 4)
-		m = (k + ptr->para_num - 4) * 4;
+	for (para_num = 0; triple_list[index_index[i-1-para_num]].op != param; para_num++)
+		;
+	if (para_num > 4)
+		m = (k + para_num - 4) * 4;
 	else
 		m = k * 4;
 	if (m != 0)
 		add_assemble(NULL, -1, sub, 29, 29, 0, -1, 1, m);
-	for (j = ptr->para_num-1, k = 0; j >= 0; j--)
+	for (j = para_num-1, k = 0; j >= 0; j--)
 	{
-		if (triple_list[index_index[i-ptr->para_num+j]].arg1_uni != -1)
+		if (triple_list[index_index[i-para_num+j]].arg1_uni != -1)
 		{
-			tmp = fb->reg_alloc[triple_list[index_index[i-ptr->para_num+j]].arg1_uni];
-			tmp = load_operator(fb, triple_list[index_index[i-ptr->para_num+j]].arg1_uni, tmp, 2);
-			if (j >= ptr->para_num-4)
-				add_assemble(NULL, -1, mov, -1, ptr->para_num-1-j, 0, -1, 0, tmp);
+			tmp = fb->reg_alloc[triple_list[index_index[i-para_num+j]].arg1_uni];
+			tmp = load_operator(fb, triple_list[index_index[i-para_num+j]].arg1_uni, tmp, 2);
+			if (j >= para_num-4)
+				add_assemble(NULL, -1, mov, -1, para_num-1-j, 0, -1, 0, tmp);
 			else
 			{
 				add_assemble(NULL, -1, stw, 29, tmp, 0, -1, 1, k);
@@ -948,21 +951,23 @@ int call_code(func_block *fb, int i)
 		}
 		else
 		{
-			if (j >= ptr->para_num-4)
-				add_assemble(NULL, -1, mov, -1, ptr->para_num-1-j, 0, -1, 1, triple_list[index_index[i-ptr->para_num+j]].arg1.imm_value);
+			if (j >= para_num-4)
+				add_assemble(NULL, -1, mov, -1, para_num-1-j, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
 			else
 			{
-				add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, triple_list[index_index[i-ptr->para_num+j]].arg1.imm_value);
+				add_assemble(NULL, -1, mov, -1, 3, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
 				add_assemble(NULL, -1, stw, 29, 3, 0, -1, 1, k);
 				k += 4;
 			}
 		}
 	}
-	add_assemble(ptr->func_name, -1, b_l, -1, -1, 0, -1, 0, -1);
+	add_assemble(triple_list[index_index[i]].arg2.var_name, -1, b_l, -1, -1, 0, -1, 0, -1);
 	if (m != 0)
 		add_assemble(NULL, -1, add, 29, 29, 0, -1, 1, m);
-	for (j = 4, k = 0; j <= 15 && j <= q->reg_used+3; j++)
+	for (j = 4, k = 0; j <= 15; j++)
 	{
+		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+3)
+			break;
 		fb->reg_var[j] = tmp_reg_var[j];
 		if (fb->reg_var[j] != -1 && (live[fb->reg_var[j]/32] >> (31-fb->reg_var[j]%32)) % 2 == 1)
 		{
