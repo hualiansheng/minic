@@ -368,6 +368,10 @@ int console_info(CPU_d* cpu, CMD cmd){
   else if(strcmp(cmd.args[0], "cpu") == 0 ||
           strcmp(cmd.args[0], "c") == 0)
     debugger_print_cpu_info(cpu->cpu_info);
+  else if(strcmp(cmd.args[0], "instructions") == 0 ||
+	  strcmp(cmd.args[0], "inst") == 0 ||
+	  strcmp(cmd.args[0], "i") == 0)
+    debugger_print_inst_statistic(cpu->proc);
   else
     console_help_info();
   return 1;
@@ -531,6 +535,7 @@ void console_help_info(){
   printf("info stack/s     : print stack infomation\n");
   printf("info CMSR/C      : print CMSR infomation\n");
   printf("info cpu/c       : print cpu infomation\n");
+  printf("info inst/i      : print instruction statistic information\n");
 }
 
 void console_help_x(){

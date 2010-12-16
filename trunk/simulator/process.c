@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <memory.h>
 
 #include "process.h"
 
@@ -24,6 +25,7 @@ PROCESS* proc_initial(char* filename){
   }
 
   proc = malloc(sizeof(PROCESS));
+  memset(proc, 0, sizeof(PROCESS));
   proc->stack = NULL;
   proc->mem = NULL;
   ELF_initial(filename);

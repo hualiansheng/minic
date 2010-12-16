@@ -43,6 +43,8 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
   while(mem_invalid(cache->mem, block_addr) != 0){
     block_addr += 4;
     in_block_count += 4;
+    if(in_block_count > CACHE_BLOCK_SIZE)
+      break;
   }
   if(in_block_count > CACHE_BLOCK_SIZE){
     fprintf(stderr, "Address invalid, addr 0x%.8x.\n", addr);

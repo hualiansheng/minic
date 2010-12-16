@@ -17,12 +17,9 @@ extern void debugger_modify_mem(PROC_MEM* mem, uint32_t addr, int32_t content);
 extern void debugger_print_stack(PROC_MEM* mem, uint32_t sp);
 extern void debugger_modify_stack(PROC_MEM* mem, uint32_t sp,
                                   uint32_t addr, int32_t content);
-extern void debugger_set_break_point(CPU_d* cpu, uint32_t addr);
-extern void debugger_remove_break_point(CPU_d* cpu, uint32_t addr);
-extern void debugger_list_break_point(CPU_d* cpu, uint32_t addr);
-extern void debugger_list_codes(CPU_d* cpu, uint32_t addr, int lines);
 extern int debugger_search_symtbl(PROCESS* proc, uint32_t addr, char* result,
                                   int type);
 extern uint32_t debugger_search_symtbl_func(PROCESS* proc, char* func_name);
+void debugger_print_inst_statistic(PROCESS* proc);
 
 #endif

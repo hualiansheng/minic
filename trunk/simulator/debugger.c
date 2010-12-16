@@ -166,19 +166,6 @@ uint32_t debugger_search_symtbl_func(PROCESS* proc, char* func_name){
   return 0;
 }
 
-void debugger_set_break_point(CPU_d* cpu, uint32_t addr){
+void debugger_print_inst_statistic(PROCESS* proc){
   
 }
-
-void debugger_remove_break_point(CPU_d* cpu, uint32_t addr){
-
-}
-
-void debugger_list_break_point(CPU_d* cpu, uint32_t addr){
-
-}
-
-void debugger_list_codes(CPU_d* cpu, uint32_t addr, int lines){
-
-}
-
