@@ -640,7 +640,7 @@ int star_code(func_block *fb, int i)
 			add_assemble(NULL, -1, ldw, r1, 3, 1, 2, 0, r2);
 		}
 		else
-			add_assemble(NULL, -1, ldw, r1, 3, 1, 2, 1, temp.arg2.imm_value);
+			add_assemble(NULL, -1, ldw, r1, 3, 0, -1, 1, temp.arg2.imm_value*4);
 		store_result(fb, mov, u0, -1, r0, 0, -1, 0, 3);
 	}
 	else
@@ -721,7 +721,7 @@ int star_assign_code(func_block *fb, int i)
 			add_assemble(NULL, -1, stw, r1, r3, 1, 2, 0, r2);
 		}
 		else
-			add_assemble(NULL, -1, stw, r1, r3, 1, 2, 1, temp.arg2.imm_value);
+			add_assemble(NULL, -1, stw, r1, r3, 0, -1, 1, temp.arg2.imm_value*4);
 		if (check_live(fb, i, 1))
 		{
 			r0 = fb->reg_alloc[u0];

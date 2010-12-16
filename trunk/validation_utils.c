@@ -262,7 +262,11 @@ void print_target_code(FILE* target_file)
 		if (assemble_list[i].ins == func || assemble_list[i].ins == label)
 		{
 			if (assemble_list[i].ins == func)
+			{
+				fprintf(target_file, "\t.global\t%s\n", assemble_list[i].func_name);
+				fprintf(target_file, "\t.type %s, function\n", assemble_list[i].func_name);
 				fprintf(target_file,"%s:\n", assemble_list[i].func_name);
+			}
 			else
 				fprintf(target_file,".L%d:\n", assemble_list[i].label);
 		}
