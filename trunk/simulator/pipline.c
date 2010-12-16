@@ -202,6 +202,10 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
                     printf("\n");
                 }
 		else if(strcmp(func_name, "rand_int") == 0){
+                    if(pipline->regs->r[0] == 0){
+                        fprintf(stderr, "Error : arg of rand_int() is 0, div 0 error.\n");
+                        exit(1);
+                    }
 		    pipline->regs->r[0] = rand() % pipline->regs->r[0];
 		}
 		else if(strcmp(func_name, "scan_int") == 0){
