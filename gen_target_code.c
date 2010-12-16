@@ -927,8 +927,9 @@ int call_code(func_block *fb, int i)
 		}
 		tmp_reg_var[j] = fb->reg_var[j];
 	}
-	for (para_num = 0; triple_list[index_index[i-1-para_num]].op != param; para_num++)
+	for (para_num = 0; triple_list[index_index[i-1-para_num]].op == param; para_num++)
 		;
+	//printf("para_num : %d\n", para_num);
 	if (para_num > 4)
 		m = (k + para_num - 4) * 4;
 	else
