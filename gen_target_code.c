@@ -706,7 +706,7 @@ int add_code(func_block *fb, int i)
 		u1 = triple_list[index_index[i]].arg1_uni;
 		u2 = triple_list[index_index[i]].arg2_uni;
 		if (type1 < 2 && type2 < 2)
-			add_std_assemble(fb, add, u0, u1, u1);
+			add_std_assemble(fb, add, u0, u1, u2);
 		else
 		{
 			if (type1 < 2)
