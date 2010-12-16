@@ -322,10 +322,14 @@ int check_para_ptr(func_block *fb, int i, int base)
 	p = triple_list[index_index[triple_list[index_index[i+j]].arg1.temp_index]].symtbl;
 	if (p->item[p->para_num-j].star_num != 0)
 	{
-		for (l = 0; l < fb->uni_item_num; l++)
+		while (j >= 0)
 		{
-			if (fb->mapping[l].isTmp != 1)
-				change_live(fb, i+j-base, 0, l);
+			for (l = 0; l < fb->uni_item_num; l++)
+			{
+				if (fb->mapping[l].isTmp != 1)
+					change_live(fb, i+j-base, 0, l);
+			}
+			j--;
 		}
 	}
 	return 0;
