@@ -1,6 +1,6 @@
-int f(int c, int b);
+void print_int(int num);
 int main()
 {
 	int a;
-	f(a, 10);
+	print_int(12);
 }

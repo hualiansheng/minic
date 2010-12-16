@@ -5,6 +5,7 @@
 #include "gen_intermediate_code.h"
 #define INIT_ITEM_NUM 64
 
+extern AST_NODE* tree_root;
 extern triple *triple_list;
 extern int *index_index;
 extern int triple_list_index;
@@ -319,7 +320,7 @@ int check_para_ptr(func_block *fb, int i, int base)
 			break;
 		j++;
 	}
-	p = triple_list[index_index[triple_list[index_index[i+j]].arg1.temp_index]].symtbl;
+	p = func_query(tree_root->symtbl, triple_list[index_index[i+j]].arg2.var_name);
 	if (p->item[p->para_num-j].star_num != 0)
 	{
 		while (j >= 0)
