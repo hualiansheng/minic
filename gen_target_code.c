@@ -168,7 +168,8 @@ int convert()
 		add_assemble((triple_list[index_index[fb->start->begin]].symtbl)->func_name, -1, func, -1, -1, 0, -1, 0, -1);
 		for (i = fb->start->begin; i <= fb->over->end; i++)
 		{
-			load_live(fb, i);
+			if (triple_list[index_index[i]].op != enterF)
+				load_live(fb, i);
 			if (triple_list[index_index[i]].label != 0)
 				add_assemble(NULL, triple_list[index_index[i]].label, label, -1, -1, 0, -1, 0, -1);
 			g[triple_list[index_index[i]].op-3000](fb, i);
@@ -183,7 +184,7 @@ int load_live(func_block *fb, int i)
 	unsigned int *live = fb->live_status[i-fb->start->begin];
 	for (j = 0; j < fb->uni_item_num; j++)
 	{
-		if ((live[j/32] >> (31-j%32)) % 2 == 1)
+		if (fb->mapping[j].isTmp != 1 && (live[j/32] >> (31-j%32)) % 2 == 1)
 		{
 			r = fb->reg_alloc[j];
 			if (r != -1 && fb->reg_var[r] != j)
