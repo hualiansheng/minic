@@ -1,6 +1,6 @@
 OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o
 CSCOPE = *.c *.h *.l *.y
-ARGS = -g -Wall -DDEBUG
+ARGS = -g -Wall 
 minic: $(OBJECT)
 	gcc -lm $(ARGS) -o minic $(OBJECT)
 minic.tab.o: minic.tab.c minic.tab.h AST.h attr.h
