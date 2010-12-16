@@ -52,6 +52,7 @@ int initial();
 int memory_allocation();
 int setLabel();
 int convert();
+int load_live(func_block *fb, int i);
 int add_assemble(char *func_name, int label, enum instruction ins, int Rn, int Rd, int Rs_or_Imm, int Rs_Imm, int Rm_or_Imm, int Rm_Imm);
 int check_live(func_block *fb, int i, int isTmp);
 int load_operator(func_block *fb, int u, int r, int _r);
@@ -167,9 +168,29 @@ int convert()
 		add_assemble((triple_list[index_index[fb->start->begin]].symtbl)->func_name, -1, func, -1, -1, 0, -1, 0, -1);
 		for (i = fb->start->begin; i <= fb->over->end; i++)
 		{
+			load_live(fb, i);
 			if (triple_list[index_index[i]].label != 0)
 				add_assemble(NULL, triple_list[index_index[i]].label, label, -1, -1, 0, -1, 0, -1);
 			g[triple_list[index_index[i]].op-3000](fb, i);
+		}
+	}
+	return 0;
+}
+
+int load_live(func_block *fb, int i)
+{
+	int j, r;
+	unsigned int *live = fb->live_status[i-fb->start->begin];
+	for (j = 0; j < fb->uni_item_num; j++)
+	{
+		if ((live[j/32] >> (31-j%32)) % 2 == 1)
+		{
+			r = fb->reg_alloc[j];
+			if (r != -1 && fb->reg_var[r] != j)
+			{
+				fb->reg_var[r] = j;
+				add_assemble(NULL, -1, ldw, 27, r, 0, -1, 1, fb->uni_table[j]->offset);
+			}
 		}
 	}
 	return 0;
@@ -211,14 +232,14 @@ int load_operator(func_block *fb, int u, int r, int _r)
 		r = _r;
 		add_assemble(NULL, -1, ldw, 27, r, 0, -1, 1, fb->uni_table[u]->offset);
 	}
-	else
+	/*else
 	{
 		if (fb->reg_var[r] != u)
 		{
 			fb->reg_var[r] = u;
 			add_assemble(NULL, -1, ldw, 27, r, 0, -1, 1, fb->uni_table[u]->offset);
 		}
-	}
+	}*/
 	return r;
 }
 
