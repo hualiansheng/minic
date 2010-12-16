@@ -19,6 +19,7 @@ typedef struct assemble {
 	enum instruction ins;
 	int Rn;
 	int Rd;
+	int shift_direct;
 	int Rs_or_Imm;
 	int Rs_Imm;
 	int Rm_or_Imm;

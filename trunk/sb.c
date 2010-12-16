@@ -1,6 +1,8 @@
-void print_int(int num);
 int main()
 {
-	int a;
-	print_int(12);
+	int a, b[10];
+	int *p;
+	p = &a;
+	a = p - b;
+	return a;
 }
