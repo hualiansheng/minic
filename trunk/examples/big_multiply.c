@@ -1,3 +1,6 @@
+int print_int(int num);
+int print_char(char c);
+
 int mod(int x, int y)
 {
 	while (x >= y)
@@ -23,7 +26,7 @@ int main()
 	for (i = 0; i < 40 ; i++)
 		ans[i] = 0;
 	for (i = 0; i < len1; i++)
-		a[i] = 11;
+		a[i] = 9;
 	len2 = 8;
 	for (i = 0; i < len2; i++)
 		b[i] = 5;
@@ -34,8 +37,12 @@ int main()
 	for (i = 0; i < len1+len2; i++)
 	{
 		temp = ans[i] + jw;
-		ans[i] = mod(temp, 16);
-		jw = div(temp, 16);
+		ans[i] = mod(temp, 10);
+		jw = div(temp, 10);
 	}
+	for(i=0; i<40; i++){
+		print_int(ans[i]);
+	}
+	print_char('\n');
 	return 0;
 }
