@@ -663,25 +663,37 @@ void set_CMSR(REGISTERS* regs, int32_t operand1, int32_t operand2,
                 reg_setC(regs, 0);
         }
 		/**
-		 * WRONG
+		 * WRONG, Fixed by Chunqi Li
 		 * */
         else if(opcodes == SUB || opcodes == SBC || opcodes == CSUB){
-            uint32_t tmp = (uint32_t)operand1 - 1;
-            if(opcodes == SBC && reg_getC(regs) == 1)
-                tmp = tmp + 1;
-            if(tmp > (uint32_t)operand2)
-                reg_setC(regs, 1);
-            else
-                reg_setC(regs, 0);
+			if(opcodes != SBC){
+				if(operand1 < operand2)
+					reg_setC(regs, 0);
+				else
+					reg_setC(regs, 1);
+			}else{
+				if(operand1 == 0x80000000 && operand2 != 0x80000000)
+					reg_setC(regs, 0);
+				else if(operand1 - reg_getC(regs) < operand2)
+					reg_setC(regs, 0);
+				else
+					reg_setC(regs, 1);
+			}
         }
         else if(opcodes == RSB || opcodes == RSC){
-            uint32_t tmp = (uint32_t)operand2 - 1;
-            if(opcodes == RSC && reg_getC(regs) == 1)
-                tmp = tmp + 1;
-            if(tmp > (uint32_t)operand1)
-                reg_setC(regs, 1);
-            else
-                reg_setC(regs, 0);
+			if(opcodes != RSC){
+				if(operand2 < operand1)
+					reg_setC(regs, 0);
+				else 
+					reg_setC(regs, 1);
+			}else{
+				if(operand2 == 0x80000000 && operand1 != 0x80000000)
+					reg_setC(regs, 0);
+				else if(operand2 - reg_getC(regs) < operand1)
+					reg_setC(regs, 0);
+				else
+					reg_setC(regs, 1);
+			}
         }
     }
 }
