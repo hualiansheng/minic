@@ -883,6 +883,7 @@ int call_code(func_block *fb, int i)
 	{
 		if (fb->mapping[j].isTmp != 1 && fb->reg_alloc[j] != -1)
 		{
+			add_assemble(NULL, -1, stw, 27, fb->reg_alloc[j], 0, 0, -1, 1, fb->uni_table[j]->offset);
 			fb->reg_var[fb->reg_alloc[j]] = -1;
 			tmp_reg_var[fb->reg_alloc[j]] = -1;
 		}
@@ -934,7 +935,7 @@ int call_code(func_block *fb, int i)
 		if (u != -1 && fb->mapping[u].isTmp == 1 && (live[u/32] >> (31-u%32)) % 2 == 1)
 		{
 			k++;
-			add_assemble(NULL, -1, stw, 29, j, 0, 0, -1, 1, -k*4);
+			add_assemble(NULL, -1, ldw, 29, j, 0, 0, -1, 1, -k*4);
 		}
 	}
 	tmp = triple_list[index_index[i]].tmp_uni;

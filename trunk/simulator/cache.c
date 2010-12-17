@@ -28,6 +28,7 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
     int in_block_index;
     uint32_t *presult;
     int in_block_count = 0;
+	//printf("cache miss 0x%.8x\n", addr);
     block_index = (addr % CACHE_SIZE)/CACHE_BLOCK_SIZE;
     mark_addr = addr >> ((int)(log(CACHE_SIZE)/log(2)));
     in_block_index = addr % CACHE_BLOCK_SIZE;
@@ -78,6 +79,10 @@ CACHE_RETURN cache_hit(CACHE* cache, uint32_t addr){
     c_r.cpu_cycles = CACHE_HIT_CYCLE;
     presult = (uint32_t*)&(cache->data[block_index][in_block_index]);
     c_r.data = *presult;
+	//printf("Cache Block addr : 0x%.8x\n", addr - in_block_index);
+	//int i;
+	//for(i=0; i<CACHE_BLOCK_SIZE; i+=4)
+	//	printf("DATA : 0x%.8x\n", *(uint32_t*)&(cache->data[block_index][i]));
     //printf("Cache Hit! Data : 0x%x\n", c_r.data);
     return c_r;
 }
