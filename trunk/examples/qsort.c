@@ -29,10 +29,16 @@ int main(){
   int data[128];
   for(i=0; i<128; i++)
     data[i] = rand_int(128);
+  for(i=0; i<128; i++){
+    print_int(data[i]);
+    print_char(' ');
+  }
+  print_char('\n');
+  print_char('\n');
   qsort(data,0, 128);
   for(i=0; i<128; i++){
     print_int(data[i]);
-    print_char('\n');
+    print_char(' ');
   }
   print_char('\n');
   print_char('\n');
