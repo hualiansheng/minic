@@ -605,6 +605,8 @@ void set_CMSR(REGISTERS* regs, int32_t operand1, int32_t operand2,
         //set CMSR C bit
         if(shift_carry != -1)
             reg_setC(regs, shift_carry);
+		else
+			reg_setC(regs, 0);
         //set CMSR Z bit
         if(result == 0)
             reg_setZ(regs, 1);
@@ -630,6 +632,7 @@ void set_CMSR(REGISTERS* regs, int32_t operand1, int32_t operand2,
                 reg_setV(regs, 1);
             else
                 reg_setV(regs, 0);
+			
         }
         else if(opcodes == RSB || opcodes == RSC){
             if((operand1 < 0 && operand2 > 0 && result < 0) ||
@@ -659,6 +662,9 @@ void set_CMSR(REGISTERS* regs, int32_t operand1, int32_t operand2,
             else
                 reg_setC(regs, 0);
         }
+		/**
+		 * WRONG
+		 * */
         else if(opcodes == SUB || opcodes == SBC || opcodes == CSUB){
             uint32_t tmp = (uint32_t)operand1 - 1;
             if(opcodes == SBC && reg_getC(regs) == 1)

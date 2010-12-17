@@ -86,7 +86,7 @@ int reg_setV(REGISTERS *regs, int v){
     if(v == 1)
         regs->flag = regs->flag | (1<<28);
     else
-        regs->flag = regs->flag | ~(1<<28);
+        regs->flag = regs->flag & ~(1<<28);
     return 1;
 }
 
