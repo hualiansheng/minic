@@ -1,15 +1,28 @@
 #! /bin/bash
 
-if [ $# -lt 3 ]; then
-	echo $0 '<c source file> <standard lib> <output file>'
+if [ $# -lt 1 ]; then
+	echo $0 '<c source file> [output file]'
 	exit
 fi
+
+if [ $# -lt 2 ]; then
+	output_file="${1%.*}"
+else
+	output_file=$2
+fi
+
+cmd_path="${0%/*}/"
 cmd="${0%/*}/minic"
 path=`pwd`"/"
 ass_file="${1%.*}.s"
 echo $ass_file
+echo "Compiling..."
+echo "======================="
 $cmd $1
-echo ""
-echo "Output File : "$path$3
-unicore32-linux-gcc $ass_file $2 -o $path$3
+echo "======================="
+echo "Compile Done."
+echo "Linking..."
+echo "Execuating command : unicore32-linux-gcc "$ass_file $cmd_path"standard.out" -o $path$2
+unicore32-linux-gcc $ass_file $cmd_path"standard.out" -o $path$output_file
+echo "Link Done."
 
