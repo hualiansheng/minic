@@ -3,6 +3,7 @@
 #include <memory.h>
 #include "basic_block.h"
 #include "register.h"
+#include "register_stats.h"
 #include "gen_intermediate_code.h"
 extern triple *triple_list;
 extern int *index_index;
@@ -862,20 +863,29 @@ int set_rb_code(func_block *fb, int i)
 
 int call_code(func_block *fb, int i)
 {
-	int j, k, tmp, m, rtn_reg, idx, para_num;
+	int j, k, tmp, m, rtn_reg, idx, para_num, u;
 	int tmp_reg_var[32];
 	unsigned int *live = fb->live_status[i-fb->start->begin];
 	idx = triple_list[index_index[i]].arg1.temp_index;
-	for (j = 4, k = 0; j <= 15; j++)
+	for (j = CALLER_REG_START, k = 0; j <= CALLER_REG_END; j++)
 	{
-		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+3)
+		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+CALLER_REG_START-1)
 			break;
-		if (fb->reg_var[j] != -1 && (live[fb->reg_var[j]/32] >> (31-fb->reg_var[j]%32)) % 2 == 1)
+		u = fb->reg_var[j];
+		if (u != -1 && fb->mapping[u].isTmp == 1 && (live[u/32] >> (31-u%32)) % 2 == 1)
 		{
 			k++;
 			add_assemble(NULL, -1, stw, 29, j, 0, 0, -1, 1, -k*4);
 		}
 		tmp_reg_var[j] = fb->reg_var[j];
+	}
+	for (j = 0; j < fb->uni_item_num; j++)
+	{
+		if (fb->mapping[j].isTmp != 1 && fb->reg_alloc[j] != -1)
+		{
+			fb->reg_var[fb->reg_alloc[j]] = -1;
+			tmp_reg_var[fb->reg_alloc[j]] = -1;
+		}
 	}
 	for (para_num = 0; triple_list[index_index[i-1-para_num]].op == param; para_num++)
 		;
@@ -920,10 +930,11 @@ int call_code(func_block *fb, int i)
 		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+3)
 			break;
 		fb->reg_var[j] = tmp_reg_var[j];
-		if (fb->reg_var[j] != -1 && (live[fb->reg_var[j]/32] >> (31-fb->reg_var[j]%32)) % 2 == 1)
+		u = fb->reg_var[j];
+		if (u != -1 && fb->mapping[u].isTmp == 1 && (live[u/32] >> (31-u%32)) % 2 == 1)
 		{
 			k++;
-			add_assemble(NULL, -1, ldw, 29, j, 0, 0, -1, 1, -k*4);
+			add_assemble(NULL, -1, stw, 29, j, 0, 0, -1, 1, -k*4);
 		}
 	}
 	tmp = triple_list[index_index[i]].tmp_uni;
@@ -956,10 +967,10 @@ int enterF_code(func_block *fb, int i)
 	add_assemble(NULL, -1, stw, 29, 27, 0, 0, -1, 1, -16);
 	add_assemble(NULL, -1, sub, 29, 27, 0, 0, -1, 1, 4);
 	add_assemble(NULL, -1, sub, 29, 29, 0, 0, -1, 1, fb->min_stack_size);
-	for (j = 0; j < fb->reg_used-12; j++)
+	for (j = 0; j < fb->reg_used-(CALLER_REG_END-CALLER_REG_START+1); j++)
 	{
-		add_assemble(NULL, -1, stw, 27, 17+j, 0, 0, -1, 1, -(16+j*4));
-		temp_reg_var[17+j] = fb->reg_var[17+j];
+		add_assemble(NULL, -1, stw, 27, CALLEE_REG_START+j, 0, 0, -1, 1, -(16+j*4));
+		temp_reg_var[CALLEE_REG_START+j] = fb->reg_var[CALLEE_REG_START+j];
 	}
 	for (j = 0; j < 4 && j < ptr->para_num; j++)
 		add_assemble(NULL, -1, stw, 27, j, 0, 0, -1, 1, ptr->item[ptr->para_num-1-j].offset);
@@ -982,10 +993,10 @@ int enterS_code(func_block *fb, int i)
 int leaveF_code(func_block *fb, int i)
 {
 	int j;
-	for (j = 0; j < fb->reg_used-12; j++)
+	for (j = 0; j < fb->reg_used-(CALLER_REG_END-CALLER_REG_START+1); j++)
 	{
-		fb->reg_var[17+j] = temp_reg_var[17+j];
-		add_assemble(NULL, -1, ldw, 27, 17+j, 0, 0, -1, 1, -(16+j*4));
+		fb->reg_var[CALLEE_REG_START+j] = temp_reg_var[CALLEE_REG_START+j];
+		add_assemble(NULL, -1, ldw, 27, CALLEE_REG_START+j, 0, 0, -1, 1, -(16+j*4));
 	}
 	add_assemble(NULL, -1, ldw, 27, 30, 0, 0, -1, 1, -4);
 	add_assemble(NULL, -1, ldw, 27, 29, 0, 0, -1, 1, -8);
