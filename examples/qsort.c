@@ -1,6 +1,8 @@
-void print_int(int a);
-void print_blank();
+void print_int(int i);
 void print_char(char c);
+void print_string(char* s);
+int rand_int(int num);
+
 void qsort(int *data,int begin, int end){
   int i, j, tmp;
   if(end <= begin + 1)
@@ -26,12 +28,13 @@ int main(){
   int i;
   int data[128];
   for(i=0; i<128; i++)
-    data[i] = 128-i;
+    data[i] = rand_int(128);
   qsort(data,0, 128);
-  for(i = 0 ; i<128 ;i++)
-  {
-	  print_int(data[i]);
-  	  print_char(',');
+  for(i=0; i<128; i++){
+    print_int(data[i]);
+    print_char('\n');
   }
+  print_char('\n');
+  print_char('\n');
   return 0;
 }

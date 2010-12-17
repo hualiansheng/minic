@@ -1,0 +1,15 @@
+#! /bin/bash
+
+if [ $# -lt 3 ]; then
+	echo $0 '<c source file> <standard lib> <output file>'
+	exit
+fi
+cmd="${0%/*}/minic"
+path=`pwd`"/"
+ass_file="${1%.*}.s"
+echo $ass_file
+$cmd $1
+echo ""
+echo "Output File : "$path$3
+unicore32-linux-gcc $ass_file $2 -o $path$3
+
