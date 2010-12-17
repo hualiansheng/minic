@@ -2,6 +2,7 @@
 #include <memory.h>
 #include "basic_block.h"
 #include "register.h"
+#include "register_stats.h"
 
 extern func_block *fblist;
 var_vertex *var_vexs;
@@ -286,14 +287,14 @@ int color(func_block *fb, int k)
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
 			if ((var_vexs[i].adj_vexs[j/32] & (1<<(31-j%32))) == (1<<(31-j%32)) && fb->reg_alloc[j] != -1)
-				flag[fb->reg_alloc[j]-4] = 1;
+				flag[fb->reg_alloc[j]-CALLER_REG_START] = 1;
 		}
 		for (j = 0; j < k; j++)
 		{
 			if (!flag[j])
 			{
 				for (ptr = &var_vexs[i]; ptr != NULL; ptr = ptr->con_vexs)
-					fb->reg_alloc[ptr->n] = j + 4;
+					fb->reg_alloc[ptr->n] = j + CALLER_REG_START;
 				break;
 			}
 		}
@@ -303,11 +304,11 @@ int color(func_block *fb, int k)
 	{
 		if (fb->reg_alloc[j] > i)
 			i = fb->reg_alloc[j];
-		if (fb->reg_alloc[j] > 15)
+		if (fb->reg_alloc[j] > CALLER_REG_END)
 			fb->reg_alloc[j]++;
 		fb->uni_table[j]->reg = fb->reg_alloc[j];
 	}
-	fb->reg_used = i - 3;
+	fb->reg_used = i - CALLER_REG_START + 1 ;
 	return 0;
 }
 

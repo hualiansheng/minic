@@ -865,28 +865,27 @@ int call_code(func_block *fb, int i)
 {
 	int j, k, tmp, m, rtn_reg, idx, para_num, u;
 	int tmp_reg_var[32];
-	unsigned int *live = fb->live_status[i-fb->start->begin];
+	unsigned int *live = fb->live_status[i+1-fb->start->begin];
 	idx = triple_list[index_index[i]].arg1.temp_index;
 	for (j = CALLER_REG_START, k = 0; j <= CALLER_REG_END; j++)
 	{
 		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+CALLER_REG_START-1)
 			break;
 		u = fb->reg_var[j];
-		if (u != -1 && fb->mapping[u].isTmp == 1 && (live[u/32] >> (31-u%32)) % 2 == 1)
+		if (u != -1 && (live[u/32] >> (31-u%32)) % 2 == 1)
 		{
-			k++;
-			add_assemble(NULL, -1, stw, 29, j, 0, 0, -1, 1, -k*4);
+			if (fb->mapping[u].isTmp == 1)
+			{
+				k++;
+				add_assemble(NULL, -1, stw, 29, j, 0, 0, -1, 1, -k*4);
+			}
+			else
+			{
+				add_assemble(NULL, -1, stw, 27, j, 0, 0, -1, 1, fb->uni_table[u]->offset);
+				fb->reg_var[j] = -1;
+			}
 		}
 		tmp_reg_var[j] = fb->reg_var[j];
-	}
-	for (j = 0; j < fb->uni_item_num; j++)
-	{
-		if (fb->mapping[j].isTmp != 1 && fb->reg_alloc[j] != -1)
-		{
-			add_assemble(NULL, -1, stw, 27, fb->reg_alloc[j], 0, 0, -1, 1, fb->uni_table[j]->offset);
-			fb->reg_var[fb->reg_alloc[j]] = -1;
-			tmp_reg_var[fb->reg_alloc[j]] = -1;
-		}
 	}
 	for (para_num = 0; triple_list[index_index[i-1-para_num]].op == param; para_num++)
 		;
@@ -926,7 +925,7 @@ int call_code(func_block *fb, int i)
 	add_assemble(triple_list[index_index[i]].arg2.var_name, -1, b_l, -1, -1, 0, 0, -1, 0, -1);
 	if (m != 0)
 		add_assemble(NULL, -1, add, 29, 29, 0, 0, -1, 1, m);
-	for (j = 4, k = 0; j <= 15; j++)
+	for (j = CALLER_REG_START, k = 0; j <= CALLER_REG_END; j++)
 	{
 		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+CALLER_REG_START-1)
 			break;
