@@ -16,12 +16,12 @@ Simulator 验证大纲
     验证的主要策略是按代码中不同的域进行验证。
     验证内容和代码列表如下：
     a、数据处理指令的验证（D_Imm_shift、D_Reg_shift、D_Immediate）
-    20、opcodes域的验证，验证代码：20data_opcodes.c
-    21、shift域（前两类）和Rotate域（第三类）的验证，验证代码：21data_shift_rotate.c
-    22、S域的验证（标志寄存器设置），验证代码：22data_S.c
-    23、PC作为目的寄存器的验证，验证代码:23data_PC_dest.c
-    24、乘法和乘加指令的验证，验证代码：24multiply.c
-    25、乘法和乘加指令PC作为目的寄存器的验证，验证代码：25multiply_PC_dest.c
+	目录：verification/simulator/data_process_inst
+    20、opcodes域的验证，验证代码：opcode.s
+    21、shift域（前两类）和Rotate域（第三类）的验证，验证代码：shift.s
+    22、S域的验证（标志寄存器设置），验证代码：cmsr_logic.s, cmsr_arith.s
+    23、PC作为目的寄存器的验证，验证代码:pc_dst.s
+    24、乘法和乘加指令的验证，验证代码：mul.s
     
     b、分支跳转指令的验证（主要是条件转移指令的验证）
     30、对cond域的验证和跳转地址正确性的验证，验证代码：30b_cond.c
