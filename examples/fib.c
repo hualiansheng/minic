@@ -1,3 +1,5 @@
+void print_int(int num);
+
 int fib(int n)
 {
 	if (n == 0 || n == 1)
@@ -6,6 +8,6 @@ int fib(int n)
 }
 int main()
 {
-	printf("%x\n",fib(10));
+	print_int(fib(10));
 }
 

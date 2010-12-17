@@ -228,6 +228,7 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
 		else
 			inst_Ex(pipline, cpu_info, 1);
 	}
+
 	pipline->pipline_data[2] = pipline->pipline_data[1];
 	pipline_ID(pipline, cpu_info);
 	// drain pipline
@@ -235,7 +236,6 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
 		drain_pipline(pipline, 2);
 		pipline->drain_pipline = 0;
 	}
-
 	if(pipline->pipline_data[2] == NULL)
 		sprintf(pipline->pipline_info[2],
 				"Pipline #2 : Ex  - Inst Execuation Level Empty.\n");
@@ -267,7 +267,7 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
 		if(data->inst_type == L_S_R_OFFSET
 				|| data->inst_type == L_S_I_OFFSET){
 			if(data->B == 0 && data->addr % 4 != 0){
-				fprintf(stderr, "Error : Data Transportation Error, Address not Aligned.\n");
+				fprintf(stderr, "Error : Data Transportation Error, Address not Aligned 0x%.8x.\n", data->addr);
 				exit(1);
 			}
 			CACHE_RETURN cache_return;
@@ -482,6 +482,7 @@ void sim_scan(PIPLINE* pipline, int type){
 	int len;
 	if(type == INT){
 		int num;
+		//fflush(stdin);
 		scanf("%d", &num);
 		if(mem_invalid(pipline->proc->mem, pipline->regs->r[0]) != 0){
 			fprintf(stderr, "Invalid address, 0x%.8x\n",
@@ -495,9 +496,12 @@ void sim_scan(PIPLINE* pipline, int type){
 		}
 		mem_set(pipline->proc->mem, pipline->regs->r[0],
 				&num, sizeof(int));
+		cache_update(pipline->d_cache, pipline->regs->r[0]);
 	}else if(type == CHAR){
 		char c;
-		scanf("%c", &c);
+		while ((c = getchar()) == '\n')
+			;
+		//scanf("%c", &c);
 		if(mem_invalid(pipline->proc->mem, pipline->regs->r[0]) != 0){
 			fprintf(stderr, "Invalid address, 0x%.8x\n",
 					pipline->regs->r[0]);
@@ -510,6 +514,7 @@ void sim_scan(PIPLINE* pipline, int type){
 		}
 		mem_set(pipline->proc->mem, pipline->regs->r[0],
 				&c, sizeof(char));
+		cache_update(pipline->d_cache, pipline->regs->r[0]);
 
 	}else if(type == STRING){
 		scanf("%s", s);
@@ -521,8 +526,12 @@ void sim_scan(PIPLINE* pipline, int type){
 		}
 		if((mem_type(pipline->proc->mem, pipline->regs->r[0]) & DATA_WR) == 0){
 			fprintf(stderr, "Read-only address, from 0x%.8x to 0x%.8x\n", pipline->regs->r[0], pipline->regs->r[0] + len);
-			mem_set(pipline->proc->mem, pipline->regs->r[0], s, len);
+			exit(1);
 		}
+		mem_set(pipline->proc->mem, pipline->regs->r[0], s, len);
+		int i;
+		for(i=0; i<len; i+=4)
+			cache_update(pipline->d_cache, pipline->regs->r[0] + i);
 	}
 }
 
