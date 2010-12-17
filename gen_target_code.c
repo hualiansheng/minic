@@ -927,7 +927,7 @@ int call_code(func_block *fb, int i)
 		add_assemble(NULL, -1, add, 29, 29, 0, 0, -1, 1, m);
 	for (j = 4, k = 0; j <= 15; j++)
 	{
-		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+3)
+		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+CALLER_REG_START-1)
 			break;
 		fb->reg_var[j] = tmp_reg_var[j];
 		u = fb->reg_var[j];
