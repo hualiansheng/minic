@@ -22,7 +22,7 @@ $cmd $1
 echo "======================="
 echo "Compile Done."
 echo "Linking..."
-echo "Execuating command : unicore32-linux-gcc "$ass_file $cmd_path"standard.out" -o $path$2
+echo "Execuating command : unicore32-linux-gcc "$ass_file $cmd_path"standard.out" -o $path$output_file
 unicore32-linux-gcc $ass_file $cmd_path"standard.out" -o $path$output_file
 echo "Link Done."
 
