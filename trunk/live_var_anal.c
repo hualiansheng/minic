@@ -270,7 +270,7 @@ int analyze_live(func_block *fb)
 			arg2 = triple_list[index_index[i]].arg2_uni;
 			if (tmp != -1)
 				change_live(fb, i-base, 1, tmp);
-			if (arg1 != -1)
+			if (arg1 != -1 && triple_list[index_index[i]].op != address_op)
 			{
 				if (triple_list[index_index[i]].op == star_op)
 				{
