@@ -71,30 +71,32 @@ int gen_var_graph(func_block *fb)
 		var_vexs[i].deg = 0;
 		fb->reg_alloc[i] = -1;
 	}
-	for (j = 0; j < fb->uni_item_num; j++)
+	/*for (j = 0; j < fb->uni_item_num; j++)
 	{
 		if (fb->uni_table[j]->isGlobal == 1)
 			var_vexs[j].deg = -1;
-	}
+	}*/
 	for (i = 0; i < fb->code_num; i++)
 	{
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
-			if (fb->uni_table[j]->isGlobal == 1)
-				continue;
+			//if (fb->uni_table[j]->isGlobal == 1)
+			//	continue;
 			if ((fb->live_status[i][j/32] & (1<<(31-j%32))) == (1<<(31-j%32)))
 			{
-				for (l = 0; l < fb->uni_item_num; l++)
+				for (l = 0; l < fb->width; l++)
+					var_vexs[j].adj_vexs[l] = var_vexs[j].adj_vexs[l] | fb->live_status[i][l];
+				/*for (l = 0; l < fb->uni_item_num; l++)
 				{
 					if (fb->uni_table[l]->isGlobal != 1 && l != j)
 						var_vexs[j].adj_vexs[l/32] = var_vexs[j].adj_vexs[l/32] | (fb->live_status[i][l/32] & (1<<(31-l%32)));
-				}
+				}*/
 			}
 		}
 	}
 	for (i = 0; i < fb->uni_item_num; i++)
 	{
-		//var_vexs[i].adj_vexs[i/32] = var_vexs[i].adj_vexs[i/32] & (0xffffffff - (1<<(31-i%32)));
+		var_vexs[i].adj_vexs[i/32] = var_vexs[i].adj_vexs[i/32] & (0xffffffff - (1<<(31-i%32)));
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
 			if ((var_vexs[i].adj_vexs[j/32] & (1<<(31-j%32))) == (1<<(31-j%32)))
@@ -306,7 +308,7 @@ int color(func_block *fb, int k)
 			i = fb->reg_alloc[j];
 		if (fb->reg_alloc[j] > CALLER_REG_END)
 			fb->reg_alloc[j]++;
-		fb->uni_table[j]->reg = fb->reg_alloc[j];
+		//fb->uni_table[j]->reg = fb->reg_alloc[j];
 	}
 	fb->reg_used = i - CALLER_REG_START + 1 ;
 	return 0;

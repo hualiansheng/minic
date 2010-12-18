@@ -17,7 +17,7 @@ extern basic_block *bblist;
 extern func_block *fblist;
 extern int block_num;
 
-char *ins_name[] = {"", ".L", "ldw", "stw", "b.l", "mov", "add", "sub", "rsub", "mul", "jump","cmpsub.a", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
+char *ins_name[] = {"", "", "ldw", "stw", "b.l", "mov", "add", "sub", "rsub", "mul", "jump","cmpsub.a", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
 };
 extern assemble *assemble_list;
 extern int assemble_num;
@@ -85,7 +85,7 @@ void print_symtbl(symtbl_hdr* p)
 	printf("item_num: %d\n", p->item_num);
 	printf("maxSize: %d\n", p->maxSize);
 	for (i = 0; i < p->item_num; i++)
-		printf("%s  %d  %d  %s  %d\n", name[p->item[i].type-FUNC_OFFSET], p->item[i].star_num, p->item[i].writable, p->item[i].name, p->item[i].size);
+		printf("%s  %d  %d  %s  %d  %d\n", name[p->item[i].type-FUNC_OFFSET], p->item[i].star_num, p->item[i].writable, p->item[i].name, p->item[i].size, p->item[i].isGlobal);
 	printf("\n");
 	for (ptr = p->leftChild_tbl; ptr != NULL; ptr = ptr->rightSibling_tbl)
 		print_symtbl(ptr);
@@ -259,52 +259,66 @@ void print_target_code(FILE* target_file)
 	enum instruction inst;
 	for (i = 0; i < assemble_num; i++)
 	{
-		if (assemble_list[i].ins == func || assemble_list[i].ins == label)
+		inst = assemble_list[i].ins;
+		if (inst == special)
 		{
-			if (assemble_list[i].ins == func)
-			{
-				fprintf(target_file, "\t.global\t%s\n", assemble_list[i].func_name);
-				fprintf(target_file, "\t.type %s, function\n", assemble_list[i].func_name);
-				fprintf(target_file,"%s:\n", assemble_list[i].func_name);
-			}
+			fprintf(target_file, "%s\n", assemble_list[i].content);
+			continue;
+		}
+		if (inst == label)
+		{
+			if (assemble_list[i].label == -1)
+				fprintf(target_file, "%s:\n", assemble_list[i].content);
 			else
 				fprintf(target_file,".L%d:\n", assemble_list[i].label);
+			continue;
+		}
+		if (inst == b_l)
+		{
+			fprintf(target_file, "\t%s\t%s\n", ins_name[inst-5000], assemble_list[i].content);
+			continue;
+		}
+		if (inst == beq || inst == bsl || inst == beg || inst == bsg ||inst == bel || inst == b || inst == bne)
+		{
+			fprintf(target_file, "\t%s\t.L%d\n", ins_name[inst-5000], assemble_list[i].label);
+			continue;
+		}
+		if (inst == ldw || inst == stw)
+		{
+			if (assemble_list[i].label != -1)
+				fprintf(target_file, "\t%s\tr%d, .L%d+%d\n", ins_name[inst-5000], assemble_list[i].Rd, assemble_list[i].label, assemble_list[i].Rm_Imm);
+			else
+			{
+				fprintf(target_file, "\t%s\tr%d, [r%d+], ", ins_name[inst-5000], assemble_list[i].Rd, assemble_list[i].Rn);
+				if (assemble_list[i].Rm_or_Imm == 0)
+					fprintf(target_file, "r");
+				else
+					fprintf(target_file, "#");
+				fprintf(target_file, "%d\n", assemble_list[i].Rm_Imm);
+			}
+			continue;
+		}
+		fprintf(target_file,"\t%s\t", ins_name[inst-5000]);
+		if (assemble_list[i].Rd != -1)
+			fprintf(target_file,"r%d, ", assemble_list[i].Rd);
+		if (assemble_list[i].Rn != -1)
+			fprintf(target_file,"r%d, ", assemble_list[i].Rn);
+		if (assemble_list[i].Rm_or_Imm == 0)
+		{
+			if (assemble_list[i].Rm_Imm != -1)
+				fprintf(target_file, "r%d", assemble_list[i].Rm_Imm);
 		}
 		else
+			fprintf(target_file, "#%d", assemble_list[i].Rm_Imm);
+		if (assemble_list[i].Rs_or_Imm == 1)
 		{
-			inst = assemble_list[i].ins;
-			if (inst == b_l || inst == beq || inst == bsl || inst == beg || inst == bsg ||inst == bel || inst == b || inst == bne)
-			{
-				if (inst == b_l)
-					fprintf(target_file, "\t%s\t%s\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].func_name);
-				else
-					fprintf(target_file, "\t%s\t.L%d\n", ins_name[assemble_list[i].ins-5000], assemble_list[i].label);
-			}
+			if (assemble_list[i].shift_direct == 0)
+				fprintf(target_file, "<<");
 			else
-			{	fprintf(target_file,"\t%s\t", ins_name[inst-5000]);
-				if (assemble_list[i].Rd != -1)
-					fprintf(target_file,"r%d, ", assemble_list[i].Rd);
-				if (assemble_list[i].Rn != -1)
-				{
-					if (assemble_list[i].ins == ldw || assemble_list[i].ins == stw)
-							fprintf(target_file,"[r%d+], ", assemble_list[i].Rn);
-					else
-						fprintf(target_file,"r%d, ", assemble_list[i].Rn);
-				}
-				if (assemble_list[i].Rm_or_Imm == 0)
-				{
-					if (assemble_list[i].Rm_Imm != -1)
-						fprintf(target_file,"r%d", assemble_list[i].Rm_Imm);
-				}
-				else
-					fprintf(target_file,"#%d", assemble_list[i].Rm_Imm);
-				if (assemble_list[i].Rs_or_Imm == 1)
-				{
-					fprintf(target_file,"<<#%d",assemble_list[i].Rs_Imm);
-				}
-				fprintf(target_file,"\n");
-			}
+				fprintf(target_file, ">>");
+			fprintf(target_file, "#%d", assemble_list[i].Rs_Imm);
 		}
+		fprintf(target_file, "\n");
 	}
 }
 

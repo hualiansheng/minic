@@ -36,7 +36,7 @@ struct symtbl_item
 	int size;			//used for arrays only, indicating the number of its elements
 	int func_off;
 	int offset;
-	int reg;
+	//int reg;
 };
 
 /*struct symtbl_func_para
