@@ -714,7 +714,7 @@ int rvalue_code(AST_NODE *p)
 				   temp_hdr = func_query(tree_root->symtbl, (p->leftChild->content).s_content);
 				   if(temp_hdr -> ret_type == CHAR_T && temp_hdr ->ret_star ==0) add_triple(call,temp_symtbl->func_off, (int)(p->leftChild->content).s_content,0, 1, 0);
 				   else if(temp_hdr -> ret_type == CHAR_T && temp_hdr ->ret_star ==1) add_triple(call,temp_symtbl->func_off, (int)(p->leftChild->content).s_content,2, 1, 0);
-				   if(temp_hdr -> ret_type == INT_T && temp_hdr ->ret_star ==1) add_triple(call,temp_symtbl->func_off, (int)(p->leftChild->content).s_content,3, 1, 0);
+				   else if(temp_hdr -> ret_type == INT_T && temp_hdr ->ret_star ==1) add_triple(call,temp_symtbl->func_off, (int)(p->leftChild->content).s_content,3, 1, 0);
 				   else add_triple(call,temp_symtbl->func_off, (int)(p->leftChild->content).s_content,1,1, 0);
 				   free(arg_list);
 				   free(arg_type_list);

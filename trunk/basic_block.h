@@ -41,6 +41,7 @@ typedef struct func_block {
 	int reg_used;
 	int reg_var[32];
 	int min_stack_size;
+	int global_label;
 }func_block;
 
 #endif
