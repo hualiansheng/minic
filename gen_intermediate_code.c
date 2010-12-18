@@ -389,8 +389,9 @@ int rvalue_code(AST_NODE *p)
 				   }
 				   else{
 					   if(p->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
+						   add_triple(c_str, (int)p->leftChild->leftChild->content.s_content, -1, 2, 3, -1);
 						   const_string = p->leftChild->leftChild->content.s_content;
-						   return -4;//return -3: 替换成一个string constant
+						   return triple_list_index - 1;//return -3: 替换成一个string constant
 					   }
 					   else if(p->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
 						   const_value = p->leftChild->leftChild->content.c_content;
