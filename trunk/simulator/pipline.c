@@ -285,8 +285,12 @@ int pipline_Mem(PIPLINE* pipline, CPU_info* cpu_info){
 			else
 				cpu_info->wr_mem_times ++;
 			// visit memory
-			if(data->L == 1)
-				pipline->regs->r[data->Rd] = cache_return.data;
+			if(data->L == 1){
+				if(data->B == 0)
+					pipline->regs->r[data->Rd] = cache_return.data;
+				else
+					pipline->regs->r[data->Rd] = cache_return.data & 0x000000FF;
+			}
 			else{
 				//printf("store.\n");
 				// Handle PC is Rd

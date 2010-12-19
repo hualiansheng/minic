@@ -1,5 +1,6 @@
+	.text
 	.global	qsort
-	.type qsort, function
+	.type	qsort,function
 qsort:
 	stw	r31, [r29+], #-4
 	stw	r30, [r29+], #-8
@@ -85,8 +86,10 @@ qsort:
 	ldw	r29, [r27+], #-8
 	ldw	r27, [r27+], #-12
 	jump	r30
+.L9:
+	.text
 	.global	main
-	.type main, function
+	.type	main,function
 main:
 	stw	r31, [r29+], #-4
 	stw	r30, [r29+], #-8
@@ -98,10 +101,10 @@ main:
 	stw	r3, [r27+], #-532
 	ldw	r5, [r27+], #-532
 	mov	r7, #0
-.L11:
+.L12:
 	cmpsub.a	r7, #128
-	beg	.L10
-.L9:
+	beg	.L11
+.L10:
 	add	r6, r5, r7<<#2
 	stw	r5, [r27+], #-532
 	stw	r6, [r29+], #-4
@@ -117,13 +120,13 @@ main:
 	stw	r4, [r6+], #0
 	add	r4, r7, #1
 	mov	r7, r4
-	b	.L11
-.L10:
+	b	.L12
+.L11:
 	mov	r7, #0
-.L14:
+.L15:
 	cmpsub.a	r7, #128
-	beg	.L13
-.L12:
+	beg	.L14
+.L13:
 	add	r4, r5, r7<<#2
 	ldw	r4, [r4+], #0
 	stw	r5, [r27+], #-532
@@ -140,8 +143,8 @@ main:
 	ldw	r5, [r27+], #-532
 	add	r4, r7, #1
 	mov	r7, r4
-	b	.L14
-.L13:
+	b	.L15
+.L14:
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, #10
@@ -161,10 +164,10 @@ main:
 	b.l	qsort
 	ldw	r5, [r27+], #-532
 	mov	r7, #0
-.L17:
+.L18:
 	cmpsub.a	r7, #128
-	beg	.L16
-.L15:
+	beg	.L17
+.L16:
 	add	r4, r5, r7<<#2
 	ldw	r4, [r4+], #0
 	stw	r5, [r27+], #-532
@@ -181,15 +184,16 @@ main:
 	ldw	r5, [r27+], #-532
 	add	r4, r7, #1
 	mov	r7, r4
-	b	.L17
-.L16:
+	b	.L18
+.L17:
 	mov	r0, #10
 	b.l	print_char
 	mov	r0, #10
 	b.l	print_char
 	mov	r0, #0
-.L18:
+.L19:
 	ldw	r30, [r27+], #-4
 	ldw	r29, [r27+], #-8
 	ldw	r27, [r27+], #-12
 	jump	r30
+.L20:
