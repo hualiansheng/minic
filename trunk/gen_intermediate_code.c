@@ -380,7 +380,7 @@ int rvalue_code(AST_NODE *p)
 				   if(p->leftChild->nodeType == LVALUE){
 					   temp_rvalue = gen_triple_code[p->leftChild->nodeType-FUNC_OFFSET](p->leftChild);
 					   if(temp_rvalue != -1){
-						   add_triple(star_op, temp_rvalue, -1, triple_list[temp_rvalue].result_type, 1, -1);
+						   add_triple(star_op, temp_rvalue, -1, (triple_list[temp_rvalue].result_type == 2)?0:1, 1, -1);
 						   return triple_list_index-1;
 					   }
 					   else{
