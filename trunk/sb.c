@@ -9,13 +9,18 @@ char* f(int x)
 {
 	char* p;
 	p = s;
+	s[1] = c;
 	return p;
 }
 int main()
 {
 	int num;
+	a[1] = 1;
+	a[2] = 1;
+	a[3] = a[2];
 	num = i + 500;
 	q = &i;
 	p = f(a[1]);
+	
 	return num;
 }

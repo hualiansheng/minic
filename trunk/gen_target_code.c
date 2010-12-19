@@ -114,7 +114,12 @@ int memory_allocation()
 			if (!(fb->mapping[i].isTmp == 1 && fb->reg_alloc[i] != -1))
 			{
 				if (fb->uni_table[i]->size != -1)
-					off -= 4*fb->uni_table[i]->size;
+				{
+					if (fb->uni_table[i]->type == INT_T)
+						off -= 4*fb->uni_table[i]->size;
+					else
+						off -= (fb->uni_table[i]->size+3)/4;
+				}
 				fb->uni_table[i]->offset = off;
 				off -= 4;
 			}
@@ -308,7 +313,7 @@ int add_assemble(int label, enum instruction ins, int Rn, int Rd, int shift_dire
 
 int add_special(char *content, enum instruction ins)
 {	
-	if ((assemble_num+1)*sizeof(assemble) > assemble_size)
+	if ((assemble_num+1)*sizeof(assemble) > assemble_size)  
 		adjustSize((void**)&assemble_list, &assemble_size);
 	assemble_list[assemble_num].content = content;	
 	assemble_list[assemble_num].label = -1;
@@ -770,7 +775,10 @@ int star_code(func_block *fb, int i)
 		u1 = triple_list[index_index[i]].arg1_uni;
 		r1 = fb->reg_alloc[u1];
 		r1 = load_operator(fb, u1, r1, 1);
-		store_result(fb, i, ldw, u0, r1, r0, 0, 0, -1, 1, 0);
+		if (triple_list[index_index[i]].result_type != 0)
+			store_result(fb, i, ldw, u0, r1, r0, 0, 0, -1, 1, 0);
+		else
+			store_result(fb, i, ldb, u0, r1, r0, 0, 0, -1, 1, 0);
 	}
 	return 0;
 }
@@ -825,7 +833,11 @@ int star_assign_code(func_block *fb, int i)
 		r2 = 3;
 		add_assemble(-1, mov, -1, r2, 0, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value);
 	}
-	add_assemble(-1, stw, r1, r2, 0, 0, -1, 1, 0);
+	//fprintf(stderr,"result_type: %d\n",triple_list[index_index[i]].result_type );
+	if (triple_list[index_index[i]].result_type != 0)
+		add_assemble(-1, stw, r1, r2, 0, 0, -1, 1, 0);
+	else
+		add_assemble(-1, stb, r1, r2, 0, 0, -1, 1, 0);
 	if (check_live(fb, i, 1))
 	{
 		r0 = fb->reg_alloc[u0];
