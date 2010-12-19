@@ -17,7 +17,7 @@ extern basic_block *bblist;
 extern func_block *fblist;
 extern int block_num;
 
-char *ins_name[] = {"", "", "ldw", "stw", "b.l", "mov", "add", "sub", "rsub", "mul", "jump","cmpsub.a", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
+char *ins_name[] = {"", "", "ldw", "stw","ldb", "stb",  "b.l", "mov", "add", "sub", "rsub", "mul", "jump","cmpsub.a", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
 };
 extern assemble *assemble_list;
 extern int assemble_num;
@@ -283,7 +283,7 @@ void print_target_code(FILE* target_file)
 			fprintf(target_file, "\t%s\t.L%d\n", ins_name[inst-5000], assemble_list[i].label);
 			continue;
 		}
-		if (inst == ldw || inst == stw)
+		if (inst == ldw || inst == stw || inst == ldb || inst == stb)
 		{
 			if (assemble_list[i].label != -1)
 				fprintf(target_file, "\t%s\tr%d, .L%d+%d\n", ins_name[inst-5000], assemble_list[i].Rd, assemble_list[i].label, assemble_list[i].Rm_Imm);

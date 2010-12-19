@@ -391,11 +391,11 @@ int rvalue_code(AST_NODE *p)
 					   if(p->leftChild->leftChild->nodeType == STRING_CONSTANT_T){
 						   add_triple(c_str, (int)p->leftChild->leftChild->content.s_content, -1, 2, 3, -1);
 						   const_string = p->leftChild->leftChild->content.s_content;
-						   return triple_list_index - 1;//return -3: 替换成一个string constant
+						   return triple_list_index - 1;//return -4: 替换成一个string constant
 					   }
 					   else if(p->leftChild->leftChild->nodeType == CHAR_CONSTANT_T){
 						   const_value = p->leftChild->leftChild->content.c_content;
-						   return -3;//return -2 : rvalue 应该被替换成一个constant
+						   return -3;//return -3 : rvalue 应该被替换成一个constant
 					   }
 					   else if(p->leftChild->leftChild->nodeType == ICONSTANT_T){
 						   const_value = p->leftChild->leftChild->content.i_content;
@@ -651,8 +651,8 @@ int rvalue_code(AST_NODE *p)
 								*/
 						   }
 						   else if(temp_rvalue == -3){
-							   arg_list[arg_num] = (int)const_string;
-							   arg_type_list[arg_num] = 3;
+							   arg_list[arg_num] = (int)const_value;
+							   arg_type_list[arg_num] = 2;
 							   arg_num ++;
 						   }
 
@@ -694,8 +694,8 @@ int rvalue_code(AST_NODE *p)
 								*/
 						   }
 						   else if(temp_rvalue == -3){
-							   arg_list[arg_num] = (int)const_string;
-							   arg_type_list[arg_num] = 3;
+							   arg_list[arg_num] = (int)const_value;
+							   arg_type_list[arg_num] = 2;
 							   arg_num ++;
 						   }
 						   else{
