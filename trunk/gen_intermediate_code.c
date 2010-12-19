@@ -753,13 +753,13 @@ int lvalue_code(AST_NODE *p)
 		temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
 		b_ident = p->leftChild->content.s_content;
 		assert(temp_symtbl != NULL);
-		if(temp_symtbl->type == CHAR_T ) b_sizetype = 0;
-		else b_sizetype = 1;
+		if(temp_symtbl->type == CHAR_T ) b_sizetype = 2;
+		else b_sizetype = 3;
 
 		ptr = p->leftChild->rightSibling->rightSibling;
 		temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 
-		if(b_sizetype == 0){
+		if(b_sizetype == 2){
 			switch(temp_rvalue){
 				case -1:{
 							temp_symtbl = symtbl_query(ptr->symtbl,temp_ID, 0);
@@ -1138,7 +1138,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 									  add_triple(char_to_int_op, var1, -1, 1, var_type1, -1);
 									  temp_index = triple_list_index - 1;
 									  if(size_type2 == 1 || size_type2 == 2){
-										  add_triple(minus_op, var2, temp_index, size_type2, 1, var_type2);								
+										  add_triple(minus_op, temp_index, var2, size_type2, 1, var_type2);								
 									  }
 									  else add_triple(minuss_op, var1, temp_index, size_type1 ,var_type1, 1);
 								  }
