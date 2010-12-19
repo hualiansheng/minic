@@ -28,7 +28,7 @@ int star_assign_code(func_block *fb, int i);
 int add_code(func_block *fb, int i);
 int minus_code(func_block *fb, int i);
 int multiply_code(func_block *fb, int i);
-int char_to_int_code(func_block *fb, int i);
+int char_int_code(func_block *fb, int i);
 int equal_code(func_block *fb, int i);
 int less_code(func_block *fb, int i);
 int larger_code(func_block *fb, int i);
@@ -47,11 +47,10 @@ int leaveF_code(func_block *fb, int i);
 int leaveS_code(func_block *fb, int i);
 int rtn_code(func_block *fb, int i);
 int array_shift_code(func_block *fb, int i);
-int int_to_char_code(func_block *fb, int i);
 int Imm_code(func_block *fb, int i);
 int r_shift_code(func_block *fb, int i);
 int (*g[36])(func_block*, int) = {
-	if_goto_code, if_goto_code, goto_code, negative_code, not_code, address_code, star_code, positive_code, assign_code, star_assign_code, add_code, minus_code, multiply_code, char_to_int_code, equal_code, less_code, larger_code, eqlarger_code, eqless_code, noteq_code, or_code, and_code, get_rb_code, set_rb_code, call_code, param_code, enterF_code, enterS_code, leaveF_code, leaveS_code, rtn_code, array_shift_code, int_to_char_code, Imm_code, array_shift_code, r_shift_code
+	if_goto_code, if_goto_code, goto_code, negative_code, not_code, address_code, star_code, positive_code, assign_code, star_assign_code, add_code, minus_code, multiply_code, char_int_code, equal_code, less_code, larger_code, eqlarger_code, eqless_code, noteq_code, or_code, and_code, get_rb_code, set_rb_code, call_code, param_code, enterF_code, enterS_code, leaveF_code, leaveS_code, rtn_code, array_shift_code, char_int_code, Imm_code, array_shift_code, r_shift_code
 };
 int initial();
 int memory_allocation();
@@ -934,8 +933,19 @@ int multiply_code(func_block *fb, int i)
 	return 0;
 }
 
-int char_to_int_code(func_block *fb, int i)
+int char_int_code(func_block *fb, int i)
 {
+	int u0, u1, r0, r1;
+	u0 = triple_list[index_index[i]].tmp_uni;
+	u1 = triple_list[index_index[i]].arg1_uni;
+	r0 = fb->reg_alloc[u0];
+	if (u1 != -1)
+	{
+		r1 = load_operator(fb, u1, fb->reg_alloc[u1], 2);
+		store_result(fb, i, mov, u0, -1, r0, 0, 0, -1, 0, r1);
+	}
+	else
+		store_result(fb, i, mov, u0, -1, r0, 0, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
 	return 0;
 }
 
@@ -1210,11 +1220,6 @@ int array_shift_code(func_block *fb, int i)
 		else
 			store_result(fb, i, ins, u0, r1, r0, 0, 0, -1, 1, triple_list[index_index[i]].arg2.imm_value*4);
 	}
-	return 0;
-}
-
-int int_to_char_code(func_block *fb, int i)
-{
 	return 0;
 }
 
