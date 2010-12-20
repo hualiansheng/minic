@@ -1,0 +1,29 @@
+\input{style}
+\begin{document}
+% 设置章节标题格式
+\CTEXsetup[format={\raggedright}]{chapter}
+\CTEXsetup[format={\raggedright\Large\bfseries}]{section}
+\CTEXsetup[format={\raggedright\large\bfseries}]{subsection}
+\CTEXsetup[format={\raggedright\normalsize\bfseries}]{subsubsection}
+% 设置代码引用格式
+\lstset{language=C, numbers=left, basicstyle=\small,
+  keywordstyle=\color{blue}, commentstyle=\color{PineGreen},
+  stringstyle=\color{red}, frame=shadowbox, breaklines=true,
+  backgroundcolor=\color{lightgray}, extendedchars=true
+}
+%
+%封面
+\input{cover}
+\tableofcontents
+\chapter*{简介}
+\input{introduction}
+\chapter{词法、语法分析}
+\input{lex_bison}
+\chapter{中间表示}
+\input{intermidiate}
+\chapter{目标代码}
+\input{target_code}
+\chapter{编译-体系联合实验}
+\input{joint}
+\input{appendix}
+\end{document}

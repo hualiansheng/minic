@@ -1,0 +1,34 @@
+%CTeX的report文档类   如果是article就用ctexart
+\documentclass[a4paper,winfonts]{ctexrep}
+% ------------------------------------------------------------------------------------------------------
+%额外的数学符号支持
+%\usepackage{amsthm}
+%额外的注脚支持
+\usepackage[stable]{footmisc}
+%页边距设置
+\usepackage[top=0.8in,bottom=0.8in, left=0.8in, right=0.8in]{geometry}
+%图片引用及格式支持
+\usepackage{graphicx}
+%长表格支持
+\usepackage{longtable}
+\usepackage{dingbat}
+%超链接目录支持
+\usepackage[CJKbookmarks=true,colorlinks,linkcolor=blue]{hyperref}    
+%彩色支持、更多的色彩名称
+\usepackage[usenames,dvipsnames]{color}
+%代码高亮段支持
+\usepackage{listings} %source code printing support
+%subsubsubsection支持
+\setcounter{secnumdepth}{5}
+\renewcommand\theparagraph{\alph{paragraph}} \usepackage{lipsum}
+
+%浅灰色（代码底色）
+\definecolor{lightgray}{RGB}{230,230,230}
+%常用emacs命令
+%C-c C-q C-s(-e) Indentation
+%C-c C-s new section
+%C-c C-e new environment
+%C-c C-c compile
+%C-c C-v preview
+\lstdefinelanguage[scheme]{Lisp}{morekeywords={define}}
+\usepackage{dirtree}

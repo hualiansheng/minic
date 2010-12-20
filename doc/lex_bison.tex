@@ -1,0 +1,29 @@
+\section{词法分析, flex}
+\label{flex}
+词法分析的目的是将输入的源文件中的符号识别为语法分析器能够接受的tokens。其基本原理是利用正则表达式pattern来匹配、分割源文件中的符号。同时，词法分析还需要识别并保存一些名字和常量，比如函数名、变量名和字符串常量。
+
+MiniC的词法规则同标准C的对应规则基本相同：
+\begin{enumerate}
+	\item 标识符必须以下划线或大小写字母开头，由下划线、大小写字母和数字组成
+	\item 字符常量需要放在单引号\verb|''|中，字符串常量需要放在双引号\verb|""|中
+	\item 有如下保留字不能当作标识符：\verb|extern|, \verb|register|, \verb|void|, \verb|int|, \verb|char|, \verb|if|, \verb|else|, \verb|for|, \verb|while|, \verb|return|
+	\item 特殊符号包括：\verb#{}, (), [], +, -, *, !, &, =, |, >, <#
+\end{enumerate}
+由于语法分析器bison实际上不能获得\hyperref[ASTnode]{AST叶节点}上的信息，因此生成AST叶节点的工作交由flex完成。\\
+\noindent
+{\it \anchor flex源文件请参阅：\verb|minic.l|}
+\section{语法分析, bison}
+\label{bison}
+语法分析的目的是根据语言的BNF范式，将词法分析器提交的token流进行规约，在规约的同时应用一些语法规则。语法分析的结果有两个：
+\begin{enumerate}
+	\item 将\emph{语法正确}的源文件转换为语法规则所要求的中间形式，这一中间形式不在具有语言的语法特性，或
+	\item 发现语法错误，如果错误能够暂时恢复，就继续语法分析，在完成后提示错误信息；否则，直接停止语法分析，报告错误。
+\end{enumerate}
+MiniC项目利用bison辅助进行语法分析，分析完成后，将建立一棵AST。
+
+在介绍对bison的利用前，由于我们的项目修改了给定的MiniC文法，所以首先要对修改后的文法进行说明。
+\subsection{MiniC文法}
+{\noindent \it \anchor 本项目的全部BNF范式请参阅：\verb|BNF|}\\
+我们对原MiniC文法的改动主要在其表达式文法部分。
+
+\section{语法错误检查}
