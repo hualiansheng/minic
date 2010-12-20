@@ -1,5 +1,6 @@
+	.text
 	.global	main
-	.type main, function
+	.type	main,function
 main:
 	stw	r31, [r29+], #-4
 	stw	r30, [r29+], #-8
@@ -48,7 +49,7 @@ main:
 	ldw	r4, [r27+], #-532
 	stw	r4, [r27+], #-532
 	stw	r5, [r27+], #-16
-	mov	r0, #10
+	mov	r0, #0
 	b.l	print_char
 	ldw	r5, [r27+], #-16
 	ldw	r4, [r27+], #-532
@@ -56,11 +57,11 @@ main:
 	b	.L6
 .L5:
 	stw	r4, [r27+], #-532
-	mov	r0, #10
+	mov	r0, #0
 	b.l	print_char
 	ldw	r4, [r27+], #-532
 	stw	r4, [r27+], #-532
-	mov	r0, #10
+	mov	r0, #0
 	b.l	print_char
 	ldw	r4, [r27+], #-532
 	mov	r5, #0
@@ -113,7 +114,7 @@ main:
 	ldw	r4, [r27+], #-532
 	stw	r4, [r27+], #-532
 	stw	r5, [r27+], #-16
-	mov	r0, #10
+	mov	r0, #0
 	b.l	print_char
 	ldw	r5, [r27+], #-16
 	ldw	r4, [r27+], #-532
@@ -128,3 +129,4 @@ main:
 	ldw	r29, [r27+], #-8
 	ldw	r27, [r27+], #-12
 	jump	r30
+.L19:

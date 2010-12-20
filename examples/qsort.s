@@ -137,7 +137,7 @@ main:
 	ldw	r5, [r27+], #-532
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
-	mov	r0, #32
+	mov	r0, #0
 	b.l	print_char
 	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
@@ -147,13 +147,13 @@ main:
 .L14:
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
-	mov	r0, #10
+	mov	r0, #0
 	b.l	print_char
 	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
-	mov	r0, #10
+	mov	r0, #0
 	b.l	print_char
 	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
@@ -178,7 +178,7 @@ main:
 	ldw	r5, [r27+], #-532
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
-	mov	r0, #32
+	mov	r0, #0
 	b.l	print_char
 	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
@@ -186,9 +186,9 @@ main:
 	mov	r7, r4
 	b	.L18
 .L17:
-	mov	r0, #10
+	mov	r0, #0
 	b.l	print_char
-	mov	r0, #10
+	mov	r0, #0
 	b.l	print_char
 	mov	r0, #0
 .L19:
