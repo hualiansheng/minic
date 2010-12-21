@@ -5,13 +5,17 @@
 %\usepackage{amsthm}
 %额外的注脚支持
 \usepackage[stable]{footmisc}
+%caption for environment
+\usepackage{caption}
 %页边距设置
 \usepackage[top=0.8in,bottom=0.8in, left=0.8in, right=0.8in]{geometry}
 %图片引用及格式支持
 \usepackage{graphicx}
 %长表格支持
 \usepackage{longtable}
+%more symbols
 \usepackage{dingbat}
+\usepackage{manfnt}
 %超链接目录支持
 \usepackage[CJKbookmarks=true,colorlinks,linkcolor=blue]{hyperref}    
 %彩色支持、更多的色彩名称
@@ -30,5 +34,19 @@
 %C-c C-e new environment
 %C-c C-c compile
 %C-c C-v preview
-\lstdefinelanguage[scheme]{Lisp}{morekeywords={define}}
+\setmonofont{Courier New}
+\lstset{ language={[ANSI]C},
+         showspaces=false,
+         showtabs=false,
+         tabsize=4,
+         frame=single,
+         framerule=1pt,
+         %numbers=left,
+         %numberstyle=\small,
+         basicstyle=\tt,
+         directivestyle=\tt,
+         identifierstyle=\tt,
+         commentstyle=\tt,
+         stringstyle=\tt,
+         keywordstyle=\color{blue}\tt }
 \usepackage{dirtree}
