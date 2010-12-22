@@ -43,6 +43,8 @@ f:
 	.ascii	"\000"
 .LC3:
 	.ascii	"penglaobandashabi\000"
+.LC4:
+	.ascii	"\n\000"
 	.text
 	.global	main
 	.type	main,function
@@ -89,6 +91,29 @@ main:
 	mov	r5, r4
 	ldw	r1, .L4+12
 	stw	r5, [r1+], #0
+	stw	r7, [r27+], #-16
+	mov	r0, r5
+	b.l	print_string
+	ldw	r10, .L4+0
+	ldw	r1, .L4+4
+	ldw	r8, [r1+], #0
+	ldw	r7, [r27+], #-16
+	ldw	r1, .L4+8
+	ldw	r6, [r1+], #0
+	ldw	r1, .L4+12
+	ldw	r5, [r1+], #0
+	ldw	r4, .L4+28
+	stw	r7, [r27+], #-16
+	mov	r0, r4
+	b.l	print_string
+	ldw	r10, .L4+0
+	ldw	r1, .L4+4
+	ldw	r8, [r1+], #0
+	ldw	r7, [r27+], #-16
+	ldw	r1, .L4+8
+	ldw	r6, [r1+], #0
+	ldw	r1, .L4+12
+	ldw	r5, [r1+], #0
 	add	r4, r10, #4
 	ldw	r4, [r4+], #0
 	mov	r0, r4
@@ -111,3 +136,4 @@ main:
 	.word	.LC2
 	.word	.LC0
 	.word	.LC3
+	.word	.LC4

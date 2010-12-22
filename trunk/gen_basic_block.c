@@ -8,6 +8,8 @@ extern int triple_list_index;
 basic_block *bblist;
 func_block *fblist;
 int block_num;
+int gen_predecessor();
+int set_predecessor(basic_block *pre, basic_block *suc);
 
 int gen_basic_block()
 {
@@ -109,5 +111,42 @@ int gen_basic_block()
 	cur_func->over = cur_block;
 	cur_func->bb_num = m;
 	free(isLeader);
+	gen_predecessor();
 	return 0;
 }
+
+int gen_predecessor()
+{
+	basic_block *bb;
+	for (bb = bblist; bb != NULL; bb = bb->next)
+		bb->predecessor = NULL;
+	for (bb = bblist; bb != NULL; bb = bb->next)
+	{
+		if (bb->follow != NULL)
+			set_predecessor(bb, bb->follow);
+		if (bb->jump != NULL)
+			set_predecessor(bb, bb->jump);
+	}
+	return 0;
+}
+
+int set_predecessor(basic_block *pre, basic_block *suc)
+{
+	PreList *p;
+	if (suc->predecessor == NULL)
+	{
+		suc->predecessor = (PreList*)malloc(sizeof(PreList));
+		suc->predecessor->m = pre->m;
+		suc->predecessor->next = NULL;
+	}
+	else
+	{
+		for (p = suc->predecessor; p->next != NULL; p = p->next)
+			;
+		p->next = (PreList*)malloc(sizeof(PreList));
+		p->next->m = pre->m;
+		p->next->next = NULL;
+	}
+	return 0;
+}
+

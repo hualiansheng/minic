@@ -1110,7 +1110,8 @@ int call_code(func_block *fb, int i)
 			}
 			else
 			{
-				add_assemble(-1, stw, 27, j, 0, 0, -1, 1, fb->uni_table[u]->offset);
+				if (!fb->uni_table[u]->isGlobal)
+					add_assemble(-1, stw, 27, j, 0, 0, -1, 1, fb->uni_table[u]->offset);
 				fb->reg_var[j] = -1;
 			}
 		}

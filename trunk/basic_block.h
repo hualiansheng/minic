@@ -2,6 +2,11 @@
 #define BASIC_BLOCK_H_
 #include "symtbl.h"
 
+typedef struct PreList {
+	int m;
+	struct PreList* next;
+}PreList;
+
 typedef struct basic_block {
 	int begin;
 	int end;
@@ -11,6 +16,7 @@ typedef struct basic_block {
 	struct basic_block* follow;
 	struct basic_block* jump;
 	struct func_block* fb;
+	PreList *predecessor;
 }basic_block;
 
 typedef struct map_table {
