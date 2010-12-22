@@ -7,10 +7,10 @@ main:
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
-	sub	r29, r29, #27
-	add	r3, r27, #-19
 	stw	r3, [r27+], #-23
 	ldw	r5, [r27+], #-23
+	sub	r29, r29, #27
+	add	r3, r27, #-19
 	mov	r7, #0
 .L3:
 	cmpsub.a	r7, #10

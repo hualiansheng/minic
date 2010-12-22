@@ -258,8 +258,7 @@ void print_target_code(FILE* target_file, int dispatch_flag)
 	
 	int i,j;
 	enum instruction inst;
-	if(dispatch_flag)
-		fprintf(stderr,"Optmize option: assemble dispatch - on\n");
+
 	for (j = 0; j < assemble_num; j++)
 	{
 		//to decide whether using the result of assmeble dispatch.
