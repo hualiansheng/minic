@@ -1,5 +1,4 @@
 #include "register.h"
-#include "symtbl_operation.c"
 extern assamble *assamble_list;
 extern int assemble_num;
 
@@ -18,10 +17,11 @@ void inst_block();
 void topo_sort(int begin, int end);
 void create_dep_graph(int begin, int end);
 void do_first(int x);
-
+int adjustSize(void**p, int*size);
 void instruction_dispatch()
 {
 	int i;
+	inst_block();
 	assamble_dispatch_index = malloc(sizeof(int) * assemble_num);
 	for(i = 0 ; i < assemble_num ; i++)	assamble_dispatch_index[i] = i;
 	for(i = 0 ; i < instruction_block_num ; i++){

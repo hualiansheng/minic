@@ -1,4 +1,4 @@
-OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o
+OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o instruction_dispatch.o
 CSCOPE = *.c *.h *.l *.y
 ARGS = -g -Wall
 minic: $(OBJECT)
@@ -35,6 +35,8 @@ register_allocation.o: register_allocation.c register.h basic_block.h register_s
 	gcc $(ARGS) -c register_allocation.c
 gen_target_code.o: gen_target_code.c register.h register_stats.h
 	gcc $(ARGS) -c gen_target_code.c
+instruction_dispatch.o:instruction_dispatch.c register.h 
+	gcc $(ARGS) -c instruction_dispatch.c
 cscope: $(CSCOPE)
 	cscope -Rbq
 clean:
