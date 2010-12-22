@@ -18,16 +18,16 @@ f:
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
-	sub	r29, r29, #24
 	stw	r0, [r27+], #-16
 	ldw	r5, .L2+0
+	sub	r29, r29, #24
 	ldw	r1, .L2+4
-	ldw	r4, [r1+], #0
-	ldw	r6, .L2+8
-	ldw	r6, .L2+12
 	add	r5, r5, #1
+	ldw	r4, [r1+], #0
 	stb	r4, [r5+], #0
+	ldw	r6, .L2+8
 	mov	r0, r6
+	ldw	r6, .L2+12
 .L1:
 	ldw	r30, [r27+], #-4
 	ldw	r29, [r27+], #-8
