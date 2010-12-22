@@ -18,4 +18,5 @@ int print_live_var();
 int register_allocation(int);
 int gen_target_code();
 int print_target_code();
+void instruction_dispatch();
 #endif

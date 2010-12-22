@@ -36,7 +36,7 @@ register_allocation.o: register_allocation.c register.h basic_block.h register_s
 gen_target_code.o: gen_target_code.c register.h register_stats.h
 	gcc $(ARGS) -c gen_target_code.c
 instruction_dispatch.o:instruction_dispatch.c register.h 
-	gcc $(ARGS) -c instruction_dispatch.c
+	gcc $(ARGS) gen_target_code.o -c instruction_dispatch.c
 cscope: $(CSCOPE)
 	cscope -Rbq
 clean:
