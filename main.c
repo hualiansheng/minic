@@ -252,9 +252,9 @@ int main(int argc, char** argv)
 	gen_target_code();
 	fprintf(stderr,"done.\n");
 	
-	fprintf(stderr,"Dispatch assemble instructions...");
-	instruction_dispatch();
-	fprintf(stderr,"done.\n");
+	//fprintf(stderr,"Dispatch assemble instructions...");
+	//instruction_dispatch();
+	//fprintf(stderr,"done.\n");
 	if(dispatch_flag)
 		fprintf(stderr,"OPTIMIZATION: Will use dispatched assemble!\n");
 

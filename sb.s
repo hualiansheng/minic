@@ -1,96 +1,113 @@
-	.file	"sb.c"
 	.comm	i, 4, 4
 	.comm	a, 40000000, 4
 	.comm	q, 4, 4
 	.comm	c, 1, 1
-	.comm	p, 4, 4
+	.comm	p, 1, 4
 	.comm	s, 98, 4
+	.section	.rodata
+.LC0:
+	.ascii	"hualiansheng\000"
+.LC1:
+	.ascii	"abcdefg\000"
 	.text
-	.align	2
 	.global	f
 	.type	f,function
 f:
-	@ args = 0, pretend = 0, frame = 8
-	@ frame_needed = 1, uses_anonymous_args = 0
-	mov	ip, sp
-	stw	pc, [sp-], #4;
-	stw	lr, [sp-], #8;
-	stw	ip, [sp-], #12;
-	stw	ip, [sp-], #12;stw	fp, [sp-], #16;
-	stw	ip, [sp-], #12;stw	fp, [sp-], #16;sub	sp, sp, #16;
-	sub	fp, ip, #4
-	sub	sp, sp, #8
-	stw	r0, [fp+], #-20
-	ldw	r15, .L3
-	stw	r15, [fp+], #-16
-	ldw	r15, .L3+4
-	ldb	r14, [r15+], #0	@ zero_extendqisi2
-	ldw	r15, .L3
-	stb	r14, [r15+], #1
-	ldw	r15, [fp+], #-16
-	mov	r0, r15
-	mov	ip, fp
-	ldw	fp,  [fp-], #12
-	ldw	sp,  [ip-], #8
-	ldw	ip,  [ip-], #4
-	jump	ip
-.L4:
-	.align	2
-.L3:
+	stw	r31, [r29+], #-4
+	stw	r30, [r29+], #-8
+	stw	r29, [r29+], #-12
+	stw	r27, [r29+], #-16
+	sub	r27, r29, #4
+	sub	r29, r29, #24
+	stw	r0, [r27+], #-16
+	ldw	r5, .L2+0
+	ldw	r1, .L2+4
+	ldw	r4, [r1+], #0
+	ldw	r6, .L2+8
+	ldw	r6, .L2+12
+	add	r5, r5, #1
+	stb	r4, [r5+], #0
+	mov	r0, r6
+.L1:
+	ldw	r30, [r27+], #-4
+	ldw	r29, [r27+], #-8
+	ldw	r27, [r27+], #-12
+	jump	r30
+.L2:
 	.word	s
 	.word	c
-	.size	f, .-f
-	.align	2
+	.word	.LC0
+	.word	.LC1
+	.section	.rodata
+.LC2:
+	.ascii	"\000"
+.LC3:
+	.ascii	"penglaobandashabi\000"
+	.text
 	.global	main
 	.type	main,function
 main:
-	@ args = 0, pretend = 0, frame = 4
-	@ frame_needed = 1, uses_anonymous_args = 0
-	mov	ip, sp
-	stw	pc, [sp-], #4;
-	stw	lr, [sp-], #8;
-	stw	ip, [sp-], #12;
-	stw	ip, [sp-], #12;stw	fp, [sp-], #16;
-	stw	ip, [sp-], #12;stw	fp, [sp-], #16;sub	sp, sp, #16;
-	sub	fp, ip, #4
-	sub	sp, sp, #4
-	ldw	r15, .L7
-	mov	r14, #1
-	stw	r14, [r15+], #4
-	ldw	r15, .L7
-	mov	r14, #1
-	stw	r14, [r15+], #8
-	ldw	r15, .L7
-	ldw	r14, [r15+], #8
-	ldw	r15, .L7
-	stw	r14, [r15+], #12
-	ldw	r15, .L7+4
-	ldw	r15, [r15+], #0
-	add	r15, r15, #500
-	stw	r15, [fp+], #-16
-	ldw	r15, .L7+8
-	ldw	r14, .L7+4
-	stw	r14, [r15+], #0
-	ldw	r15, .L7
-	ldw	r15, [r15+], #4
-	mov	r0, r15
+	stw	r31, [r29+], #-4
+	stw	r30, [r29+], #-8
+	stw	r29, [r29+], #-12
+	stw	r27, [r29+], #-16
+	sub	r27, r29, #4
+	sub	r29, r29, #20
+	ldw	r10, .L4+0
+	ldw	r1, .L4+4
+	ldw	r8, [r1+], #0
+	ldw	r7, [r27+], #-16
+	ldw	r1, .L4+8
+	ldw	r6, [r1+], #0
+	ldw	r1, .L4+12
+	ldw	r5, [r1+], #0
+	add	r4, r10, #4
+	mov	r3, #1
+	stw	r3, [r4+], #0
+	add	r4, r10, #8
+	mov	r3, #1
+	stw	r3, [r4+], #0
+	add	r9, r10, #12
+	add	r4, r10, #8
+	ldw	r4, [r4+], #0
+	stw	r4, [r9+], #0
+	add	r4, r8, #500
+	mov	r7, r4
+	ldw	r4, .L4+4
+	mov	r6, r4
+	ldw	r1, .L4+8
+	stw	r6, [r1+], #0
+	ldw	r4, .L4+16
+	mov	r5, r4
+	ldw	r1, .L4+12
+	stw	r5, [r1+], #0
+	ldw	r4, .L4+20
+	mov	r5, r4
+	ldw	r1, .L4+12
+	stw	r5, [r1+], #0
+	ldw	r4, .L4+24
+	mov	r5, r4
+	ldw	r1, .L4+12
+	stw	r5, [r1+], #0
+	add	r4, r10, #4
+	ldw	r4, [r4+], #0
+	mov	r0, r4
 	b.l	f
-	mov	r14, r0
-	ldw	r15, .L7+12
-	stw	r14, [r15+], #0
-	ldw	r15, [fp+], #-16
-	mov	r0, r15
-	mov	ip, fp
-	ldw	fp,  [fp-], #12
-	ldw	sp,  [ip-], #8
-	ldw	ip,  [ip-], #4
-	jump	ip
-.L8:
-	.align	2
-.L7:
+	mov	r4, r0
+	mov	r5, r4
+	ldw	r1, .L4+12
+	stw	r5, [r1+], #0
+	mov	r0, r7
+.L3:
+	ldw	r30, [r27+], #-4
+	ldw	r29, [r27+], #-8
+	ldw	r27, [r27+], #-12
+	jump	r30
+.L4:
 	.word	a
 	.word	i
 	.word	q
 	.word	p
-	.size	main, .-main
-	.ident	"GCC: (UC4_1.0_gama_20101126) 4.4.2"
+	.word	.LC2
+	.word	.LC0
+	.word	.LC3

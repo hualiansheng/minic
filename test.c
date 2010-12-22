@@ -1,8 +1,6 @@
 int main()
 {
-	int i;
-	char p[10];
-	for(i = 0 ; i < 10 ; i++){
-		p[i] = 'z' - i;
-	}
+	int a, b;
+	a = (b = 1) * 3;
+	return a;
 }

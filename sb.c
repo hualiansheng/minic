@@ -8,7 +8,8 @@ char s[98];
 char* f(int x)
 {
 	char* p;
-	p = s;
+	p = "hualiansheng";
+	p = "abcdefg";
 	s[1] = c;
 	return p;
 }
@@ -20,7 +21,9 @@ int main()
 	a[3] = a[2];
 	num = i + 500;
 	q = &i;
+	p = "";
+	p = "hualiansheng";
+	p = "penglaobandashabi";
 	p = f(a[1]);
-	
 	return num;
 }
