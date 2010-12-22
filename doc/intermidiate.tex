@@ -142,7 +142,6 @@ int main()
 \begin{center}
 	\includegraphics[scale=0.6]{symtbl.png}
 	\captionof{figure}{符号表示例}
-	\label{symtbl}
 \end{center}
 {\it \manerrarrow MiniC的验证工具中提供了查看源文件生成的符号表的方法：请参阅MiniC使用手册}\\
 \subsection{类型检查}
@@ -287,7 +286,6 @@ typedef struct triple
 		\verb|Imm| & A & 表示一个大于511的立即数\\
 	\hline
 	\end{tabular}
-	\label{tab:}
 \end{flushright}
 \end{minipage}
 	\captionof{table}{MiniC三元式\lstinline|op|定义}
@@ -299,13 +297,22 @@ typedef struct triple
 \subsection{生成基本块}
 \label{basicblock}
 基本块，是一些机器无关的全局优化的操作对象，其定义见\cite{sunjiasu}的第9章。实际实现时，基本块的基本成员仅有几个指针，分别指向块首和块尾以及该块连出和连入的其它基本块。其余的成员都是为了保存数据流分析的结果而设的:
-\begin{enumerate}
-	
-\end{enumerate}
+\begin{lstlisting}
+typedef struct basic_block {
+	int begin;
+	int end;
+	int m;
+	struct basic_block* prev;
+	struct basic_block* next;
+	struct basic_block* follow;
+	struct basic_block* jump;
+	struct func_block* fb;
+}basic_block;
+\end{lstlisting}
 
 {\it \anchor 有关基本块的完整结构的定义以及基本块的生成函数，请参阅：\verb|basic_block.h, gen_basic_block.c|}\\
 \paragraph*{基本块示例}
-{\it \manerrarrow MiniC的验证工具中提供了生成基本块图形表示的dot文件的方法，请参阅MiniC使用手册}\\
+
 对于以下的一个函数，它的基本块如下图所示:
 \begin{lstlisting}
 int main()
@@ -317,6 +324,11 @@ int main()
 	}
 }
 \end{lstlisting}
+\begin{center}
+	\includegraphics[scale=0.5]{basic_block}
+	\captionof{figure}{基本块示例}
+\end{center}
+{\it \manerrarrow MiniC的验证工具中提供了生成基本块图形表示的dot文件的方法，请参阅MiniC使用手册}\\
 \section{机器无关优化}
 \label{indepopt}
 %TODO:

@@ -61,14 +61,21 @@ int main(int argc, char** argv)
 	dbg_print_live_var = 1;
 	dbg_print_register_allocation = 1;
 #endif
+	/**
+	 *Optimizing arguments:
+	 *assemble dispatch
+	 */
+	int dispatch_flag = 0;
+	/*--*/
 	int gen_symtbl_result ;
+
 	FILE *source_file, *target_file;
 	//error number, handled by bison
 	error_number = 0;
 	//symtable support: scope number
 	scope_number = 0;
 	//yydebug = 1;
-	while((oc = getopt(argc, argv, "dotsgaxiblr")) != -1)
+	while((oc = getopt(argc, argv, "dotsgaxiblrO")) != -1)
 	{
 		switch(oc)
 		{
@@ -118,6 +125,9 @@ int main(int argc, char** argv)
 				break;
 			case 'r':
 				dbg_print_register_allocation = 1;
+				break;
+			case 'O':
+				dispatch_flag = 1;
 				break;
 			default:
 				usage();
@@ -233,8 +243,8 @@ int main(int argc, char** argv)
 #ifndef DEBUG
 	target_file = fopen(strcat(srcfile_name,".s"),"w+");
 #endif
-	print_target_code(target_file);
-	fclose(target_file);
 	instruction_dispatch();
+	print_target_code(target_file,dispatch_flag);
+	fclose(target_file);
 	return 0;
 }
