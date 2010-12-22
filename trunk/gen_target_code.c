@@ -49,13 +49,20 @@ int rtn_code(func_block *fb, int i);
 int array_shift_code(func_block *fb, int i);
 int Imm_code(func_block *fb, int i);
 int r_shift_code(func_block *fb, int i);
-int (*g[36])(func_block*, int) = {
-	if_goto_code, if_goto_code, goto_code, negative_code, not_code, address_code, star_code, positive_code, assign_code, star_assign_code, add_code, minus_code, multiply_code, char_int_code, equal_code, less_code, larger_code, eqlarger_code, eqless_code, noteq_code, or_code, and_code, get_rb_code, set_rb_code, call_code, param_code, enterF_code, enterS_code, leaveF_code, leaveS_code, rtn_code, array_shift_code, char_int_code, Imm_code, array_shift_code, r_shift_code
+int c_str_code(func_block *fb, int i);
+int (*g[37])(func_block*, int) = {
+	if_goto_code, if_goto_code, goto_code, negative_code, not_code, address_code, star_code, positive_code, assign_code, star_assign_code, add_code, minus_code, multiply_code, char_int_code, equal_code, less_code, larger_code, eqlarger_code, eqless_code, noteq_code, or_code, and_code, get_rb_code, set_rb_code, call_code, param_code, enterF_code, enterS_code, leaveF_code, leaveS_code, rtn_code, array_shift_code, char_int_code, Imm_code, array_shift_code, r_shift_code, c_str_code
 };
+enum instruction map_ins[6][2] = {{bsl, beg}, {bel, bsg}, {beq, bne}, {bne, beq}, {beg, bsl}, {bsg, bel}};
+char **c_str_list;
+int c_str_num;
+int c_str_maxSize;
 int initial();
 int memory_allocation();
 int setLabel();
 int convert();
+int search_const_str(char *target);
+int set_cstr_used(func_block *fb, int j);
 int func_assem_init(func_block *fb);
 int func_assem_end(func_block *fb);
 int load_live(func_block *fb, int i);
@@ -70,7 +77,6 @@ int check_bool_use(func_block *fb, int i);
 int assign_bool_value(enum instruction ins, func_block *fb, int i);
 int compare_operation(func_block *fb, int i, int cond, int m);
 int search_label(func_block *fb, int i, int m, int not_flag);
-enum instruction map_ins[6][2] = {{bsl, beg}, {bel, bsg}, {beq, bne}, {bne, beq}, {beg, bsl}, {bsg, bel}};
 
 int gen_target_code()
 {
@@ -183,6 +189,9 @@ int convert()
 	assemble_list = (assemble*)malloc(64*sizeof(assemble));
 	assemble_size = 64*sizeof(assemble);
 	assemble_num = 0;
+	c_str_list = (char**)malloc(4*sizeof(char*));
+	c_str_maxSize = 4 * sizeof(char*);
+	c_str_num = 0;
 	for (i = 0; i < p->item_num; i++)
 	{
 		if (p->item[i].type != FUNCTION_DEF)
@@ -220,10 +229,71 @@ int convert()
 	return 0;
 }
 
+int search_const_str(char *target)
+{
+	int j;
+	for (j = 0; j < c_str_num; j++)
+		if (!strcmp(target, c_str_list[j]))
+			return j;
+	return -1;
+}
+
+int set_cstr_used(func_block *fb, int j)
+{
+	CStrList *p;
+	if (fb->c_str_used == NULL)
+	{
+		fb->c_str_used = (CStrList*)malloc(sizeof(CStrList));
+		fb->c_str_used->c_str = j;
+		fb->c_str_used->next = NULL;
+	}
+	else
+	{
+		for (p = fb->c_str_used; p->next != NULL; p = p->next)
+			if (j == p->c_str)
+				return 0;
+		if (j == p->c_str)
+			return 0;
+		p->next = (CStrList*)malloc(sizeof(CStrList));
+		p->next->c_str = j;
+		p->next->next = NULL;
+	}
+	return 0;
+}
+
 int func_assem_init(func_block *fb)
 {
-	int i, off;
+	int i, j, off, first_flag = 1;
 	char *temp;
+	fb->c_str_used = NULL;
+	for (i = fb->start->begin; i <= fb->over->end; i++)
+	{
+		if (triple_list[index_index[i]].op == c_str)
+		{
+			j = search_const_str(triple_list[index_index[i]].arg1.var_name);
+			if (j == -1)
+			{
+				if ((c_str_num+1)*sizeof(char*) > c_str_maxSize)
+					adjustSize((void**)&c_str_list, &c_str_maxSize);
+				j = c_str_num++;
+				c_str_list[j] = triple_list[index_index[i]].arg1.var_name;
+				if (first_flag)
+				{
+					temp = (char*)malloc(32*sizeof(char));
+					sprintf(temp, "\t.section	.rodata");
+					add_special(temp, special);
+					first_flag = 0;
+				}
+				temp = (char*)malloc(16*sizeof(char));
+				sprintf(temp, ".LC%d", j);
+				add_special(temp, label);
+				temp = (char*)malloc((strlen(c_str_list[j])+16)*sizeof(char));
+				sprintf(temp, "\t.ascii	\"%s\\000\"", c_str_list[j]);
+				add_special(temp, special);								
+			}
+			set_cstr_used(fb, j);
+		}
+	}
 	for (i = 0, off = 0; i < fb->uni_item_num; i++)
 	{
 		if (fb->uni_table[i]->isGlobal)
@@ -232,6 +302,7 @@ int func_assem_init(func_block *fb)
 			off += 4;
 		}
 	}
+	fb->const_off = off;
 	temp = (char*)malloc(6*sizeof(char));
 	sprintf(temp, "\t.text");
 	add_special(temp, special);
@@ -249,6 +320,7 @@ int func_assem_end(func_block *fb)
 {
 	int i;
 	char *temp;
+	CStrList *p;
 	add_assemble(fb->global_label, label, -1, -1, 0, 0, -1, 0, -1);
 	for (i = 0; i < fb->uni_item_num; i++)
 	{
@@ -258,6 +330,12 @@ int func_assem_end(func_block *fb)
 			sprintf(temp, "\t.word\t%s", fb->uni_table[i]->name);
 			add_special(temp, special);
 		}
+	}
+	for (p = fb->c_str_used; p != NULL; p = p->next)
+	{
+		temp = (char*)malloc(32*sizeof(char));
+		sprintf(temp, "\t.word\t.LC%d", p->c_str);
+		add_special(temp, special);
 	}
 	return 0;
 }
@@ -870,31 +948,22 @@ int add_code(func_block *fb, int i)
 
 int minus_code(func_block *fb, int i)
 {
-	int type1, type2, u0, u1, u2, r1, r2;
+	int type1, type2, u0, u1, u2;
 	if (check_live(fb, i, 1))
 	{
 		u0 = triple_list[index_index[i]].tmp_uni;
 		u1 = triple_list[index_index[i]].arg1_uni;
 		u2 = triple_list[index_index[i]].arg2_uni;
-		if (triple_list[index_index[i+1]].op != r_shift)
-		{
-			type1 = triple_list[index_index[i]].arg1_type;
-			type2 = triple_list[index_index[i]].arg2_type;
-			if (type1 < 2 && type2 < 2)
-				add_std_assemble(fb, i, sub, u0, u1, u2);
-			else
-			{
-				if (type1 < 2)
-					add_imm_assemble(fb, i, sub, u0, u1, triple_list[index_index[i]].arg2.imm_value);
-				if (type2 < 2)
-					add_imm_assemble(fb, i, rsub, u0, u2, triple_list[index_index[i]].arg1.imm_value);
-			}
-		}
+		type1 = triple_list[index_index[i]].arg1_type;
+		type2 = triple_list[index_index[i]].arg2_type;
+		if (type1 < 2 && type2 < 2)
+			add_std_assemble(fb, i, sub, u0, u1, u2);
 		else
 		{
-			r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
-			r2 = load_operator(fb, u2, fb->reg_alloc[u2], 2);
-			store_result(fb, i, sub, u0, r1, fb->reg_alloc[u0], 1, 1, 2, 0, r2);
+			if (type1 < 2)
+				add_imm_assemble(fb, i, sub, u0, u1, triple_list[index_index[i]].arg2.imm_value);
+			if (type2 < 2)
+				add_imm_assemble(fb, i, rsub, u0, u2, triple_list[index_index[i]].arg1.imm_value);
 		}
 	}
 	return 0;
@@ -1230,6 +1299,37 @@ int Imm_code(func_block *fb, int i)
 
 int r_shift_code(func_block *fb, int i)
 {
+	int u0, u1, r0, r1;
+	if (check_live(fb, i, 1))
+	{
+		u0 = triple_list[index_index[i]].tmp_uni;
+		u1 = triple_list[index_index[i]].arg1_uni;
+		r0 = fb->reg_alloc[u0];
+		r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
+		store_result(fb, i, mov, u0, -1, r0, 1, 1, 2, 0, r1);
+	}
 	return 0;
 }
 
+int c_str_code(func_block *fb, int i)
+{
+	int j, off, u0, r0;
+	CStrList *p;
+	if (check_live(fb, i, 1))
+	{
+		j = search_const_str(triple_list[index_index[i]].arg1.var_name);
+		for (p = fb->c_str_used, off = fb->const_off; p != NULL && p->c_str != j; p = p->next, off += 4)
+			;
+		u0 = triple_list[index_index[i]].tmp_uni;
+		r0 = fb->reg_alloc[u0];
+		if (r0 != -1)
+			add_assemble(fb->global_label, ldw, -1, r0, 0, 0, -1, 1, off);
+		else
+		{
+			r0 = 3;
+			add_assemble(fb->global_label, ldw, -1, r0, 0, 0, -1, 1, off);
+			add_assemble(-1, stw, 27, r0, 0, 0, -1, 1, fb->uni_table[u0]->offset);
+		}
+	}
+	return 0;
+}

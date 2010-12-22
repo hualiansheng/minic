@@ -69,7 +69,7 @@ int gen_uni_table(func_block *fb)
 			triple_list[index_index[i]].tmp_uni = gen_tmp_item(fb, i);
 		else
 			triple_list[index_index[i]].tmp_uni = -1;
-		if (tmp_op == call || tmp_op == goto_op)
+		if (tmp_op == call || tmp_op == goto_op || tmp_op == c_str)
 		{
 			triple_list[index_index[i]].arg1_uni = -1;
 			triple_list[index_index[i]].arg2_uni = -1;

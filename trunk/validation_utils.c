@@ -291,8 +291,11 @@ void print_target_code(FILE* target_file, int dispatch_flag)
 		}
 		if (inst == ldw || inst == stw || inst == ldb || inst == stb)
 		{
-			if (assemble_list[i].label != -1)
-				fprintf(target_file, "\t%s\tr%d, .L%d+%d\n", ins_name[inst-5000], assemble_list[i].Rd, assemble_list[i].label, assemble_list[i].Rm_Imm);
+			if (assemble_list[i].label != -1 || assemble_list[i].content != NULL)
+			{
+				fprintf(target_file, "\t%s\tr%d, ", ins_name[inst-5000], assemble_list[i].Rd);
+				fprintf(target_file, ".L%d+%d\n", assemble_list[i].label, assemble_list[i].Rm_Imm);
+			}
 			else
 			{
 				fprintf(target_file, "\t%s\tr%d, [r%d+], ", ins_name[inst-5000], assemble_list[i].Rd, assemble_list[i].Rn);
