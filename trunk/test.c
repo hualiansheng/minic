@@ -1,9 +1,9 @@
 int main()
 {
-	char c;
-	int i;
-	char p[10];
-	for(i = 0 ; i < 10 ; i++){
-		p[i] = 'z' - i;
+	int a[10], b[10], i, temp;
+	for(i = 0 ; i < 10 ; i ++){
+		temp = a[i];
+		a[i] = b[i];
+		b[i] = temp;
 	}
 }

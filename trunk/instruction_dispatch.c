@@ -1,8 +1,12 @@
 #include "register.h"
-extern int *instruction_blocks;
-extern int instruction_block_num;
+#include "symtbl_operation.c"
 extern assamble *assamble_list;
 extern int assemble_num;
+
+int *instruction_blocks;
+int instruction_block_num;
+int block_max_num =  16;// double of max block number
+
 int **data_dep_graph;// for each block
 int *assamble_dispatch_index; // array of dispatch
 int inst_num_block; //instruction number in current block
@@ -10,7 +14,7 @@ int *dispatch_block; // array of dispatch in current block
 int current_inst; // the current instruction number in the dispatch block;
 int *in_degree; // array of in degree
 
-
+void inst_block();
 void topo_sort(int begin, int end);
 void create_dep_graph(int begin, int end);
 void do_first(int x);
@@ -170,4 +174,29 @@ void do_first(int x)
 		}
 	}
 	in_degree[x] = -1;
+}
+
+void inst_block()
+{
+	int i, new_block;
+	instruction_block_num = 0;
+	instruction_blocks = malloc(block_max_num*sizeof(int));
+	new_block = 1;
+	for(i = 0 ; i < assamble_num ; i++){
+		if(new_block == 1){
+			if(assamble_list[i].ins==lable)
+				if(instruction_block_num*2 == block_max_num){
+					adjustSize(&instruction_blocks, sizeof(int)*block_max_num);
+				}
+				instruction_blocks[instruction_block_num*2] = i;
+				new_block = 0;
+		}
+		if(new_block == 0){
+			if(assamble_list[i].ins == lable || assamble_list[i].ins ==b_l || assamble_list[i].ins == jump || assamble_list[i].ins == bne || assamble_list[i].ins == beq || assamble_list[i].ins == bsl || assamble_list[i].ins == beg || assamble_list[i].ins == bel || assamble_list[i].ins == b ||){
+				instruction_blocks[instruction_block_num*2+1] = i-1;
+				new_block = 1;
+				instruction_block_num ++;			
+			}		
+		}
+	}
 }
