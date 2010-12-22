@@ -235,5 +235,6 @@ int main(int argc, char** argv)
 #endif
 	print_target_code(target_file);
 	fclose(target_file);
+	instruction_dispatch();
 	return 0;
 }
