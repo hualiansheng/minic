@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 	//symtable support: scope number
 	scope_number = 0;
 	//yydebug = 1;
-	while((oc = getopt(argc, argv, "dotsgaxiblrO")) != -1)
+	while((oc = getopt(argc, argv, "dotsgaxiblrO:")) != -1)
 	{
 		switch(oc)
 		{
@@ -127,7 +127,19 @@ int main(int argc, char** argv)
 				dbg_print_register_allocation = 1;
 				break;
 			case 'O':
-				dispatch_flag = 1;
+				switch(optarg[0])
+				{
+					case '0':
+						// No optmizing at all
+						break;
+					case '2':
+					//	data_flow_flag = 1;
+					case '1':
+						dispatch_flag = 1;
+						break;
+					default:
+						;
+				}
 				break;
 			default:
 				usage();
@@ -239,11 +251,19 @@ int main(int argc, char** argv)
 	fprintf(stderr,"Generating target code...");
 	gen_target_code();
 	fprintf(stderr,"done.\n");
+	
+	fprintf(stderr,"Dispatch assemble instructions...");
+	instruction_dispatch();
+	fprintf(stderr,"done.\n");
+	if(dispatch_flag)
+		fprintf(stderr,"OPTIMIZATION: Will use dispatched assemble!\n");
+
+	/* get code output!*/
 	target_file = stdout;
 #ifndef DEBUG
 	target_file = fopen(strcat(srcfile_name,".s"),"w+");
 #endif
-	instruction_dispatch();
+
 	print_target_code(target_file,dispatch_flag);
 	fclose(target_file);
 	return 0;
