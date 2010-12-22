@@ -4,7 +4,7 @@ int *q;
 char c;
 char *p;
 char s[98];
-
+void print_string(char *str);
 char* f(int x)
 {
 	char* p;
@@ -24,6 +24,8 @@ int main()
 	p = "";
 	p = "hualiansheng";
 	p = "penglaobandashabi";
+	print_string(p);
+	print_string("\n");
 	p = f(a[1]);
 	return num;
 }
