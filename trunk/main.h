@@ -17,6 +17,6 @@ int print_basic_block();
 int print_live_var();
 int register_allocation(int);
 int gen_target_code();
-int print_target_code();
+void print_target_code(FILE*,int);
 void instruction_dispatch();
 #endif

@@ -16,12 +16,12 @@ char *operator_name[]={"if,goto","if_not,goto","goto","-","not","&","!*","+","="
 extern basic_block *bblist;
 extern func_block *fblist;
 extern int block_num;
-
 char *ins_name[] = {"", "", "ldw", "stw","ldb", "stb",  "b.l", "mov", "add", "sub", "rsub", "mul", "jump","cmpsub.a", "bne", "beq", "bsl", "beg", "bsg", "bel", "b", "cmoveq", "cmovsl", "cmoveg", "cmovel", "cmovne", "cmovsg"
 };
 extern assemble *assemble_list;
 extern int assemble_num;
-
+//dispatched assembles
+extern int* assemble_dispatch_index;
 void print_AST_dot_core(AST_NODE* ptr);
 void print_AST(AST_NODE* ptr, int level)
 {
@@ -253,12 +253,19 @@ void print_register_allocation()
 	fclose(out);
 }
 
-void print_target_code(FILE* target_file)
+void print_target_code(FILE* target_file, int dispatch_flag)
 {
-	int i;
+	
+	int i,j;
 	enum instruction inst;
-	for (i = 0; i < assemble_num; i++)
+	if(dispatch_flag)
+		fprintf(stderr,"Optmize option: assemble dispatch - on\n");
+	for (j = 0; j < assemble_num; j++)
 	{
+		//to decide whether using the result of assmeble dispatch.
+		i = j;
+		if(dispatch_flag)
+			i = assemble_dispatch_index[j];
 		inst = assemble_list[i].ins;
 		if (inst == special)
 		{
