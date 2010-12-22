@@ -8,7 +8,7 @@ extern int assemble_num;
 
 int *instruction_blocks;
 int instruction_block_num;
-int block_max_num =  16;// double of max block number
+int block_max_num =  100;// double of max block number
 
 int **data_dep_graph;// for each block
 int *assemble_dispatch_index; // array of dispatch
@@ -26,14 +26,17 @@ void instruction_dispatch()
 {
 	int i,j;
 	inst_block();
+/*	
 	for(i = 0 ; i < instruction_block_num ; i ++){
 		printf("%d, %d \n", instruction_blocks[i*2], instruction_blocks[i*2+1]);
-	}
+	}*/
 	assemble_dispatch_index = malloc(sizeof(int) * assemble_num);
 	for(i = 0 ; i < assemble_num ; i++)	assemble_dispatch_index[i] = i;
-	for(i = 0 ; i < instruction_block_num ; i++){
+	for(i = 0 ; i <1 ; i++){
 		create_dep_graph(instruction_blocks[i*2], instruction_blocks[i*2+1]);
-	/*	for(j = 0 ; j < inst_num_block ;j ++){
+	/*
+		for(j = 0 ; j < inst_num_block ;j ++){
+			int k;
 			for(k = 0 ; k < inst_num_block; k++){
 				printf("%d ", data_dep_graph[j][k]);
 			}
@@ -46,10 +49,10 @@ void instruction_dispatch()
 		}
 		free(data_dep_graph);
 	}
-	for(i = 0 ;i < assemble_num ;i++){
+/*	for(i = 0 ;i < assemble_num ;i++){
 		printf("%d ",assemble_dispatch_index[i]);
 	}
-	printf("\n");
+	printf("\n");*/
 }
 
 void create_dep_graph(int begin, int end)
@@ -90,12 +93,13 @@ void create_dep_graph(int begin, int end)
 			default:{
 						if(temp.Rd != -1){
 							for(j = begin ; j < i ; j++){
-								if(assemble_list[j].Rn != -1 && assemble_list[j].Rn == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
+							if(assemble_list[j].Rn != -1 && assemble_list[j].Rn == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
 								else if(assemble_list[j].Rs_or_Imm == 1 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
 								else if(assemble_list[j].Rm_or_Imm == 1 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;						 
 							}
 							for(j = i+1 ; j <= end; j++){
-								if(assemble_list[j].Rn != -1 && assemble_list[j].Rn == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
+								if(assemble_list[j].ins == stw && assemble_list[j].Rd == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
+								else if(assemble_list[j].Rn != -1 && assemble_list[j].Rn == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
 								else if(assemble_list[j].Rs_or_Imm == 1 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
 								else if(assemble_list[j].Rm_or_Imm == 1 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[i-begin][j-begin]= 1;
 							}
@@ -105,7 +109,7 @@ void create_dep_graph(int begin, int end)
 	}
 	//array of in_degree
 	in_degree = (int *)malloc(sizeof(int)*inst_num_block);
-	memset(in_degree, 0, sizeof(in_degree));
+	memset(in_degree, 0, sizeof(int)*inst_num_block);
 	for(i = 0 ; i < inst_num_block; i ++){
 		for(j = 0 ; j < inst_num_block; j++)
 			in_degree[i] += data_dep_graph[j][i];	
@@ -114,14 +118,14 @@ void create_dep_graph(int begin, int end)
 void topo_sort(int begin , int end)
 {
 	int i, j,  flag = 1;
-	dispatch_block = malloc(sizeof(int)* (inst_num_block+10));
+	dispatch_block = malloc(sizeof(int)* inst_num_block);
 	memset(dispatch_block, 0, sizeof(int) * inst_num_block);
 	current_inst = 0;
 	for(i = begin ; i <= end ; i ++){
 		if(assemble_list[i].ins == ldw && in_degree[i-begin] != -1){
 			do_first(i-begin);
 			for(j = 0 ; j < inst_num_block ; j++){
-				if(in_degree[j] == 0 && j != i+1/*data_dep_graph[i-begin][j] ==0*/){
+				if(in_degree[j] == 0 && j != i-begin+1/*data_dep_graph[i-begin][j] ==0*/){
 					do_first(j);
 					break;
 				}
@@ -147,7 +151,7 @@ void do_first(int x)
 {
 	int i;
 	for(i = 0 ; i < inst_num_block ; i++){
-		if(data_dep_graph[i][x] > 0){
+		if(data_dep_graph[i][x] == 1){
 			do_first(i);		
 		}	
 	}
@@ -171,28 +175,21 @@ void inst_block()
 	instruction_blocks = malloc(block_max_num*sizeof(int));
 	new_block = 1;
 	for(i = 0 ; i < assemble_num ; i++){
-		if(assemble_list[i].ins == special) continue;
 		if(new_block == 1){
-			if(assemble_list[i].ins==label)
-				if(instruction_block_num*2 == block_max_num){
-					temp_s = block_max_num * sizeof(int);
-					adjustSize((void **)&instruction_blocks, (unsigned int *)&temp_s);
-					block_max_num = temp_s / sizeof(int);
-				}
-				instruction_blocks[instruction_block_num*2] = i+1;
-				new_block = 0;
+			if(assemble_list[i].ins == special || assemble_list[i].ins == label || assemble_list[i].ins ==b_l || assemble_list[i].ins == jump || assemble_list[i].ins == bne || assemble_list[i].ins == beq || assemble_list[i].ins == bsl || assemble_list[i].ins == beg || assemble_list[i].ins == bel || assemble_list[i].ins == b ) continue;
+			if(instruction_block_num*2 == block_max_num){
+				temp_s = block_max_num * sizeof(int);
+				adjustSize((void **)&instruction_blocks, (unsigned int *)&temp_s);
+				block_max_num = temp_s / sizeof(int);
+			}
+			instruction_blocks[instruction_block_num*2] = i;
+			new_block = 0;
 		}
 		else if(new_block == 0){
-			if(assemble_list[i].ins ==b_l || assemble_list[i].ins == jump || assemble_list[i].ins == bne || assemble_list[i].ins == beq || assemble_list[i].ins == bsl || assemble_list[i].ins == beg || assemble_list[i].ins == bel || assemble_list[i].ins == b ){
+			if( assemble_list[i].ins == special || assemble_list[i].ins == label || assemble_list[i].ins ==b_l || assemble_list[i].ins == jump || assemble_list[i].ins == bne || assemble_list[i].ins == beq || assemble_list[i].ins == bsl || assemble_list[i].ins == beg || assemble_list[i].ins == bel || assemble_list[i].ins == b ){
 				instruction_blocks[instruction_block_num*2+1] = i-1;
 				new_block = 1;
 				instruction_block_num ++;
-			}
-			else if(assemble_list[i].ins == label){
-				instruction_blocks[instruction_block_num*2+1] = i -1;
-				new_block = 1;
-				instruction_block_num ++;
-				i--;
 			}
 		}
 	}
