@@ -137,6 +137,7 @@ int set_predecessor(basic_block *pre, basic_block *suc)
 	{
 		suc->predecessor = (PreList*)malloc(sizeof(PreList));
 		suc->predecessor->m = pre->m;
+		suc->predecessor->ptr = pre;
 		suc->predecessor->next = NULL;
 	}
 	else
@@ -145,6 +146,7 @@ int set_predecessor(basic_block *pre, basic_block *suc)
 			;
 		p->next = (PreList*)malloc(sizeof(PreList));
 		p->next->m = pre->m;
+		p->next->ptr = pre;
 		p->next->next = NULL;
 	}
 	return 0;

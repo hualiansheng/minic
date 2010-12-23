@@ -33,6 +33,7 @@ typedef struct triple
 	int arg2_uni;
 	int tmp_uni;
 	int label;
+	int is_deleted;
 }triple;
 
 typedef struct stack_item//++ -- stack的item

@@ -12,4 +12,5 @@ void print_AST_dot(AST_NODE*ptr);
 void print_intermediate_code();
 void print_register_allocation();
 void print_interference_graph();
+void print_available_expr();
 #endif

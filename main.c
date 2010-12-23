@@ -238,6 +238,14 @@ int main(int argc, char** argv)
 	fprintf(stderr,"Allocating registers for variables...");
 	register_allocation(AVALIABLE_REG_NUM);
 	fprintf(stderr,"done.\n");
+	
+	/**
+	 * TEMP
+	 */
+	//fprintf(stderr,"guabile\n");
+	//available_expr();
+	//fprintf(stderr,"guabi2le\n");
+	print_available_expr();
 	/**
 	 *DEBUG FILE:
 	 *register allocation debug file is register_allocation.debug

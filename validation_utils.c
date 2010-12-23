@@ -330,4 +330,42 @@ void print_target_code(FILE* target_file, int dispatch_flag)
 		fprintf(target_file, "\n");
 	}
 }
+void print_available_expr()
+{
+	func_block* fb;
+	int i,j,base,tmp;
+	FILE* out = stderr;
+	for(fb = fblist; fb != NULL; fb = fb->next)
+	{
+		base = fb->start->begin;
+		for(i = 0; i < fb->code_num; i++)
+			fprintf(stderr,"%d\t",i+base);
+		fprintf(stderr,"\n");
+		for(i = 0; i < fb->code_num; i++)
+		{
+			for(j = 0; j < fb->code_num; j++)
+				fprintf(stderr,"%d\t",(fb->available_status[i][j/32]>>(31-j%32))&1);
+			tmp = i;
+			i = i+base;
+			if(triple_list[i].is_deleted)
+				fprintf(out,"[%d] : ", i);
+			else
+				fprintf(out, "(%d) : ", i);
+			fprintf(out, "%s ",operator_name[triple_list[i].op - 3000]);
+			if(triple_list[i].arg1_type == 0 || triple_list[i].arg1_type == 3) 
+				fprintf(out, "%s ", triple_list[i].arg1.var_name);
+			else	if (triple_list[i].arg1_type == 1)
+					fprintf(out, "(%d) ", triple_list[i].arg1.temp_index);
+				else	fprintf(out, "%d ", triple_list[i].arg1.temp_index);
+			if(triple_list[i].arg2_type == 0 || triple_list[i].arg2_type == 3) 
+				fprintf(out, "%s ", triple_list[i].arg2.var_name);
+			else	if (triple_list[i].arg2_type == 1) 
+					fprintf(out, "(%d) ", triple_list[i].arg2.temp_index);
+				else	fprintf(out, "%d ", triple_list[i].arg2.temp_index);
+			fprintf(stderr,"\n");
+			i = tmp;
 
+		}
+		fprintf(stderr,"------------------\n");
+	}
+}
