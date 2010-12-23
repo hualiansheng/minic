@@ -1,5 +1,3 @@
-/* Test array */
-
 extern int printline_int(int x);
 
 int a[4];

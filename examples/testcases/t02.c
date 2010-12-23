@@ -1,6 +1,5 @@
-/* Test While */
 extern int print_int(int x);
-extern int print_string(int x);
+extern int print_string(char* x);
 
 int main()
 {
@@ -9,7 +8,7 @@ int main()
   while ( i < 10 || (i != 10 && (i+3) < 100))
   {
     i = i + 1;
-    print_int(i);
+	print_int(i);
     print_string("\n");
   }
   for ( i = 0; i < 10 || (i==10)&& ((i+3)<100); i++)

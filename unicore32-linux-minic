@@ -5,20 +5,43 @@ if [ $# -lt 1 ]; then
 	exit
 fi
 
-if [ $# -lt 2 ]; then
-	output_file="${1%.*}"
-else
-	output_file=$2
+arg_O=0
+output_file=""
+while getopts :O:o:? OPT; do
+	case $OPT in
+		O)
+			arg_O="$OPTARG";;
+		o)
+			output_file="$OPTARG";;
+		\?)
+			echo $0 '<c source file> [output file]'
+			exit;;
+	esac
+done
+
+for src in $@; do
+	tmp=0;
+done
+
+if [ "$output_file" = "" ];then
+	output_file="${src%.*}"
+fi
+
+args=""
+if [ "$arg_O" = "1" ];then
+	args=" -O1 "
 fi
 
 cmd_path="${0%/*}/"
 cmd="${0%/*}/minic"
 path=`pwd`"/"
-ass_file="${1%.*}.s"
+ass_file="${src%.*}.s"
+echo $output_file
 echo $ass_file
 echo "Compiling..."
 echo "======================="
-$cmd $1 $3
+echo $cmd $src $args
+$cmd $src $args
 echo "======================="
 echo "Compile Done."
 echo "Linking..."

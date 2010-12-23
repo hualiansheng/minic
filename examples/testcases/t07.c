@@ -1,4 +1,3 @@
-/* test recursion */
 
 extern int printline_int(int x);
 
