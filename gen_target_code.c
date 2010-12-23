@@ -485,16 +485,21 @@ int store_result(func_block *fb, int i, enum instruction ins, int u, int Rs, int
 	}
 	else
 	{
-		if ((fb->live_status[i+1-fb->start->begin][u/32]>>(31-u%32)) % 2 == 1)
-			fb->reg_var[Rd] = u;
-		if (!(ins == mov && Rm_or_Imm == 0 && Rd == Rm_Imm && Rs_or_Imm == 0 && Rs_Imm == -1))
+		if (fb->uni_table[u]->isGlobal)
 		{
+			if ((fb->live_status[i+1-fb->start->begin][u/32]>>(31-u%32)) % 2 == 1)
+				fb->reg_var[Rd] = u;
+			else
+				Rd = 3;
 			add_assemble(-1, ins, Rs, Rd, shift_direct, Rs_or_Imm, Rs_Imm, Rm_or_Imm, Rm_Imm);
-			if (fb->uni_table[u]->isGlobal)
-			{
-				add_assemble(fb->global_label, ldw, -1, 1, 0, 0, -1, 1, fb->uni_table[u]->offset);
-				add_assemble(-1, stw, 1, Rd, 0, 0, -1, 1, 0);
-			}
+			add_assemble(fb->global_label, ldw, -1, 1, 0, 0, -1, 1, fb->uni_table[u]->offset);
+			add_assemble(-1, stw, 1, Rd, 0, 0, -1, 1, 0);
+		}
+		else
+		{
+			fb->reg_var[Rd] = u;
+			if (!(ins == mov && Rm_or_Imm == 0 && Rd == Rm_Imm && Rs_or_Imm == 0 && Rs_Imm == -1))
+				add_assemble(-1, ins, Rs, Rd, shift_direct, Rs_or_Imm, Rs_Imm, Rm_or_Imm, Rm_Imm);
 		}
 	}
 	return 0;
