@@ -106,17 +106,7 @@ main:
 	beg	.L11
 .L10:
 	add	r6, r5, r7<<#2
-	stw	r5, [r27+], #-532
-	stw	r6, [r29+], #-4
-	stw	r7, [r27+], #-16
-	sub	r29, r29, #4
-	mov	r0, #128
-	b.l	rand_int
-	add	r29, r29, #4
-	ldw	r6, [r29+], #-4
-	mov	r4, r0
-	ldw	r7, [r27+], #-16
-	ldw	r5, [r27+], #-532
+	rsub	r4, r7, #128
 	stw	r4, [r6+], #0
 	add	r4, r7, #1
 	mov	r7, r4

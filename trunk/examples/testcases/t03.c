@@ -1,6 +1,6 @@
-/* Test Expressions */ 
 
-extern int printline_int(int x);
+extern void print_int(int x);
+extern void print_ln();
 
 int main()
 {
@@ -8,10 +8,13 @@ int main()
   a = 1;
   b = 2;
   c = 3;
-  printline_int( ((((((a)))))) + b * a);
+  print_int( ((((((a)))))) + b * a);
+  print_ln();
   c = + a + (+b);
-  printline_int(c);
+  print_int(c);
+  print_ln();
   c = -a - (-b);
-  printline_int(c);
+  print_int(c);
+  print_ln();
   return 0;
 }

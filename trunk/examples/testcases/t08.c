@@ -1,4 +1,3 @@
-/* test brace */
 
 extern int printline_int(int x);
 

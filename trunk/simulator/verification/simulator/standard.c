@@ -37,3 +37,6 @@ int rand_int(int mod){
 	return rand() % mod;
 }
 
+int printline_int(int x){
+	printf("%d\n", x);
+}

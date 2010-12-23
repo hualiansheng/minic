@@ -1,4 +1,3 @@
-/* Test if else */
 extern int printline_int(int x);
 int main()
 {

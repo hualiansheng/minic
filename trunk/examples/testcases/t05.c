@@ -1,4 +1,3 @@
-/* Test Function Call */
 
 extern int printline_int(int x);
 
