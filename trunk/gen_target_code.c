@@ -767,8 +767,13 @@ int negative_code(func_block *fb, int i)
 	u0 = triple_list[index_index[i]].tmp_uni;
 	r0 = fb->reg_alloc[u0];
 	u1 = triple_list[index_index[i]].arg1_uni;
-	r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
-	store_result(fb, i, rsub, u0, r1, r0, 0, 0, -1, 1, 0);
+	if (u1 == -1)
+		store_result(fb, i, mov, u0, -1, r0, 0, 0, -1, 1, -triple_list[index_index[i]].arg1.imm_value);
+	else
+	{
+		r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
+		store_result(fb, i, rsub, u0, r1, r0, 0, 0, -1, 1, 0);
+	}
 	return 0;
 }
 
