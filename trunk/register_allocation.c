@@ -78,6 +78,8 @@ int gen_var_graph(func_block *fb)
 	}*/
 	for (i = 0; i < fb->code_num; i++)
 	{
+		//if (triple_list[index_index[i+fb->start->begin]].is_deleted)
+		//	continue;
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
 			//if (fb->uni_table[j]->isGlobal == 1)

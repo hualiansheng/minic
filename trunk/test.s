@@ -15,21 +15,19 @@ f:
 	sub	r27, r29, #4
 	sub	r29, r29, #32
 	stw	r0, [r27+], #-16
-	mov	r7, #0
 	mov	r6, #0
-	cmpsub.a	r7, #0
+	mov	r5, #0
+	cmpsub.a	r6, #0
 	beq	.L2
 .L1:
-	add	r4, r7, r6
-	mul	r5, r4, r6
-	add	r4, r7, r6
-	mul	r4, r4, r6
-	add	r4, r5, r4
+	add	r4, r6, r5
+	mul	r4, r4, r5
+	add	r4, r4, r4
 	b	.L3
 .L2:
-	add	r4, r7, r6
+	add	r4, r6, r5
 .L3:
-	add	r4, r7, r6
+	add	r4, r6, r5
 	mov	r0, r4
 .L4:
 	ldw	r30, [r27+], #-4

@@ -25,7 +25,7 @@ extern int triple_list_index;
  *alloc_mem the GEN, KILL, IN, OUT bit vector for each function block
  */
 #define TARGET_EXPR_NUM 14
-enum operator target_expr[]={negative_op, address_op, star_op, positive_op,  add_op, minus_op, multiply_op, char_to_int_op, adds_op, int_to_char_op, minuss_op, r_shift};
+enum operator target_expr[]={negative_op, address_op, positive_op, add_op, minus_op, multiply_op, char_to_int_op, adds_op, int_to_char_op, minuss_op, r_shift};
 int alloc_mem();
 int init_value();
 int solve_each_triple(func_block *fb);
