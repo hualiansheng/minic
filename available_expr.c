@@ -63,24 +63,41 @@ int live_in_block(int idx, basic_block* bb, func_block* fb)
 	int i;
 	for(i = idx + 1; i <= bb->end; i++)
 	{
-		if((is_assign_expr(triple_list[i].op) || is_address_expr(triple_list[i].op)) && (triple_list[i].arg1_uni == triple_list[idx].arg1_uni || triple_list[i].arg1_uni == triple_list[idx].arg2_uni))
+		if(!deleted(triple_list[i])&&(is_assign_expr(triple_list[i].op) || is_address_expr(triple_list[i].op)) && (triple_list[i].arg1_uni == triple_list[idx].arg1_uni || triple_list[i].arg1_uni == triple_list[idx].arg2_uni))
 			return 0;
 	}
 	return 1;
 }
+/*
+ * 外层迭代过程：
+ * 先进行可用表达式分析
+ * 再进行复写传播
+ * 然后迭代
+ * 直到没有代码被删除
+ */
 int available_expr()
 {
 	func_block* fb;
+	int has_deleted_triple, iteration_count;
+	//内存分配只需1次
 	alloc_mem();
-	init_value();
-	for(fb = fblist; fb != NULL; fb = fb->next)
+	has_deleted_triple = 1;
+	iteration_count = 0;
+	while(has_deleted_triple)
 	{
-		solve_each_function(fb);
-		solve_each_triple(fb);
-		delete_redundent_triple(fb);
+		has_deleted_triple = 0;
+		init_value();
+		for(fb = fblist; fb != NULL; fb = fb->next)
+		{
+			solve_each_function(fb);
+			solve_each_triple(fb);
+			if(delete_redundent_triple(fb))
+				has_deleted_triple = 1;
+		}
+		iteration_count++;
 	}
 
-	return 0;
+	return iteration_count;
 }
 
 /**
@@ -102,10 +119,6 @@ int alloc_mem()
 			fb -> kill[i] = (unsigned int*)malloc((fb->code_num/32 +1) * sizeof(int));
 			fb -> a_in[i] = (unsigned int*)malloc((fb->code_num/32 +1) * sizeof(int));
 			fb -> a_out[i] = (unsigned int*)malloc((fb->code_num/32 +1) * sizeof(int));
-			memset(fb->gen[i], 0, (fb->code_num/32+1)*sizeof(int));
-			memset(fb->kill[i], 0, (fb->code_num/32+1)*sizeof(int));
-			memset(fb->a_in[i], 0, (fb->code_num/32+1)*sizeof(int));
-			memset(fb->a_out[i], 0, (fb->code_num/32+1)*sizeof(int));
 		}
 		/**
 		 * each triple has an In[] 
@@ -114,7 +127,6 @@ int alloc_mem()
 		for(i = 0; i < fb->code_num; i++)
 		{
 			fb->available_status[i] = (unsigned int*) malloc((fb->code_num/32+1)*sizeof(int));
-			memset(fb->available_status[i], 0, (fb->code_num/32+1)*sizeof(int));
 		}
 	}
 	return 0;
@@ -125,11 +137,23 @@ int alloc_mem()
 int init_value()
 {
 	func_block* fb;
+	
 	basic_block* bb;
 	int i,j;
 	//for each function block:
 	for(fb = fblist; fb != NULL; fb = fb->next)
 	{
+		//clear all arrays for each basic block
+		for(i = 0; i < fb->bb_num; i++)
+		{
+			memset(fb->gen[i], 0, (fb->code_num/32+1)*sizeof(int));
+			memset(fb->kill[i], 0, (fb->code_num/32+1)*sizeof(int));
+			memset(fb->a_in[i], 0, (fb->code_num/32+1)*sizeof(int));
+			memset(fb->a_out[i], 0, (fb->code_num/32+1)*sizeof(int));
+		}
+		//clear all In[] arrays for each triple
+		for(i = 0; i < fb->code_num; i++)
+			memset(fb->available_status[i], 0, (fb->code_num/32+1)*sizeof(int));
 		//for each basic block:
 		for(bb = fblist -> start; bb != fblist -> over -> next; bb = bb->next)
 		{
@@ -232,6 +256,7 @@ int solve_each_function(func_block* fb)
 			}
 		}
 	}
+	free(newout);
 	return 0;
 }
 /**
@@ -255,10 +280,10 @@ int solve_each_triple(func_block *fb)
 		for(i = bb->begin; i < bb->end; i++)
 		{
 			//需要跳过被删除的三元式
-			if(deleted(triple_list[i]))
-				continue;
 			for(j = 0;j < bit_length; j++)
 				fb->available_status[i-base+1][j] = fb->available_status[i-base][j];
+			if(deleted(triple_list[i]))
+				continue;
 			//受影响
 			if(is_assign_expr(triple_list[i].op) || is_address_expr(triple_list[i].op))
 			{
@@ -350,7 +375,7 @@ int get_convergence(int* same_list, basic_block* bb, func_block* fb, int triple_
 }
 int delete_redundent_triple(func_block* fb)
 {
-	int i,j,base,has_available;
+	int i,j,base,has_available, triple_deleted_count=0;
 	basic_block* bb;
 	int *propagated, *same_list;
 	//标记成员被替换的语句
@@ -392,21 +417,26 @@ int delete_redundent_triple(func_block* fb)
 								&& triple_list[j].arg1.temp_index == i)
 						{
 							triple_list[j].arg1.temp_index = converge_at;
+							triple_list[j].arg1_uni = triple_list[converge_at].tmp_uni;
 							propagated[j-base] = 1;
 						}
 						if(triple_list[j].arg2_type == 1 
 								&& triple_list[j].arg2.temp_index == i)
 						{
 							triple_list[j].arg2.temp_index = converge_at;
+							triple_list[j].arg2_uni = triple_list[converge_at].tmp_uni;
 							propagated[j-base] = 1;
 						}
 					}
 					//删除本三元式
 					triple_list[i].is_deleted = 1;
+					triple_deleted_count ++;
 				}
 			}
 		}
 			
 	}
-	return 1;
+	free(propagated);
+	free(same_list);
+	return triple_deleted_count;
 }

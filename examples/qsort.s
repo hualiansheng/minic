@@ -7,11 +7,11 @@ qsort:
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
+	sub	r29, r29, #40
 	stw	r0, [r27+], #-24
 	stw	r1, [r27+], #-20
 	stw	r2, [r27+], #-16
 	ldw	r8, [r27+], #-16
-	sub	r29, r29, #40
 	ldw	r7, [r27+], #-20
 	ldw	r6, [r27+], #-24
 	add	r4, r7, #1
@@ -37,8 +37,8 @@ qsort:
 .L5:
 	add	r9, r6, r5<<#2
 	ldw	r9, [r9+], #0
-	add	r10, r6, r5<<#2
 	mov	r11, r9
+	add	r10, r6, r5<<#2
 	add	r9, r6, r4<<#2
 	ldw	r9, [r9+], #0
 	stw	r9, [r10+], #0
@@ -51,8 +51,8 @@ qsort:
 .L4:
 	add	r9, r6, r7<<#2
 	ldw	r9, [r9+], #0
-	add	r10, r6, r7<<#2
 	mov	r11, r9
+	add	r10, r6, r7<<#2
 	sub	r9, r5, #1
 	add	r9, r6, r9<<#2
 	ldw	r9, [r9+], #0
@@ -96,10 +96,10 @@ main:
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
+	sub	r29, r29, #536
 	add	r3, r27, #-528
 	stw	r3, [r27+], #-532
 	ldw	r5, [r27+], #-532
-	sub	r29, r29, #536
 	mov	r7, #0
 .L12:
 	cmpsub.a	r7, #128

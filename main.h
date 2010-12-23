@@ -20,4 +20,5 @@ int gen_target_code();
 void print_target_code(FILE*,int);
 void instruction_dispatch();
 int available_expr();
+int gen_uni_table();
 #endif

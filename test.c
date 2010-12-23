@@ -13,7 +13,7 @@ char* f(int x)
 	b = 0;
 	c = 0;
 	if(a)
-		c = (a+b) + (a+b);
+		c = (a+b)*b + (a+b)*b;
 	else
 		c = a+b;
 	
