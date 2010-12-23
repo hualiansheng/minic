@@ -138,36 +138,38 @@ int setLabel()
 {
 	int i, j, l;
 	for (i = 0; i < triple_list_index; i++)
-		triple_list[index_index[i]].label = 0;
+		triple_list[index_index[i]].label = -1;
 	for (i = 0, l = 1; i < triple_list_index; i++)
 	{
+		if (triple_list[index_index[i]].is_deleted)
+			continue;
 		if (triple_list[index_index[i]].op == goto_op)
 		{
 			j = triple_list[index_index[i]].arg1.temp_index;
-			if (triple_list[index_index[j]].label == 0)		
+			if (triple_list[index_index[j]].label == -1)		
 				triple_list[index_index[j]].label = l++;
 		}
 		if (triple_list[index_index[i]].op == if_op || triple_list[index_index[i]].op == if_not_op)
 		{
 			if (!(triple_list[index_index[i+1]].op == set_rb && triple_list[index_index[i+2]].op == get_rb))
 			{
-				if (triple_list[index_index[i+1]].label == 0)		
+				if (triple_list[index_index[i+1]].label == -1)		
 					triple_list[index_index[i+1]].label = l++;
 			}
 			j = triple_list[index_index[i]].arg2.temp_index;
-			if (triple_list[index_index[j]].op != get_rb && triple_list[index_index[j]].label == 0)		
+			if (triple_list[index_index[j]].op != get_rb && triple_list[index_index[j]].label == -1)		
 				triple_list[index_index[j]].label = l++;
 		}
 		if (triple_list[index_index[i]].op == get_rb || triple_list[index_index[i]].op == not_op)
 		{
 			if (check_bool_use((triple_list[index_index[i]].block)->fb, i))
 			{
-				if (triple_list[index_index[i]].label == 0)
+				if (triple_list[index_index[i]].label == -1)
 				{
 					triple_list[index_index[i]].label = l;
 					l += 2;
 				}
-				if (triple_list[index_index[i+1]].label == 0)
+				if (triple_list[index_index[i+1]].label == -1)
 					triple_list[index_index[i+1]].label = l++;
 			}
 		}
@@ -218,9 +220,11 @@ int convert()
 		func_assem_init(fb);
 		for (i = fb->start->begin; i <= fb->over->end; i++)
 		{
+			if (triple_list[index_index[i]].is_deleted)
+				continue;
 			if (triple_list[index_index[i]].op != enterF)
 				load_live(fb, i);
-			if (triple_list[index_index[i]].label != 0)
+			if (triple_list[index_index[i]].label != -1)
 				add_assemble(triple_list[index_index[i]].label, label, -1, -1, 0, 0, -1, 0, -1);
 			g[triple_list[index_index[i]].op-3000](fb, i);
 		}

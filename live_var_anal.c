@@ -174,6 +174,8 @@ int set_prepare(func_block *fb)
 			def_use[j] = 0;
 		for (j = bb->begin; j <= bb->end; j++)
 		{
+			if (triple_list[index_index[j]].is_deleted)
+				continue;
 			if (triple_list[index_index[j]].tmp_uni != -1 && def_use[triple_list[index_index[j]].tmp_uni] == 0)
 				def_use[triple_list[index_index[j]].tmp_uni] = 1;
 			if (triple_list[index_index[j]].op == assign_op)
@@ -259,30 +261,33 @@ int analyze_live(func_block *fb)
 			fb->live_status[bb->end-base][j] = fb->v_out[bb->m][j];
 		for (i = bb->end; i >= bb->begin; i--)
 		{
-			tmp = triple_list[index_index[i]].tmp_uni;
-			arg1 = triple_list[index_index[i]].arg1_uni;
-			arg2 = triple_list[index_index[i]].arg2_uni;
-			if (tmp != -1)
-				change_live(fb, i-base, 1, tmp);
-			if (arg1 != -1 && triple_list[index_index[i]].op != address_op)
+			if (!triple_list[index_index[i]].is_deleted)
 			{
-				if (triple_list[index_index[i]].op == star_op)
+				tmp = triple_list[index_index[i]].tmp_uni;
+				arg1 = triple_list[index_index[i]].arg1_uni;
+				arg2 = triple_list[index_index[i]].arg2_uni;
+				if (tmp != -1)
+					change_live(fb, i-base, 1, tmp);
+				if (arg1 != -1 && triple_list[index_index[i]].op != address_op)
 				{
-					for (j = 0; j < fb->uni_item_num; j++)
+					if (triple_list[index_index[i]].op == star_op)
 					{
-						if (fb->mapping[j].isTmp != 1)
-							change_live(fb, i-base, 0, j);
+						for (j = 0; j < fb->uni_item_num; j++)
+						{
+							if (fb->mapping[j].isTmp != 1)
+								change_live(fb, i-base, 0, j);
+						}
 					}
+					if (triple_list[index_index[i]].op == param)
+						check_para_ptr(fb, i, base);
+					if (triple_list[index_index[i]].op == assign_op)
+						change_live(fb, i-base, 1, arg1);
+					else
+						change_live(fb, i-base, 0, arg1);
 				}
-				if (triple_list[index_index[i]].op == param)
-					check_para_ptr(fb, i, base);
-				if (triple_list[index_index[i]].op == assign_op)
-					change_live(fb, i-base, 1, arg1);
-				else
-					change_live(fb, i-base, 0, arg1);
+				if (arg2 != -1)
+					change_live(fb, i-base, 0, arg2);
 			}
-			if (arg2 != -1)
-				change_live(fb, i-base, 0, arg2);
 			if (i > bb->begin)
 			{
 				for (j = 0; j < fb->width; j++)
