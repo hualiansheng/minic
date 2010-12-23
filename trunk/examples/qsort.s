@@ -38,10 +38,10 @@ qsort:
 	add	r9, r6, r5<<#2
 	ldw	r9, [r9+], #0
 	add	r10, r6, r5<<#2
+	mov	r11, r9
 	add	r9, r6, r4<<#2
 	ldw	r9, [r9+], #0
 	stw	r9, [r10+], #0
-	mov	r11, r9
 	add	r9, r6, r4<<#2
 	stw	r11, [r9+], #0
 	add	r5, r5, #1
@@ -52,11 +52,11 @@ qsort:
 	add	r9, r6, r7<<#2
 	ldw	r9, [r9+], #0
 	add	r10, r6, r7<<#2
+	mov	r11, r9
 	sub	r9, r5, #1
 	add	r9, r6, r9<<#2
 	ldw	r9, [r9+], #0
 	stw	r9, [r10+], #0
-	mov	r11, r9
 	sub	r9, r5, #1
 	add	r9, r6, r9<<#2
 	stw	r11, [r9+], #0
