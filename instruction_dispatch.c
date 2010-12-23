@@ -72,14 +72,14 @@ void create_dep_graph(int begin, int end)
 						 for(j = begin; j < i; j++){
 							if(assemble_list[j].ins == ldw || assemble_list[j].ins == stw) data_dep_graph[j-begin][i-begin] = 1;
 							else if(assemble_list[j].Rn != -1 && assemble_list[j].Rn == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
-							else if(assemble_list[j].Rs_or_Imm == 1 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
-							else if(assemble_list[j].Rm_or_Imm == 1 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;						 
+							else if(assemble_list[j].Rs_or_Imm == 0 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
+							else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;						 
 						 }
 						 for(j = i + 1 ; j <= end; j++){
 						 	if(assemble_list[j].ins == ldw || assemble_list[j].ins == stw) data_dep_graph[i-begin][j-begin] = 1;
 							else if(assemble_list[j].Rn != -1 && assemble_list[j].Rn == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
-							else if(assemble_list[j].Rs_or_Imm == 1 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
-							else if(assemble_list[j].Rm_or_Imm == 1 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[i-begin][j-begin]= 1;
+							else if(assemble_list[j].Rs_or_Imm == 0 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
+							else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[i-begin][j-begin]= 1;
 						 }
 					 }break;
 			case stw:{
@@ -94,13 +94,13 @@ void create_dep_graph(int begin, int end)
 						if(temp.Rd != -1){
 							for(j = begin ; j < i ; j++){
 							if(assemble_list[j].Rn != -1 && assemble_list[j].Rn == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
-								else if(assemble_list[j].Rs_or_Imm == 1 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
-								else if(assemble_list[j].Rm_or_Imm == 1 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;						 
+								else if(assemble_list[j].Rs_or_Imm == 0 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;
+								else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[j-begin][i-begin] = 1;						 
 							}
 							for(j = i+1 ; j <= end; j++){
 								if(assemble_list[j].ins == stw && assemble_list[j].Rd == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
 								else if(assemble_list[j].Rn != -1 && assemble_list[j].Rn == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
-								else if(assemble_list[j].Rs_or_Imm == 1 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
+								else if(assemble_list[j].Rs_or_Imm == 0 && assemble_list[j].Rs_Imm != -1 && assemble_list[j].Rs_Imm == temp.Rd) data_dep_graph[i-begin][j-begin] = 1;
 								else if(assemble_list[j].Rm_or_Imm == 1 && assemble_list[j].Rm_Imm != -1 && assemble_list[j].Rm_Imm == temp.Rd) data_dep_graph[i-begin][j-begin]= 1;
 							}
 						}
