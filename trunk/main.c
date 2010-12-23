@@ -245,7 +245,7 @@ int main(int argc, char** argv)
 	//fprintf(stderr,"guabile\n");
 	//available_expr();
 	//fprintf(stderr,"guabi2le\n");
-	print_available_expr();
+	//print_available_expr();
 	/**
 	 *DEBUG FILE:
 	 *register allocation debug file is register_allocation.debug
