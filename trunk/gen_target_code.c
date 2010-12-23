@@ -388,6 +388,18 @@ int add_assemble(int label, enum instruction ins, int Rn, int Rd, int shift_dire
 	return 0;
 }
 
+/*int add_assemble_imm(enum instruction ins, int Rn, int Rd, int Imm)
+{
+	if (ins == ldw || ins == stw || ins == ldb || ins == stb)
+	{
+		if (Imm < )
+	}
+	else
+	{
+	}
+	return 0;
+}*/
+
 int add_special(char *content, enum instruction ins)
 {	
 	if ((assemble_num+1)*sizeof(assemble) > assemble_size)  
@@ -515,25 +527,35 @@ int check_bool_use(func_block *fb, int i)
 
 int assign_bool_value(enum instruction ins, func_block *fb, int i)
 {
-	int u0, u1, u2, r0, r1, r2;
+	int u0, u1, u2, r0, r1, r2, isImm;
 	u0 = triple_list[index_index[i]].tmp_uni;
 	u1 = triple_list[index_index[i]].arg1_uni;
 	u2 = triple_list[index_index[i]].arg2_uni;
 	r0 = fb->reg_alloc[u0];
-	r1 = fb->reg_alloc[u1];
-	r2 = fb->reg_alloc[u2];
-	r1 = load_operator(fb, u1, r1, 1);
-	r2 = load_operator(fb, u2, r2, 2);
+	if (u1 == -1)
+	{
+		r1 = 1;
+		add_assemble(-1, mov, -1, r1, 0, 0, -1, 1, triple_list[index_index[i]].arg1.imm_value);
+	}
+	else
+		r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
+	if (u2 == -1)
+	{
+		isImm = 1;
+		r2 = triple_list[index_index[i]].arg2.imm_value;
+	}
+	else
+		r2 = load_operator(fb, u2, fb->reg_alloc[u2], 2);
 	if (r0 == -1)
 	{
-		add_assemble(-1, cmpsub_a, r1, -1, 0, 0, -1, 0, r2);
+		add_assemble(-1, cmpsub_a, r1, -1, 0, 0, -1, isImm, r2);
 		add_assemble(-1, mov, -1, 3, 0, 0, -1, 1, 0);
 		add_assemble(-1, ins, -1, 3, 0, 0, -1, 1, 1);
 		add_assemble(-1, stw, 27, 3, 0, 0, -1, 1, fb->uni_table[u0]->offset);
 	}
 	else
 	{
-		add_assemble(-1, cmpsub_a, r1, -1, 0, 0, -1, 0, r2);
+		add_assemble(-1, cmpsub_a, r1, -1, 0, 0, -1, isImm, r2);
 		fb->reg_var[r0] = u0;
 		add_assemble(-1, mov, -1, r0, 0, 0, -1, 1, 0);
 		add_assemble(-1, ins, -1, r0, 0, 0, -1, 1, 1);
