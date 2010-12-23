@@ -18,11 +18,11 @@ ass_file="${1%.*}.s"
 echo $ass_file
 echo "Compiling..."
 echo "======================="
-$cmd $1
+$cmd $1 $3
 echo "======================="
 echo "Compile Done."
 echo "Linking..."
 echo "Execuating command : unicore32-linux-gcc "$ass_file $cmd_path"standard.out" -o $path$output_file
-unicore32-linux-gcc $ass_file $cmd_path"standard.out" --static  -o $path$output_file
+unicore32-linux-gcc $ass_file $cmd_path"standard.out" --static  -o $path$output_file 
 echo "Link Done."
 

@@ -32,7 +32,7 @@ void instruction_dispatch()
 	}*/
 	assemble_dispatch_index = malloc(sizeof(int) * assemble_num);
 	for(i = 0 ; i < assemble_num ; i++)	assemble_dispatch_index[i] = i;
-	for(i = 0 ; i <1 ; i++){
+	for(i = 0 ; i < instruction_block_num ; i++){
 		create_dep_graph(instruction_blocks[i*2], instruction_blocks[i*2+1]);
 	/*
 		for(j = 0 ; j < inst_num_block ;j ++){
@@ -125,7 +125,7 @@ void topo_sort(int begin , int end)
 		if(assemble_list[i].ins == ldw && in_degree[i-begin] != -1){
 			do_first(i-begin);
 			for(j = 0 ; j < inst_num_block ; j++){
-				if(in_degree[j] == 0 && j != i-begin+1/*data_dep_graph[i-begin][j] ==0*/){
+				if(in_degree[j] == 0 && assemble_list[i].Rd != assemble_list[j+begin].Rm_Imm && assemble_list[i].Rd != assemble_list[j+begin].Rn/*data_dep_graph[i-begin][j] ==0*/){
 					do_first(j);
 					break;
 				}
