@@ -28,7 +28,7 @@ int main(){
   int i;
   int data[128];
   for(i=0; i<128; i++)
-      data[i] = 128-i;
+      data[i] = 128 - i;
   for(i=0; i<128; i++){
     print_int(data[i]);
     print_char(' ');

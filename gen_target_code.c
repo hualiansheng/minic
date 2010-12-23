@@ -153,12 +153,12 @@ int setLabel()
 		{
 			if (!(triple_list[index_index[i+1]].op == set_rb && triple_list[index_index[i+2]].op == get_rb))
 			{
-				if (triple_list[index_index[i+1]].label == -1)		
+				if (triple_list[index_index[i+1]].label == -1)
 					triple_list[index_index[i+1]].label = l++;
 			}
 			j = triple_list[index_index[i]].arg2.temp_index;
-			if (triple_list[index_index[j]].op != get_rb && triple_list[index_index[j]].label == -1)		
-				triple_list[index_index[j]].label = l++;
+			if (triple_list[index_index[j]].op != get_rb && triple_list[index_index[j]].label == -1)
+					triple_list[index_index[j]].label = l++;
 		}
 		if (triple_list[index_index[i]].op == get_rb || triple_list[index_index[i]].op == not_op)
 		{
@@ -179,6 +179,20 @@ int setLabel()
 			(triple_list[index_index[i]].block)->fb->global_label = l++;
 		}
 	}
+	for (i = triple_list_index-2; i >= 0; i--)
+	{
+		if (triple_list[index_index[i]].is_deleted && triple_list[index_index[i]].label != -1)
+		{
+			for (j = i+1; triple_list[index_index[j]].is_deleted; j++)
+				;
+			if (triple_list[index_index[j]].label != -1)
+				triple_list[index_index[i]].label = triple_list[index_index[j]].label;
+			else
+				triple_list[index_index[j]].label = triple_list[index_index[i]].label;
+		}
+	}
+	//for (i = 0; i < triple_list_index; i++)
+	//	fprintf(stderr, "(%d) %d\n", i, triple_list[index_index[i]].label);
 	return 0;
 }
 
@@ -224,7 +238,7 @@ int convert()
 				continue;
 			if (triple_list[index_index[i]].op != enterF)
 				load_live(fb, i);
-			if (triple_list[index_index[i]].label != -1)
+			if (!triple_list[index_index[i]].is_deleted && triple_list[index_index[i]].label != -1)
 				add_assemble(triple_list[index_index[i]].label, label, -1, -1, 0, 0, -1, 0, -1);
 			g[triple_list[index_index[i]].op-3000](fb, i);
 		}

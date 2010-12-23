@@ -138,10 +138,16 @@ int main(int argc, char** argv)
 			case 'O':
 				switch(optarg[0])
 				{
+					case '3':
+						data_flow_flag = 1;
+						dispatch_flag = 1;
+						break;
 					case '2':
 						data_flow_flag = 1;
+						break;
 					case '1':
 						dispatch_flag = 1;
+						break;
 					case '0':
 						// No optmizing at all
 						break;
@@ -236,7 +242,7 @@ int main(int argc, char** argv)
 		fprintf(stderr,"Running available expression analysis...");
 		iteration_count = available_expr();
 		fprintf(stderr,"done, iteration count: %d\n",iteration_count);
-	//print_available_expr();
+		print_available_expr();
 	}
 	//live variable analyzing
 	fprintf(stderr,"Analyzing lively variables...");
@@ -258,9 +264,6 @@ int main(int argc, char** argv)
 	register_allocation(AVALIABLE_REG_NUM);
 	fprintf(stderr,"done.\n");
 	
-	/**
-	 * TEMP
-	 */
 	/**
 	 *DEBUG FILE:
 	 *register allocation debug file is register_allocation.debug
