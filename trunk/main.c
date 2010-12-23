@@ -63,10 +63,19 @@ int main(int argc, char** argv)
 #endif
 	/**
 	 *Optimizing arguments:
-	 *assemble dispatch
+	 * *assemble dispatch
+	 * *available expression dataflow analysis
 	 */
 	int dispatch_flag = 0;
+	int data_flow_flag = 0;
 	/*--*/
+	/*
+	 * Iteration count of available analysis
+	 * FOR DEBUG
+	 */
+	int iteration_count;
+
+
 	int gen_symtbl_result ;
 
 	FILE *source_file, *target_file;
@@ -129,13 +138,12 @@ int main(int argc, char** argv)
 			case 'O':
 				switch(optarg[0])
 				{
-					case '0':
-						// No optmizing at all
-						break;
 					case '2':
-					//	data_flow_flag = 1;
+						data_flow_flag = 1;
 					case '1':
 						dispatch_flag = 1;
+					case '0':
+						// No optmizing at all
 						break;
 					default:
 						;
@@ -218,7 +226,18 @@ int main(int argc, char** argv)
 	{	
 		print_basic_block();
 		return 0;
-	}	
+	}
+	//作数据流分析的准备：建立联合符号表
+	gen_uni_table();
+	//可用表达式分析
+	if(data_flow_flag)
+	{
+		fprintf(stderr,"OPTIMIZATION: will do extra dataflow analysis!\n");
+		fprintf(stderr,"Running available expression analysis...");
+		iteration_count = available_expr();
+		fprintf(stderr,"done, iteration count: %d\n",iteration_count);
+	//print_available_expr();
+	}
 	//live variable analyzing
 	fprintf(stderr,"Analyzing lively variables...");
 	live_var_anal();
@@ -242,10 +261,6 @@ int main(int argc, char** argv)
 	/**
 	 * TEMP
 	 */
-	//fprintf(stderr,"guabile\n");
-	//available_expr();
-	//fprintf(stderr,"guabi2le\n");
-	//print_available_expr();
 	/**
 	 *DEBUG FILE:
 	 *register allocation debug file is register_allocation.debug

@@ -1,4 +1,4 @@
-OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o instruction_dispatch.o available_expr.o
+OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o instruction_dispatch.o available_expr.o prepare_dataflow.o
 CSCOPE = *.c *.h *.l *.y
 ARGS = -g -Wall
 minic: $(OBJECT)
@@ -29,6 +29,8 @@ main.o : main.c validation_utils.h main.h register_stats.h
 	gcc $(ARGS) -c main.c
 gen_basic_block.o: gen_basic_block.c basic_block.h
 	gcc $(ARGS) -c gen_basic_block.c
+prepare_dataflow.o: prepare_dataflow.c basic_block.h
+	gcc $(ARGS) -c prepare_dataflow.c
 live_var_anal.o: live_var_anal.c basic_block.h
 	gcc $(ARGS) -c live_var_anal.c
 register_allocation.o: register_allocation.c register.h basic_block.h register_stats.h

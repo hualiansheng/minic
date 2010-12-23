@@ -3,7 +3,6 @@
 #include <memory.h>
 #include <assert.h>
 #include "gen_intermediate_code.h"
-#define INIT_ITEM_NUM 64
 
 extern AST_NODE* tree_root;
 extern triple *triple_list;
@@ -14,10 +13,11 @@ extern func_block *fblist;
 extern int block_num;
 
 int live_var_anal();
-int live_var_func(func_block *fb);
+/*
 int gen_uni_table(func_block *fb);
 int gen_tmp_item(func_block *fb, int i);
 int get_uni_item(func_block *fb, int i, char *var_name);
+*/
 int set_prepare(func_block *fb);
 int solve_in_out(func_block *fb);
 int analyze_live(func_block *fb);
@@ -29,20 +29,14 @@ int live_var_anal()
 	func_block *fb;
 	for (fb = fblist; fb != NULL; fb = fb->next)
 	{
-		live_var_func(fb);
+		set_prepare(fb);
+		solve_in_out(fb);
+		analyze_live(fb);
 	}
 	return 0;
 }
 
-int live_var_func(func_block *fb)
-{
-	gen_uni_table(fb);
-	set_prepare(fb);
-	solve_in_out(fb);
-	analyze_live(fb);
-	return 0;
-}
-
+/*
 int gen_uni_table(func_block *fb)
 {
 	int begin, end, i;
@@ -136,7 +130,7 @@ int get_uni_item(func_block *fb, int i, char *var_name)
 	}
 	return j;
 }
-
+*/
 int set_prepare(func_block *fb)
 {
 	int i,j;
