@@ -1,3 +1,4 @@
+	.comm	a, 4, 4
 	.text
 	.global	main
 	.type	main,function
@@ -12,15 +13,17 @@ main:
 	stw	r3, [r27+], #-56
 	ldw	r5, [r27+], #-56
 	ldw	r4, [r27+], #-60
-	add	r6, r5, #4
-	ldw	r4, [r6+], #0
-	add	r4, r4, #1
+	mov	r3, #1
+	ldw	r1, .L2+0
+	stw	r3, [r1+], #0
 	mov	r3, #2
-	stw	r3, [r6+], #0
-	ldw	r4, [r6+], #0
-	add	r4, r4, #1
-	ldw	r4, [r6+], #0
-	add	r4, r4, #1
+	ldw	r1, .L2+0
+	stw	r3, [r1+], #0
+	add	r5, r5, #4
+	mov	r3, #4
+	stw	r3, [r5+], #0
+	mov	r3, #3
+	stw	r3, [r5+], #0
 	mov	r0, r4
 .L1:
 	ldw	r30, [r27+], #-4
@@ -28,3 +31,4 @@ main:
 	ldw	r27, [r27+], #-12
 	jump	r30
 .L2:
+	.word	a

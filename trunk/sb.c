@@ -1,9 +1,10 @@
+int a;
 int main()
 {
-	int a[10];
-	int i;
-	i = a[1] + 1;
-	a[1] =2;
-	i = a[1] + 1;
- 	return a[1]+1;
+	int b, num[10];
+	a = 1;
+	a = 2;
+	num[1] = 4;
+	num[1] = 3;
+ 	return b;
 }
