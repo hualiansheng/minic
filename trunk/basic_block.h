@@ -1,9 +1,10 @@
 #ifndef BASIC_BLOCK_H_
 #define BASIC_BLOCK_H_
 #include "symtbl.h"
-
+struct basic_block;
 typedef struct PreList {
 	int m;
+	struct basic_block* ptr;
 	struct PreList* next;
 }PreList;
 

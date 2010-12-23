@@ -126,6 +126,8 @@ void add_triple(enum operator op, int arg1, int arg2, int result_type, int arg1_
 	//Brills modified here:
 	//Bind triple with symtbl
 	triple_list[triple_list_index].symtbl = scope_stack[scope_top - 1];
+	//可用表达式优化需要：标记该式是否被删除
+	triple_list[triple_list_index].is_deleted = 0;
 	index_index[triple_list_index] = triple_list_index;
 	triple_list_index ++;
 }
