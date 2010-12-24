@@ -110,10 +110,10 @@ int memory_allocation()
 		para_num = (triple_list[index_index[fb->start->begin]].symtbl)->para_num;
 		for (i = 4, off = 4; i < para_num; i++, off += 4)
 			fb->uni_table[i]->offset = off;
-		if (fb->reg_used < 10)
+		if (fb->reg_used <= (CALLER_REG_END-CALLER_REG_START+1))
 			off = -16;
 		else
-			off = -16 - (fb->reg_used - 9) * 4;
+			off = -16 - (fb->reg_used - (CALLER_REG_END-CALLER_REG_START+1)) * 4;
 		for (i = 0; i < 4 && i < para_num; i++)
 		{
 			fb->uni_table[i]->offset = off;
@@ -1329,7 +1329,7 @@ int enterF_code(func_block *fb, int i)
 			add_assemble(-1, mov, -1, fb->reg_alloc[j], 0, 0, -1, 0, j);
 		}
 		else
-			add_assemble(-1, stw, 27, j, 0, 0, -1, 1, ptr->item[j].offset);
+			add_assemble(-1, stw, 27, j, 0, 0, -1, 1, ptr->item[ptr->para_num-1-j].offset);
 	}
 	for (j = ptr->para_num; j < fb->uni_item_num; j++)
 	{
