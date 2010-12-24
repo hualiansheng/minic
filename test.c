@@ -1,12 +1,7 @@
-
-char* f(int x)
+int f(int a, int b, int c, int d, int e){
+	return 0;
+}
+int main()
 {
-	int i,a,b,c;
-	i = a+b;
-	if(a)
-		c = a+b;
-	else
-		c = a+b;
-	
-	return a+b;
+	f(1, 2, 3, 4, 5);
 }

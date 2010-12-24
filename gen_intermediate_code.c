@@ -709,7 +709,12 @@ int rvalue_code(AST_NODE *p)
 						   ptr = ptr->leftChild;
 					   }
 				   }//end while
+				   /*
 				   for(i = 0 ; i < arg_num ; i++){
+					   add_triple(param,arg_list[i],-1,1,arg_type_list[i],-1);
+				   }*/
+				   //reverse:
+				   for(i = arg_num - 1; i >= 0; i--){
 					   add_triple(param,arg_list[i],-1,1,arg_type_list[i],-1);
 				   }
 				   temp_symtbl = symtbl_query(p->leftChild->symtbl, p->leftChild->content.s_content, 0);
