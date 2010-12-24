@@ -1289,6 +1289,18 @@ void resume_doubleop(AST_NODE *p)
 				a_index = triple_list_index-1;
 				add_triple(assign_op, (int)temp_item.item.var_name, a_index, 0, 0, 1);
 			}
+			else if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num == 1) {
+				if(temp_item.flag == 1) add_triple(add_op, (int)temp_item.item.var_name, 1, 2, 0, 2);
+				else add_triple(minus_op, (int)temp_item.item.var_name, 1, 2, 0, 2);
+				a_index = triple_list_index-1;
+				add_triple(assign_op, (int)temp_item.item.var_name, a_index, 2, 0, 1);
+			}
+			else if(temp_symtbl->type == INT_T&& temp_symtbl->star_num == 1) {
+				if(temp_item.flag == 1) add_triple(add_op, (int)temp_item.item.var_name, 4, 3, 0, 2);
+				else add_triple(minus_op, (int)temp_item.item.var_name, 4, 3, 0, 2);
+				a_index = triple_list_index-1;
+				add_triple(assign_op, (int)temp_item.item.var_name, a_index, 3, 0, 1);
+			}
 			else {
 				if(temp_item.flag == 1) add_triple(add_op, (int)temp_item.item.var_name, 1, 1, 0, 2);
 				else add_triple(minus_op, (int)temp_item.item.var_name, 1, 1, 0, 2);
