@@ -187,7 +187,8 @@ int pipline_Ex(PIPLINE* pipline, CPU_info* cpu_info){
 					//printf("print int\n");
 					sim_print(pipline, pipline->regs->r[0], INT);
 				}
-				if(strcmp(func_name, "printline_int") == 0){
+				else if(strcmp(func_name, "printline_int") == 0){
+					printf("printline_int\n");
 					sim_print(pipline, pipline->regs->r[0], INT);
 					printf("\n");
 				}
