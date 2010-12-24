@@ -1152,7 +1152,7 @@ int check_tail_recursion(func_block *fb, int i)
 		return 1;
 	if (triple_list[index_index[i+1]].op == return_op && triple_list[index_index[i+2]].op == leaveF)
 	{
-		if (triple_list[index_index[i+1]].arg1_uni == -1)
+		if (triple_list[index_index[i+1]].arg1_type == -1)
 			return 1;
 	}
 	return 0;
@@ -1189,8 +1189,8 @@ int tail_recursion(func_block *fb, int i)
 				store_result(fb, i, mov, para_num-1-j, -1, fb->reg_alloc[para_num-1-j], 0, 0, -1, 1, triple_list[index_index[i-1-j]].arg1.imm_value);
 			else
 			{
-				add_assemble(-1, mov, -1, 3, 0, 0, -1, 1, triple_list[index_index[i-1-j]].arg1.imm_value);
-				add_assemble(-1, stw, 27, 3, 0, 0, -1, 1, k);
+				add_assemble(-1, mov, -1, 28, 0, 0, -1, 1, triple_list[index_index[i-1-j]].arg1.imm_value);
+				add_assemble(-1, stw, 27, 28, 0, 0, -1, 1, k);
 				k += 4;
 			}
 		}
@@ -1260,8 +1260,8 @@ int call_code(func_block *fb, int i)
 				add_assemble(-1, mov, -1, para_num-1-j, 0, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
 			else
 			{
-				add_assemble(-1, mov, -1, 3, 0, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
-				add_assemble(-1, stw, 29, 3, 0, 0, -1, 1, k);
+				add_assemble(-1, mov, -1, 28, 0, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
+				add_assemble(-1, stw, 29, 28, 0, 0, -1, 1, k);
 				k += 4;
 			}
 		}

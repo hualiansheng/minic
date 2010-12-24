@@ -309,7 +309,7 @@ int color(func_block *fb, int k)
 		if (fb->reg_alloc[j] > i)
 			i = fb->reg_alloc[j];
 		if (fb->reg_alloc[j] > CALLER_REG_END)
-			fb->reg_alloc[j]++;
+			fb->reg_alloc[j] = fb->reg_alloc[j]-CALLER_REG_END+CALLEE_REG_START-1;
 		//fb->uni_table[j]->reg = fb->reg_alloc[j];
 	}
 	fb->reg_used = i - CALLER_REG_START + 1 ;
