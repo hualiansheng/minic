@@ -27,10 +27,12 @@ Options:\n\
 	----------------------------------\n\
 	Target machine register system info (corresponding with ABI):\n\
 		Caller save: r%d - r%d\n\
-		Callee save: r%d - r%d\n", CALLER_REG_START,
+		Callee save: r%d - r%d\n\
+		Totally %d usable registers\n", CALLER_REG_START,
 	CALLER_REG_END,
 	CALLEE_REG_START,
-	CALLEE_REG_END);
+	CALLEE_REG_END,
+	AVALIABLE_REG_NUM);
 }
 /**
  * parse the input file name, cut out the extend name.

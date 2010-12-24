@@ -155,7 +155,7 @@ int init_value()
 		for(i = 0; i < fb->code_num; i++)
 			memset(fb->available_status[i], 0, (fb->code_num/32+1)*sizeof(int));
 		//for each basic block:
-		for(bb = fblist -> start; bb != fblist -> over -> next; bb = bb->next)
+		for(bb = fb -> start; bb != fb -> over -> next; bb = bb->next)
 		{
 			//for each triple in basic block:
 			/**
