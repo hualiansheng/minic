@@ -1,0 +1,73 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{fontspec} %字体包
+\usepackage{xunicode} %unicode
+\usepackage{indentfirst} %缩进包
+\usepackage{graphicx} %图片包
+\usepackage{color} %颜色包
+\usepackage{fancyhdr} %页眉页脚
+\usepackage{listings}
+\usepackage{times}
+%\usepackage{tikz}
+\lstset{language=C++,tabsize=4, keepspaces=true,
+    backgroundcolor=\color{white}, % 
+    frame=none,   % frame=single，表示要边框; trbl
+    keywordstyle=\color{blue}\bfseries,
+    breakindent=22pt,
+    numbers=left,stepnumber=1,
+    basicstyle=\footnotesize,
+    showspaces=false,
+    flexiblecolumns=true,
+    breaklines=true, breakautoindent=true,breakindent=4em,
+    escapeinside={/*@}{@*/}
+}
+
+%\lstset{language=C++}%这条命令可以让LaTeX排版时将C++键字突出显示
+%\lstset{breaklines}%这条命令可以让LaTeX自动将长的代码行换行排版
+%\lstset{extendedchars=false}%这一条命令可以解决代码跨页时，章节标题，页眉等汉字不显示的问题
+
+\pagestyle{fancy}
+\lhead{\bfseries unicore32子集模拟器期末报告} 
+\chead{} 
+\rhead{\bfseries} 
+
+
+\newcommand\song{\fontspec{宋体}}
+\newcommand\hei{\fontspec{黑体}}
+\newcommand\kai{\fontspec{楷体_GB2312}}
+\newcommand\lishu{\fontspec{隶书}}
+\newcommand\yahei{\fontspec{微软雅黑}}
+%\newcommand\lishu{\fontspec[ExternalLocation=/media/hda5/windows/Fonts/]{simli.ttf}}
+%\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+\setromanfont[BoldFont={黑体}]{楷体_GB2312}
+
+\begin{document}
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+
+\author{\song{李春奇} \and \song{彭焯} \and \song{华连盛} \and \song{王衎}}
+\title{算法设计与分析第一次作业}
+\maketitle
+\newpage
+\section{项目概述}
+本项目实现了一个unicore32体系结构的模拟器，模拟器实现了CPU的五级流水、分立的i-cache和d-cache、内存管理、动态指令统计等模块，实现的指令集是unicore32体系结构指令集的一个子集，与同组的四个人所做的编译器实现的c语言子集相对应。最终实现的目标是能够使得实验室提供的unicore-gcc编译得到的ELF可执行文件能够正确在模拟器上运行，同组的编译器能够正确的在模拟器上运行。
+
+本项目由于和编译器同时展开，所以同组共有四名同学。在编译器和模拟器的分工上，有着一定的偏重，其中李春奇、彭焯同学偏重于模拟器的实现，华连盛、王\song{衎}同学偏重于编译器的实现。但是在设计阶段和后期编译目标代码生成、编译优化、模拟器综合验证部分是由四名同学一起来完成的，即李春奇、彭焯同学同时也参与了编译器方面的工作，华连盛、王\song{衎}同学也同时参与了模拟器的验证工作。
+
+项目最终实现的模拟器能够在linux环境下正确运行，需要外部libelf库，请在项目svn的lib文件夹下解压安装。项目svn地址：https://minic.googlecode.com/svn/trunk/simulator
+
+\section{模块说明}
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
