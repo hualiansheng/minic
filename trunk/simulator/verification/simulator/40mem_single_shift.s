@@ -1,4 +1,4 @@
-	.file	"04mem_single_shift.c"
+	.file	"40mem_single_shift.c"
 	.text
 	.align	2
 	.global	main

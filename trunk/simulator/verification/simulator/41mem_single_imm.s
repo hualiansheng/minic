@@ -1,4 +1,4 @@
-	.file	"04mem_single_shift.c"
+	.file	"41mem_single_imm.c"
 	.text
 	.align	2
 	.global	main
@@ -13,7 +13,18 @@ main:
 	sub	fp, ip, #4
 	sub	sp, sp, #12
 
-	
+	sub r0, fp, #2
+	mov r1, #8
+	stw r1, [r0+], #2
+	@ address $fp value 8
+	ldw r2, [r0+], #2
+	@ register $r2 value 8
+
+	mov r1, #256
+	stb r1, [r0+], #2
+	@address $fp value 0
+	ldb r3, [r0+], #2
+	@ register $r3, value 0
 
 
 	mov	ip, fp
