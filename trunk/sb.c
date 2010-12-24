@@ -3,10 +3,10 @@ void print_char(char c);
 void print_string(char* s);
 int rand_int(int num);
 
-int qsort(int *data,int begin, int end){
+void qsort(int *data,int begin, int end){
   int i, j, tmp;
   if(end <= begin + 1)
-    return 0;
+    return;
   j=begin+1;
   for(i=begin+1; i<end; i++){
     if(data[i] < data[begin]){
@@ -21,7 +21,7 @@ int qsort(int *data,int begin, int end){
   data[j-1] = tmp;
   qsort(data,begin, j-1);
   qsort(data,j, end);
-  return 0;
+  return;
 }
 
 int main(){

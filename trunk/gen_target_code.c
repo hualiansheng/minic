@@ -245,10 +245,10 @@ int convert()
 		{
 			if (triple_list[index_index[i]].is_deleted)
 				continue;
-			if (triple_list[index_index[i]].op != enterF)
-				load_live(fb, i);
 			if (!triple_list[index_index[i]].is_deleted && triple_list[index_index[i]].label != -1)
 				add_assemble(triple_list[index_index[i]].label, label, -1, -1, 0, 0, -1, 0, -1);
+			if (triple_list[index_index[i]].op != enterF)
+				load_live(fb, i);
 			g[triple_list[index_index[i]].op-3000](fb, i);
 		}
 		func_assem_end(fb);
