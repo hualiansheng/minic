@@ -320,7 +320,7 @@ int check_para_ptr(func_block *fb, int i, int base)
 		j++;
 	}
 	p = func_query(tree_root->symtbl, triple_list[index_index[i+j]].arg2.var_name);
-	if (p->item[p->para_num-j].star_num != 0)
+	if (p->item[j-1].star_num != 0)
 	{
 		while (j >= 0)
 		{

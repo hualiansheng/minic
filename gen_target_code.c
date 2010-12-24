@@ -108,13 +108,18 @@ int memory_allocation()
 	for (fb = fblist; fb != NULL; fb = fb->next)
 	{
 		para_num = (triple_list[index_index[fb->start->begin]].symtbl)->para_num;
-		for (i = para_num-5, off = 4; i >= 0; i--, off += 4)
+		for (i = 4, off = 4; i < para_num; i++, off += 4)
 			fb->uni_table[i]->offset = off;
 		if (fb->reg_used < 10)
 			off = -16;
 		else
 			off = -16 - (fb->reg_used - 9) * 4;
-		for (i = (para_num<4)?0:para_num-4; i < fb->uni_item_num; i++)
+		for (i = 0; i < 4 && i < para_num; i++)
+		{
+			fb->uni_table[i]->offset = off;
+			off -= 4;
+		}
+		for (i = para_num; i < fb->uni_item_num; i++)
 		{
 			if (fb->uni_table[i]->isGlobal)
 				continue;
@@ -1164,18 +1169,18 @@ int tail_recursion(func_block *fb, int i)
 	int para_num = (triple_list[index_index[fb->start->begin]].symtbl)->para_num;
 	for (j = 0, k = 4; j < para_num; j++)
 	{
-		if (!((fb->live_status[1][(para_num-1-j)/32]>>(31-(para_num-1-j)%32)) & 1))
+		if (!((fb->live_status[1][j/32]>>(31-j%32)) & 1))
 			continue;
-		u = triple_list[index_index[i-1-j]].arg1_uni;
+		u = triple_list[index_index[i-para_num+j]].arg1_uni;
 		if (u != -1)
 		{
-			r = load_operator(fb, u, fb->reg_alloc[u], 2);
+			r = load_operator(fb, u, fb->reg_alloc[u], 28);
 			if (j < 4)
 			{
-				if (u != para_num-1-j)
-					store_result(fb, i, mov, para_num-1-j, -1, fb->reg_alloc[para_num-1-j], 0, 0, -1, 0, r);
+				if (u != j)
+					store_result(fb, i, mov, j, -1, fb->reg_alloc[j], 0, 0, -1, 0, r);
 				//else
-				//	add_assemble(-1, stw, 27, r, 0, 0, -1, 1, fb->uni_table[para_num-1-j]->offset);
+				//	add_assemble(-1, stw, 27, r, 0, 0, -1, 1, fb->uni_table[j]->offset);
 			}
 			else
 			{
@@ -1186,10 +1191,10 @@ int tail_recursion(func_block *fb, int i)
 		else
 		{
 			if (j < 4)
-				store_result(fb, i, mov, para_num-1-j, -1, fb->reg_alloc[para_num-1-j], 0, 0, -1, 1, triple_list[index_index[i-1-j]].arg1.imm_value);
+				store_result(fb, i, mov, j, -1, fb->reg_alloc[j], 0, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
 			else
 			{
-				add_assemble(-1, mov, -1, 28, 0, 0, -1, 1, triple_list[index_index[i-1-j]].arg1.imm_value);
+				add_assemble(-1, mov, -1, 28, 0, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
 				add_assemble(-1, stw, 27, 28, 0, 0, -1, 1, k);
 				k += 4;
 			}
@@ -1240,14 +1245,14 @@ int call_code(func_block *fb, int i)
 		m = k * 4;
 	if (m != 0)
 		add_assemble(-1, sub, 29, 29, 0, 0, -1, 1, m);
-	for (j = para_num-1, k = 0; j >= 0; j--)
+	for (j = 0, k = 0; j < para_num; j++)
 	{
 		if (triple_list[index_index[i-para_num+j]].arg1_uni != -1)
 		{
 			tmp = fb->reg_alloc[triple_list[index_index[i-para_num+j]].arg1_uni];
-			tmp = load_operator(fb, triple_list[index_index[i-para_num+j]].arg1_uni, tmp, 2);
-			if (j >= para_num-4)
-				add_assemble(-1, mov, -1, para_num-1-j, 0, 0, -1, 0, tmp);
+			tmp = load_operator(fb, triple_list[index_index[i-para_num+j]].arg1_uni, tmp, 28);
+			if (j < 4)
+				add_assemble(-1, mov, -1, j, 0, 0, -1, 0, tmp);
 			else
 			{
 				add_assemble(-1, stw, 29, tmp, 0, 0, -1, 1, k);
@@ -1256,8 +1261,8 @@ int call_code(func_block *fb, int i)
 		}
 		else
 		{
-			if (j >= para_num-4)
-				add_assemble(-1, mov, -1, para_num-1-j, 0, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
+			if (j < 4)
+				add_assemble(-1, mov, -1, j, 0, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
 			else
 			{
 				add_assemble(-1, mov, -1, 28, 0, 0, -1, 1, triple_list[index_index[i-para_num+j]].arg1.imm_value);
@@ -1303,7 +1308,7 @@ int param_code(func_block *fb, int i)
 
 int enterF_code(func_block *fb, int i)
 {
-	int j, u;
+	int j;
 	symtbl_hdr *ptr = triple_list[index_index[i]].symtbl;
 	add_assemble(-1, stw, 29, 31, 0, 0, -1, 1, -4);
 	add_assemble(-1, stw, 29, 30, 0, 0, -1, 1, -8);
@@ -1318,14 +1323,13 @@ int enterF_code(func_block *fb, int i)
 	}
 	for (j = 0; j < 4 && j < ptr->para_num; j++)
 	{
-		u = ptr->para_num - 1 - j;
-		if (((fb->live_status[1][u/32] >> (31-u%32)) & 1) && fb->reg_alloc[u] != -1)
+		if (((fb->live_status[1][j/32] >> (31-j%32)) & 1) && fb->reg_alloc[j] != -1)
 		{
-			fb->reg_var[fb->reg_alloc[u]] = u;
-			add_assemble(-1, mov, -1, fb->reg_alloc[u], 0, 0, -1, 0, j);
+			fb->reg_var[fb->reg_alloc[j]] = j;
+			add_assemble(-1, mov, -1, fb->reg_alloc[j], 0, 0, -1, 0, j);
 		}
 		else
-			add_assemble(-1, stw, 27, j, 0, 0, -1, 1, ptr->item[u].offset);
+			add_assemble(-1, stw, 27, j, 0, 0, -1, 1, ptr->item[j].offset);
 	}
 	for (j = ptr->para_num; j < fb->uni_item_num; j++)
 	{
