@@ -1164,19 +1164,18 @@ int tail_recursion(func_block *fb, int i)
 	int para_num = (triple_list[index_index[fb->start->begin]].symtbl)->para_num;
 	for (j = 0, k = 4; j < para_num; j++)
 	{
+		if (!((fb->live_status[1][(para_num-1-j)/32]>>(31-(para_num-1-j)%32)) & 1))
+			continue;
 		u = triple_list[index_index[i-1-j]].arg1_uni;
 		if (u != -1)
 		{
 			r = load_operator(fb, u, fb->reg_alloc[u], 2);
 			if (j < 4)
 			{
-				if ((fb->live_status[1][(para_num-1-j)/32]>>(31-(para_num-1-j)%32)) & 1)
-				{
-					if (u != para_num-1-j)
-						store_result(fb, i, mov, para_num-1-j, -1, fb->reg_alloc[para_num-1-j], 0, 0, -1, 0, r);
-				}
-				else
-					add_assemble(-1, stw, 27, r, 0, 0, -1, 1, fb->uni_table[para_num-1-j]->offset);
+				if (u != para_num-1-j)
+					store_result(fb, i, mov, para_num-1-j, -1, fb->reg_alloc[para_num-1-j], 0, 0, -1, 0, r);
+				//else
+				//	add_assemble(-1, stw, 27, r, 0, 0, -1, 1, fb->uni_table[para_num-1-j]->offset);
 			}
 			else
 			{
