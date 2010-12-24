@@ -35,7 +35,7 @@ int main(){
   }
   print_char('\n');
   print_char('\n');
-  qsort(data,0, 128);
+  qsort(data,0, 5);
   for(i=0; i<128; i++){
     print_int(data[i]);
     print_char(' ');
