@@ -1,0 +1,18 @@
+digraph G {
+	Simulator [shape=box];
+	Simulator -> Console_Module;
+	Console_Module -> CPU_Module;
+	Console_Module -> Debugger_Module;
+	Process_Module -> ELF_Parser_Module;
+	Process_Module -> Memory_Module;
+	CPU_Module -> Pipline_Module;
+	CPU_Module -> Process_Module;
+	Debugger_Module -> Interpret_Module;
+	Debugger_Module -> Breakpoint_Module;
+	Cache_Module -> Memory_Module;
+	Pipline_Module -> Cache_Module;
+	Pipline_Module -> Register_Module;
+	Pipline_Module -> Decode_Module;
+	Pipline_Module -> InstExec_Module;
+}
+
