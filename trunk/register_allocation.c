@@ -238,7 +238,7 @@ int union_node(func_block *fb, int i, int j)
 			var_vexs[l].adj_vexs[j/32] = var_vexs[l].adj_vexs[j/32] - (1<<(31-j%32));
 			if ((var_vexs[i].adj_vexs[l/32] & (1<<(31-l%32))) != (1<<(31-l%32)))
 			{
-				var_vexs[l].adj_vexs[i/32] = var_vexs[l].adj_vexs[j/32] | (1<<(31-i%32));
+				var_vexs[l].adj_vexs[i/32] = var_vexs[l].adj_vexs[i/32] | (1<<(31-i%32));
 				var_vexs[i].adj_vexs[l/32] = var_vexs[i].adj_vexs[l/32] | (1<<(31-l%32));
 				new_deg++;
 			}
@@ -312,7 +312,7 @@ int color(func_block *fb, int k)
 			fb->reg_alloc[j] = fb->reg_alloc[j]-CALLER_REG_END+CALLEE_REG_START-1;
 		//fb->uni_table[j]->reg = fb->reg_alloc[j];
 	}
-	fb->reg_used = i - CALLER_REG_START + 1 ;
+	fb->reg_used = i - CALLER_REG_START + 1;
 	return 0;
 }
 
