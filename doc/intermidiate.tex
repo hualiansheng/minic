@@ -187,13 +187,13 @@ typedef struct triple
 	int arg2_type; 
 	symtbl_hdr* symtbl; //本条三元式所属范围的符号表
 	struct basic_block *block; //本条三元式所属的基本块
-	int arg1_uni; //在数据流分析时arg1所代表的变量的index
-	int arg2_uni; //在数据流分析时arg2所代表的变量的index
-	int tmp_uni; //在数据流分析是本条三元式运算结果代表的变量的index
+	int arg1_uni; //“联合查询表”中第一个参数的编号
+	int arg2_uni; //“联合查询表”中第二个参数的编号
+	int tmp_uni; //“联合查询表”中三元式标号（临时变量）的编号
 	int label; //本条三元式的标号（仅当本条三元式是跳转语句的目标时有效）
 }triple;
 \end{lstlisting}
-
+有关“联合查询表”的作用，参见“机器无关优化”一节的\hyperref[jointtable]{“基础数据结构”}。
 \subsection{三元式指令列表}
 \label{tripleinst}
 下面的表格给出了MiniC的三元式中所有的\verb|op|以及对应的功能和三元式类型（每种类型的具体解释见本节起始处的说明）：
@@ -297,17 +297,18 @@ typedef struct triple
 %TODO:表达式转换 from毛哥
 \subsection{生成基本块}
 \label{basicblock}
-基本块，是一些机器无关的全局优化的操作对象，其定义见\cite{sunjiasu}的第9章。实际实现时，基本块的基本成员仅有几个指针，分别指向块首和块尾以及该块连出和连入的其它基本块。其余的成员都是为了保存数据流分析的结果而设的:
+基本块，是一些机器无关的全局优化的操作对象，其定义见\cite{sunjiasu}的第9章。实际实现时，基本块的基本成员仅有几个指针，分别指向块首和块尾的三元式以及该块的前驱和后继。同时，为了方便遍历某个函数的所有基本块，我们还将所有基本块连成了一条链。注意，一个基本块的前驱可以有很多个，但后继最多只有两个。
 \begin{lstlisting}
 typedef struct basic_block {
-	int begin;
-	int end;
-	int m;
-	struct basic_block* prev;
-	struct basic_block* next;
-	struct basic_block* follow;
-	struct basic_block* jump;
-	struct func_block* fb;
+	int begin; //起始三元式编号
+	int end; //结束三元式编号
+	int m; //本块在链表中的位置
+	struct basic_block* prev; //链表中的上一块
+	struct basic_block* next; //链表中的下一块
+	struct basic_block* follow; //直接后继
+	struct basic_block* jump; //跳转后继
+	PreList* predecessor; //前驱链表
+	struct func_block* fb; //所属函数
 }basic_block;
 \end{lstlisting}
 
@@ -346,5 +347,85 @@ MiniC在三元式表示上进行了如下优化：
 \paragraph*{简单的强度削减} 虽然这部分是机器相关的（在Unicore32中，乘法指令需要2 CPU cycles，而移位指令仅需要1 CPU cycle），但在三元式部分做较为简单，即把乘以2的幂次的三元式都替换成左移幂次位数的三元式。
 
 \subsection{数据流分析及相关优化}
+数据流分析技术都基于相似的算法框架和数据结构，只是在初值和迭代方程处不同。下面将介绍我们用于数据流分析的数据结构，并将重点介绍我们设计或改造的数据流分析算法。
 
+数据流分析算法的范围是一个函数，因此下面的讨论的都是怎样在单个函数中进行数据流分析。
 
+\subsubsection{基础数据结构}
+\label{jointtable}
+数据流分析算法具有以下特点：
+\begin{itemize}
+	\item 每一个“程序点”，即每个三元式之前和之后，都有不同的状态集，并且该状态集的成员可能是所有三元式（标号，也即临时变量）或所有变量
+	\item 状态集成员的状态只有2种
+	\item 需要多次迭代，每个基本块的输入或输出是根据其前驱的输入和输出进行交汇运算而得，交汇运算一般为集合并或集合交，因此需要能够快速进行这两种操作的集合表示。 
+\end{itemize}
+这些特点决定了数据流分析算法需要位向量来表示状态集，因此就会引出如何将变量或或三元式标号映射到位向量的某一位的方法；与此同时，一些算法还需要快速判断两个变量名是否代表同一个变量（因为有不同的作用域），所以我们为每一个有值的三元式建立了符号表项，并使用了一个“联合查询表”统一地保存函数中出现的所有变量和标号的符号表项指针。我们还将三元式中操作数及结果所代表的变量或标号在“联合查询表”中的位置保存了在三元式的结构中。现在，某个变量或标号在位向量中的位置就是它在“联合查询表”中的索引；比较变量相同只需判断它们在“联合查询表”中的索引是否相等。
+
+由于是在函数范围内做数据流分析，因此我们还建立了表示一个函数的数据结构，它包含了指向该函数首、尾基本块的指针以及该函数的所有数据流分析状态信息，还包括了以后的寄存器分配信息。
+\begin{lstlisting}
+typedef struct func_block {
+	basic_block* start; //函数入口基本块
+	basic_block* over; //结束基本块
+	struct func_block* prev; //函数链中上一个函数
+	struct func_block* next; //函数链中下一个函数
+
+	int code_num; //函数中三元式个数
+	int bb_num; //函数中基本块个数
+	symtbl_item** uni_table; //“联合查询表”
+	int uni_item_num;
+	int uni_table_size;
+	
+	map_table* mapping; //记录“联合查询表”中标号的映射信息
+	int map_table_size;	
+	/*活跃变量分析信息*/
+	... 
+	/*----------------*/
+	
+	/*可用表达式分析信息*/
+	...
+	/*------------------*/
+	
+	/*寄存器分配信息*/
+	...
+	/*------------------*/
+
+}func_block;
+\end{lstlisting}
+{\it \anchor 有关\verb|func_block|的完整定义以及“联合查询表”的建立方法，请参阅：\verb|basic_block.h|, \verb|prepare_dataflow.c|}\\
+
+活跃变量分析和可用表达式分析算法参见\cite{sunjiasu}中第9章。下面介绍两个我们改进和设计的关于数据流分析的优化算法。
+\subsubsection{可用表达式传播}
+这种算法只利用可用表达式信息，产生的效果类似于但劣于复写传播。采用这种算法的原因请参见本章的\hyperref[pitfallc2]{“谬误与陷阱”}。
+
+\paragraph*{目的}某些表达式在同一函数中计算了多次，需要在保证正确的情况下用第一次计算的结果代替其余计算的结果。举例如下：
+
+在下面左图的流图中，(1)(4)(7)(9)均是相同的表达式，并且从(1)开始，a和b都没有重新定值，因此可以用(1)去替换下面出现的三元式操作数(4)(7)(9)，并且删去重复计算的后三句，得到下面右图。
+\begin{center}
+\begin{minipage}{0.4\textwidth}
+\begin{center}
+	\includegraphics[scale=0.50]{before_available_expr.jpeg}
+\end{center}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{center}
+	\includegraphics[scale=0.50]{after_available_expr.jpeg}
+\end{center}
+\end{minipage}
+\captionof{figure}{可用表达式传播示例}
+\end{center}
+
+\paragraph*{算法}
+\begin{enumerate}
+	\item 进行可用表达式分析
+	\item 遍历三元式列表，对于一个未被修改或删除的三元式，如果它之前的程序点上有和它进行相同计算的可用表达式，那么沿着该三元式的所有非环前驱路径向上查找它所有最远的与它进行相同计算的可用表达式，如果仅找到1个，假设其标号为$i$，那么进行3，否则继续遍历三元式列表，遍历完毕则进行4。
+	\item 从当前三元式向下查找所有用当前三元式标号当操作数的三元式，将该操作数替换成$i$，删除当前三元式，记录被修改的三元式，继续遍历。
+	\item 如果没有三元式被删除，那么算法结束，否则进行1
+\end{enumerate}
+之所以进行迭代，是因为在修改三元式后，会出现新的替换机会。
+\paragraph*{缺陷}
+	如果去掉图中的(1)句，运用复写传播仍然能够将(9)省掉，但是我们的做法不能处理这种情况。
+\subsubsection{指针分析}
+
+\section{谬误与陷阱}
+\label{pitfallc2}
+\subsection*{中间表示设计的小缺陷将会引起大灾难}
