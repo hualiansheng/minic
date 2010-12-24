@@ -77,6 +77,8 @@ int check_bool_use(func_block *fb, int i);
 int assign_bool_value(enum instruction ins, func_block *fb, int i);
 int compare_operation(func_block *fb, int i, int cond, int m);
 int search_label(func_block *fb, int i, int m, int not_flag);
+int check_tail_recursion(func_block *fb, int i);
+int tail_recursion(func_block *fb, int i);
 
 int gen_target_code()
 {
@@ -143,6 +145,8 @@ int setLabel()
 	{
 		if (triple_list[index_index[i]].is_deleted)
 			continue;
+		if (triple_list[index_index[i]].op == enterF)
+			triple_list[index_index[i+1]].label = l++;
 		if (triple_list[index_index[i]].op == goto_op)
 		{
 			j = triple_list[index_index[i]].arg1.temp_index;
@@ -1140,8 +1144,69 @@ int set_rb_code(func_block *fb, int i)
 	return 0;
 }
 
+int check_tail_recursion(func_block *fb, int i)
+{
+	if (strcmp(triple_list[index_index[i]].arg2.var_name, (triple_list[index_index[fb->start->begin]].symtbl)->func_name))
+		return 0;
+	if (triple_list[index_index[i+1]].op == leaveF)
+		return 1;
+	if (triple_list[index_index[i+1]].op == return_op && triple_list[index_index[i+2]].op == leaveF)
+	{
+		if (triple_list[index_index[i+1]].arg1_uni == -1)
+			return 1;
+	}
+	return 0;
+}
+
+int tail_recursion(func_block *fb, int i)
+{
+	int j, k, r, u;
+	int para_num = (triple_list[index_index[fb->start->begin]].symtbl)->para_num;
+	for (j = 0, k = 4; j < para_num; j++)
+	{
+		u = triple_list[index_index[i-1-j]].arg1_uni;
+		if (u != -1)
+		{
+			r = load_operator(fb, u, fb->reg_alloc[u], 2);
+			if (j < 4)
+			{
+				if ((fb->live_status[1][(para_num-1-j)/32]>>(31-(para_num-1-j)%32)) & 1)
+				{
+					if (u != para_num-1-j)
+						store_result(fb, i, mov, para_num-1-j, -1, fb->reg_alloc[para_num-1-j], 0, 0, -1, 0, r);
+				}
+				else
+					add_assemble(-1, stw, 27, r, 0, 0, -1, 1, fb->uni_table[para_num-1-j]->offset);
+			}
+			else
+			{
+				add_assemble(-1, stw, 27, r, 0, 0, -1, 1, k);
+				k += 4;
+			}
+		}
+		else
+		{
+			if (j < 4)
+				store_result(fb, i, mov, para_num-1-j, -1, fb->reg_alloc[para_num-1-j], 0, 0, -1, 1, triple_list[index_index[i-1-j]].arg1.imm_value);
+			else
+			{
+				add_assemble(-1, mov, -1, 3, 0, 0, -1, 1, triple_list[index_index[i-1-j]].arg1.imm_value);
+				add_assemble(-1, stw, 27, 3, 0, 0, -1, 1, k);
+				k += 4;
+			}
+		}
+	}
+	add_assemble(triple_list[index_index[fb->start->begin+1]].label, b, -1, -1, 0, 0, -1, 0, -1);
+	return 0;
+}
+
 int call_code(func_block *fb, int i)
 {
+	if (check_tail_recursion(fb, i))
+	{
+		tail_recursion(fb, i);
+		return 0;
+	}
 	int j, k, tmp, m, rtn_reg, idx, para_num, u;
 	int tmp_reg_var[32];
 	unsigned int *live = fb->live_status[i+1-fb->start->begin];
@@ -1239,7 +1304,7 @@ int param_code(func_block *fb, int i)
 
 int enterF_code(func_block *fb, int i)
 {
-	int j;
+	int j, u;
 	symtbl_hdr *ptr = triple_list[index_index[i]].symtbl;
 	add_assemble(-1, stw, 29, 31, 0, 0, -1, 1, -4);
 	add_assemble(-1, stw, 29, 30, 0, 0, -1, 1, -8);
@@ -1253,7 +1318,16 @@ int enterF_code(func_block *fb, int i)
 		temp_reg_var[CALLEE_REG_START+j] = fb->reg_var[CALLEE_REG_START+j];
 	}
 	for (j = 0; j < 4 && j < ptr->para_num; j++)
-		add_assemble(-1, stw, 27, j, 0, 0, -1, 1, ptr->item[ptr->para_num-1-j].offset);
+	{
+		u = ptr->para_num - 1 - j;
+		if (((fb->live_status[1][u/32] >> (31-u%32)) & 1) && fb->reg_alloc[u] != -1)
+		{
+			fb->reg_var[fb->reg_alloc[u]] = u;
+			add_assemble(-1, mov, -1, fb->reg_alloc[u], 0, 0, -1, 0, j);
+		}
+		else
+			add_assemble(-1, stw, 27, j, 0, 0, -1, 1, ptr->item[u].offset);
+	}
 	for (j = ptr->para_num; j < fb->uni_item_num; j++)
 	{
 		if (!fb->uni_table[j]->isGlobal && fb->uni_table[j]->size != -1)
