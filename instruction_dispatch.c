@@ -176,7 +176,7 @@ void inst_block()
 	new_block = 1;
 	for(i = 0 ; i < assemble_num ; i++){
 		if(new_block == 1){
-			if(assemble_list[i].ins == special || assemble_list[i].ins == label || assemble_list[i].ins ==b_l || assemble_list[i].ins == jump || assemble_list[i].ins == bne || assemble_list[i].ins == beq || assemble_list[i].ins == bsl || assemble_list[i].ins == beg || assemble_list[i].ins == bel || assemble_list[i].ins == b ) continue;
+			if(assemble_list[i].ins == special || assemble_list[i].ins == label || assemble_list[i].ins ==b_l || assemble_list[i].ins == jump || assemble_list[i].ins == bne || assemble_list[i].ins == beq || assemble_list[i].ins == bsl || assemble_list[i].ins == beg || assemble_list[i].ins == bsg|| assemble_list[i].ins == bel || assemble_list[i].ins == b ) continue;
 			if(instruction_block_num*2 == block_max_num){
 				temp_s = block_max_num * sizeof(int);
 				adjustSize((void **)&instruction_blocks, (unsigned int *)&temp_s);
@@ -186,7 +186,7 @@ void inst_block()
 			new_block = 0;
 		}
 		else if(new_block == 0){
-			if( assemble_list[i].ins == special || assemble_list[i].ins == label || assemble_list[i].ins ==b_l || assemble_list[i].ins == jump || assemble_list[i].ins == bne || assemble_list[i].ins == beq || assemble_list[i].ins == bsl || assemble_list[i].ins == beg || assemble_list[i].ins == bel || assemble_list[i].ins == b ){
+			if( assemble_list[i].ins == special || assemble_list[i].ins == label || assemble_list[i].ins ==b_l || assemble_list[i].ins == jump || assemble_list[i].ins == bne || assemble_list[i].ins == beq || assemble_list[i].ins == bsl || assemble_list[i].ins == beg || assemble_list[i].ins == bsg ||assemble_list[i].ins == bel || assemble_list[i].ins == b ){
 				instruction_blocks[instruction_block_num*2+1] = i-1;
 				new_block = 1;
 				instruction_block_num ++;
