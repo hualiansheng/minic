@@ -70,7 +70,7 @@ int gen_uni_table()
 		fb->mapping = (map_table*)malloc(INIT_ITEM_NUM*sizeof(map_table));
 		fb->map_table_size = INIT_ITEM_NUM*sizeof(map_table);
 		symtbl_hdr *ptr = triple_list[index_index[begin]].symtbl;
-		for (i = 0; i < ptr->para_num; i++)
+		for (i = ptr->para_num-1; i >= 0; i--)
 		{
 			//if (i >= ptr->para_num-4)
 			//	ptr->item[i].rable = 0;
