@@ -23,17 +23,18 @@ void calc_const()
 				{
 					if(temp.arg1_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)(-temp.arg1.imm_value);
+								triple_list[j].arg1 = (union arg)(-temp.arg1.imm_value);
 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)(-temp.arg1.imm_value);
+								triple_list[j].arg2 = (union arg)(-temp.arg1.imm_value);
 							}
 						}
 					} 
+					break;
 				}
 			case positive_op:
 				{
@@ -48,142 +49,153 @@ void calc_const()
 							triple_list[j].arg2 = temp.arg2;
 						}
 					}
+					break;
 				}
 			case add_op:
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)(temp.arg1.imm_value + temp.arg2.imm_value); 							}
+								triple_list[j].arg1 = (union arg)(temp.arg1.imm_value + temp.arg2.imm_value); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)(temp.arg1.imm_value + temp.arg2.imm_value);
+								triple_list[j].arg2 = (union arg)(temp.arg1.imm_value + temp.arg2.imm_value);
 							}
 						}
 					}
+					break;
 				}
 			case minus_op:
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)(temp.arg1.imm_value - temp.arg2.imm_value); 							}
+								triple_list[j].arg1 = (union arg)(temp.arg1.imm_value - temp.arg2.imm_value); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)(temp.arg1.imm_value - temp.arg2.imm_value);
+								triple_list[j].arg2 = (union arg)(temp.arg1.imm_value - temp.arg2.imm_value);
 							}
 						}
 					}
+					break;
 				}
 			case multiply_op:
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)(temp.arg1.imm_value * temp.arg2.imm_value); 							}
+								triple_list[j].arg1 = (union arg)(temp.arg1.imm_value * temp.arg2.imm_value); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)(temp.arg1.imm_value * temp.arg2.imm_value);
+								triple_list[j].arg2 = (union arg)(temp.arg1.imm_value * temp.arg2.imm_value);
 							}
 						}
 					}
+					break;
 				}
 			case equal_op:
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)((temp.arg1.imm_value == temp.arg2.imm_value)?1:0); 							}
+								triple_list[j].arg1 = (union arg)((temp.arg1.imm_value == temp.arg2.imm_value)?1:0); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)((temp.arg1.imm_value == temp.arg2.imm_value)?1:0);
+								triple_list[j].arg2 = (union arg)((temp.arg1.imm_value == temp.arg2.imm_value)?1:0);
 							}
 						}
 					}
+					break;
 				}
 			case less_op:
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)((temp.arg1.imm_value < temp.arg2.imm_value)?1:0); 							}
+								triple_list[j].arg1 = (union arg)((temp.arg1.imm_value < temp.arg2.imm_value)?1:0); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)((temp.arg1.imm_value < temp.arg2.imm_value)?1:0);
+								triple_list[j].arg2 = (union arg)((temp.arg1.imm_value < temp.arg2.imm_value)?1:0);
 							}
 						}
 					}
+					break;
 				}
 			case larger_op:
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)((temp.arg1.imm_value > temp.arg2.imm_value)?1:0); 							}
+								triple_list[j].arg1 = (union arg)((temp.arg1.imm_value > temp.arg2.imm_value)?1:0); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)((temp.arg1.imm_value > temp.arg2.imm_value)?1:0);
+								triple_list[j].arg2 = (union arg)((temp.arg1.imm_value > temp.arg2.imm_value)?1:0);
 							}
 						}
 					}
+					break;
 				}
 			case eqlarger_op:
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)((temp.arg1.imm_value >= temp.arg2.imm_value)?1:0); 							}
+								triple_list[j].arg1 = (union arg)((temp.arg1.imm_value >= temp.arg2.imm_value)?1:0); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)((temp.arg1.imm_value >= temp.arg2.imm_value)?1:0);
+								triple_list[j].arg2 = (union arg)((temp.arg1.imm_value >= temp.arg2.imm_value)?1:0);
 							}
 						}
 					}
+					break;
 				}
 			case eqless_op: 
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)((temp.arg1.imm_value <= temp.arg2.imm_value)?1:0); 							}
+								triple_list[j].arg1 = (union arg)((temp.arg1.imm_value <= temp.arg2.imm_value)?1:0); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)((temp.arg1.imm_value <= temp.arg2.imm_value)?1:0);
+								triple_list[j].arg2 = (union arg)((temp.arg1.imm_value <= temp.arg2.imm_value)?1:0);
 							}
 						}
 					}
+					break;
 				}
-			case not_eq:
+			case noteq_op:
 				{
 					if(temp.arg1_type == 2 && temp.arg2_type == 2){
 						temp.is_deleted = 1;
-						for(j = i+1 ; j < tirple_list_index ; j ++){
+						for(j = i+1 ; j < triple_list_index ; j ++){
 							if(triple_list[j].arg1_type == 1 && triple_list[j].arg1.temp_index == i){
 								triple_list[j].arg1_type = 2;
-								triple_list[j].arg1 = (int)((temp.arg1.imm_value != temp.arg2.imm_value)?1:0); 							}
+								triple_list[j].arg1 = (union arg)((temp.arg1.imm_value != temp.arg2.imm_value)?1:0); 							}
 							else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
 								triple_list[j].arg2_type = 2;
-								triple_list[j].arg2 = (int)((temp.arg1.imm_value != temp.arg2.imm_value)?1:0);
+								triple_list[j].arg2 = (union arg)((temp.arg1.imm_value != temp.arg2.imm_value)?1:0);
 							}
 						}
 					}
+					break;
 				}
+			default:break;
 		}
 	}
 }
