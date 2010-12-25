@@ -1,6 +1,6 @@
 int main()
 {
-	int *p;
-	p+1;
-	return 1;
+	int a;
+	if(a+2 || (1 && 3))  return 1;
+	else return 0;
 }

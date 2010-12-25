@@ -401,12 +401,7 @@ int rvalue_code(AST_NODE *p)
 					   }
 					   else if(p->leftChild->leftChild->nodeType == ICONSTANT_T){
 						   const_value = p->leftChild->leftChild->content.i_content;
-						   if(const_value < 512) return -2;//return -2 : rvalue 应该被替换成一个constant
-						   else {
-							   add_triple(Imm_op, const_value, -1, 1, 2, -1);
-							   return triple_list_index - 1;
-
-						   }
+						   return -2;//return -2 : rvalue 应该被替换成一个constant
 					   }
 				   }
 			   }
