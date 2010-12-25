@@ -1,4 +1,4 @@
-OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o instruction_dispatch.o available_expr.o prepare_dataflow.o
+OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o instruction_dispatch.o available_expr.o prepare_dataflow.o peephole.o
 CSCOPE = *.c *.h *.l *.y
 ARGS = -g -Wall
 minic: $(OBJECT)
@@ -41,6 +41,8 @@ instruction_dispatch.o:instruction_dispatch.c register.h
 	gcc $(ARGS)  -c instruction_dispatch.c
 available_expr.o: available_expr.c basic_block.h
 	gcc $(ARGS) -c available_expr.c
+peephole.o: peephole.c gen_intermediate_code.h register.h
+	gcc $(ARGS) -c peephole.c
 cscope: $(CSCOPE)
 	cscope -Rbq
 clean:

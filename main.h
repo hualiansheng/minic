@@ -21,4 +21,6 @@ void print_target_code(FILE*,int);
 void instruction_dispatch();
 int available_expr();
 int gen_uni_table();
+void peephole_on_intermediate_code();
+
 #endif
