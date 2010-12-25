@@ -411,6 +411,7 @@ int add_assemble(int label, enum instruction ins, int Rn, int Rd, int shift_dire
 	assemble_list[assemble_num].Rs_Imm = Rs_Imm;
 	assemble_list[assemble_num].Rm_or_Imm = Rm_or_Imm;
 	assemble_list[assemble_num].Rm_Imm = Rm_Imm;
+	assemble_list[assemble_num].is_deleted = 0;
 	assemble_num++;
 	return 0;
 }

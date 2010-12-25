@@ -24,8 +24,8 @@ extern int triple_list_index;
 /**
  *alloc_mem the GEN, KILL, IN, OUT bit vector for each function block
  */
-#define TARGET_EXPR_NUM 14
-enum operator target_expr[]={negative_op, address_op, positive_op, add_op, minus_op, multiply_op, char_to_int_op, adds_op, int_to_char_op, minuss_op, r_shift};
+#define TARGET_EXPR_NUM 10
+enum operator target_expr[]={negative_op, address_op, positive_op, add_op, minus_op, multiply_op, char_to_int_op, int_to_char_op, minuss_op, r_shift};
 int alloc_mem();
 int init_value();
 int solve_each_triple(func_block *fb);
@@ -36,6 +36,23 @@ int deleted(triple t)
 {
 	return t.is_deleted;
 }
+
+int is_target_expr(triple t)
+{
+	int i;
+	//如果是指针计算，就不考虑消除
+	//目标代码窥孔优化要求
+	if(t.result_type == 2 || t.result_type == 3)
+		return 0;
+	for(i = 0; i<TARGET_EXPR_NUM; i++)
+		if(t.op == target_expr[i])
+			return 1;
+	return 0;
+}
+/*
+判断是否是可消除的表达式，
+本函数没有考虑后续的目标码窥孔优化
+废弃
 int is_target_expr(enum operator op)
 {
 	int i;
@@ -44,7 +61,7 @@ int is_target_expr(enum operator op)
 			return 1;
 	return 0;
 }
-
+*/
 int is_assign_expr(enum operator op)
 {
 	return op == assign_op;
@@ -176,7 +193,7 @@ int init_value()
 				//judge if the current triple can be added in Gen:
 				//1. expression
 				//2. not killed in block (no def followed)
-				if(is_target_expr(cur_triple.op) && live_in_block(i , bb, fb))
+				if(is_target_expr(cur_triple) && live_in_block(i , bb, fb))
 					fb -> gen[bb->m][cur_index / 32] |= 1 << (31 - cur_index % 32);
 				/*judge if the current triple can be added in Kill
 				 *only assign expr and address expr will do this
@@ -188,7 +205,7 @@ int init_value()
 					{
 						//arg1_uni is the index to joint variable table,
 						//if two veriables is the same, the the arg1_uni equals
-						if(is_target_expr(triple_list[j].op)
+						if(is_target_expr(triple_list[j])
 								&&(cur_triple.arg1_uni == triple_list[j].arg1_uni || cur_triple.arg1_uni == triple_list[j].arg2_uni))
 						{
 							cur_index = j - fb->start->begin;
@@ -306,7 +323,7 @@ int solve_each_triple(func_block *fb)
 						}
 				}
 			}
-			if(is_target_expr(triple_list[i].op))
+			if(is_target_expr(triple_list[i]))
 				fb->available_status[i-base+1][(i-base)/32] |= 1<<(31-(i-base)%32);
 		}
 	}
