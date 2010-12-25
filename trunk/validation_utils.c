@@ -11,7 +11,7 @@ int counter[100];
 extern triple* triple_list;
 extern int triple_list_size;
 extern int triple_list_index;
-char *operator_name[]={"if,goto","if_not,goto","goto","-","not","&","!*","+","=","*=","+","-","*","char to int","eq","lt","gt","geq","leq","neq","or","and","get rb","set rb","call", "param", "enter function", "enter statements", "leave function", "leave statements","return","add_shift","int_to_char", "Imm", "minus_shift", "right_shift", "constant string"};
+char *operator_name[]={"if,goto","if_not,goto","goto","-","not","&","!*","+","=","*=","+","-","*","char to int","eq","lt","gt","geq","leq","neq","or","and","get rb","set rb","call", "param", "enter function", "enter statements", "leave function", "leave statements","return","add_shift","int_to_char", "Imm", "minus_shift", "right_shift", "constant string", "left_shift"};
 
 extern basic_block *bblist;
 extern func_block *fblist;
@@ -265,6 +265,9 @@ void print_target_code(FILE* target_file, int dispatch_flag)
 		i = j;
 		if(dispatch_flag)
 			i = assemble_dispatch_index[j];
+
+		//skip deleted assembles
+		if(assemble_list[i].is_deleted) continue;
 		inst = assemble_list[i].ins;
 		if (inst == special)
 		{

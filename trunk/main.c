@@ -297,6 +297,7 @@ int main(int argc, char** argv)
 	target_file = fopen(strcat(srcfile_name,".s"),"w+");
 #endif
 
+	//peephole_on_target_code();
 	print_target_code(target_file,dispatch_flag);
 	fclose(target_file);
 	return 0;

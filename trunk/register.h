@@ -24,6 +24,7 @@ typedef struct assemble {
 	int Rs_Imm;
 	int Rm_or_Imm;
 	int Rm_Imm;
+	int is_deleted;
 }assemble;
 
 #endif
