@@ -61,6 +61,10 @@ qsort:
 	ldw	r6, [r27+], #-24
 	ldw	r7, [r27+], #-28
 	ldw	r4, [r27+], #-32
+	ldw	r5, [r27+], #-28
+	ldw	r6, [r27+], #-24
+	ldw	r7, [r27+], #-20
+	ldw	r8, [r27+], #-16
 	ldw	r11, [r27+], #-36
 	b	.L1
 .L9:
@@ -101,13 +105,12 @@ main:
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	b.l	print_int
-	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
+	ldw	r7, [r27+], #-16
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, #32
 	b.l	print_char
-	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
 	add	r7, r7, #1
 	b	.L17
@@ -115,13 +118,13 @@ main:
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	b.l	print_char
-	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
+	ldw	r7, [r27+], #-16
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	b.l	print_char
-	ldw	r7, [r27+], #-16
 	ldw	r0, [r27+], #-532
+	ldw	r7, [r27+], #-16
 	stw	r5, [r27+], #-532
 	mov	r1, #0
 	mov	r2, #128
@@ -135,13 +138,12 @@ main:
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	b.l	print_int
-	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
+	ldw	r7, [r27+], #-16
 	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, #32
 	b.l	print_char
-	ldw	r7, [r27+], #-16
 	ldw	r5, [r27+], #-532
 	add	r7, r7, #1
 	b	.L20

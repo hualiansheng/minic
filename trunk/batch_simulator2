@@ -1,0 +1,51 @@
+#! /bin/bash
+
+if [ $# -lt 3 ]; then
+	echo 'Usage : ' $0 ' <compiler location> <simulator location> <test file folder>'
+	exit
+fi
+
+cmd='ls -m '$3'/*.c'
+data=`$cmd`
+data=$data','
+data2=$data
+
+while [ "$data2" != "" ]; do
+	file=${data2%%,*}
+	file_name=${file%.*}
+	rm -f $file_name".out" >/dev/null
+	echo "Compiling  "$file
+	cmd=$1" -o "$file_name".out "$file
+	$cmd
+	if ! [ -f $file_name".out" ]; then
+		echo ""
+		echo $file" Compile error!"
+		exit
+	fi
+	echo ""
+	data2=${data2#*,}
+done
+
+echo ""
+echo "======================================"
+echo ""
+
+data2=$data
+while [ "$data2" != "" ]; do
+	file=${data2%%,*}
+	file_name=${file%.*}
+	echo ""
+	echo "Simulating  "$file_name".out."
+	echo "Press any key to begin simulator."
+	read
+	cmd=$2" "$file_name".out -r"
+	$cmd
+	echo ""
+	echo "Press any key to continue."
+	read
+	echo "==========================================="
+	data2=${data2#*,}
+done
+
+echo "Batch simulating end."
+
