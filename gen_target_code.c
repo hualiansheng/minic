@@ -51,7 +51,7 @@ int Imm_code(func_block *fb, int i);
 int r_shift_code(func_block *fb, int i);
 int c_str_code(func_block *fb, int i);
 int lshift_code(func_block *fb, int i);
-int (*g[37])(func_block*, int) = {
+int (*g[40])(func_block*, int) = {
 	if_goto_code, if_goto_code, goto_code, negative_code, not_code, address_code, star_code, positive_code, assign_code, star_assign_code, add_code, minus_code, multiply_code, char_int_code, equal_code, less_code, larger_code, eqlarger_code, eqless_code, noteq_code, or_code, and_code, get_rb_code, set_rb_code, call_code, param_code, enterF_code, enterS_code, leaveF_code, leaveS_code, rtn_code, array_shift_code, char_int_code, Imm_code, array_shift_code, r_shift_code, c_str_code, lshift_code
 };
 enum instruction map_ins[6][2] = {{bsl, beg}, {bel, bsg}, {beq, bne}, {bne, beq}, {beg, bsl}, {bsg, bel}};
