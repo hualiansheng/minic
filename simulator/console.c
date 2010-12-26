@@ -19,7 +19,6 @@ extern int v_mode;
 
 int console_step(CPU_d* cpu, CMD cmd);// command step/s
 int console_next(CPU_d* cpu);// command next/s
-int console_run(CPU_d* cpu, char* filename, int mode);// command r/rt
 int console_x(CPU_d* cpu, CMD cmd);// command x
 int console_print(CPU_d* cpu, CMD cmd);// command print/p
 int console_info(CPU_d* cpu, CMD cmd);// command info/i
