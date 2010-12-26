@@ -18,6 +18,8 @@ example:
 	mov r5, r4
 	add r4, r5, r7
 	mov r6, r4
+mov的源操作数向上找，找目标操作数为它的指令
+mov的目标操作数往下找，找源操作数为它的指令
 2.shift load/store
 example:
 	add r8, r4, r5<<#2

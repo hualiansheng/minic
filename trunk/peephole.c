@@ -4,11 +4,16 @@ void peephole_on_intermediate_code();
 void peephole_on_target_code();
 void calc_const();
 void array_operation_optimize();
+void inst_block();
+void delete_rebundant_mov();
 
 extern triple* triple_list;
 extern int triple_list_index;
 extern assemble *assemble_list;
 extern int assemble_num;
+extern int *instruction_blocks;
+extern int instruction_block_num;
+extern int bloack_max_num;
 
 void peephole_on_intermediate_code()
 {
@@ -17,6 +22,7 @@ void peephole_on_intermediate_code()
 void peephole_on_target_code()
 {
 	array_operation_optimize();
+	delete_redundant_mov();
 }
 void calc_const()
 {
@@ -232,4 +238,123 @@ void array_operation_optimize()
 			}
 		}
 	}
+}
+
+
+
+void delete_rebundant_mov()
+{
+	int *next_list;
+	int *visited;
+	int i, j, k, flag, able_to_change;
+	int temp, current_block;
+	inst_block();
+	next_list = malloc(sizeof(int)*instruction_block_num);
+	//create next list
+	for(i = 0 ; i < instruction_block_num; i ++){
+		next_list[i] = -1;
+		if(assemble_list[instruction_blocks[2*i+1]+1].ins == bne || assemble_list[instruction_blocks[2*i+1]+1].ins == beq || assemble_list[instruction_blocks[2*i+1]+1].ins == bsl || assemble_list[instruction_blocks[2*i+1]+1].ins == beg || assemble_list[instruction_blocks[2*i+1]+1].ins == bsg || assemble_list[instruction_blocks[2*i+1]+1].ins == bel || assemble_list[instruction_blocks[2*i+1]+1].ins == b){
+			temp = assemble_list[instruction_blocks[2*i+1]].label;
+			for(j = 0 ; j < assemble_num; j ++){
+				if(assemble_list[j].ins == label && assemble_list[j].label == temp){
+					for(k = 0 ; k < instruction_block_num ; k ++){
+						if(instruction_blocks[2*k]>j){
+							next_list[i] = k;
+							break;
+						}
+					}
+					break;
+				}		
+			}
+		}
+	}
+
+	for(i = 0 ; i < assemble_num ; i++){
+		if(assemble_list[i].ins == mov){
+			for(k = 0 ; k < instruction_block_num; k++){
+				if(i >= instruction_blocks[2*k] && i<=instruction_blocks[2*k+1])
+					break;
+				current_block = i;
+			}
+		//source operand
+			flag = 0;
+			for(j = i-1 ; j >= instruction_blocks[2*current_block] ; j --){
+				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rm_Imm){
+					if(defined_before_used(assemble_list[i].Rm_Imm, i, current_block))
+					{
+						assemble_list[j].Rd = assemble_list[i].Rd;
+						assemble_list[i].is_deleted = 1;
+						flag = 1;
+					}
+					break;
+				}
+			}
+			able_to_change = 1;
+			able_to_delete = 1;
+		//target operand
+			if(flag == 1) continue;
+			for(j = i+1; j <= instruction_blocks[2*current_block+1] ; j ++)
+			{
+				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rm_Imm){
+					able_to_change = 0;
+				}
+				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rd){
+					if(able_to_delete){
+						assemble_list[i].is_deleted = 1;
+					}
+					break;
+				}
+
+				if(able_to_change){
+					if(assemble_list[j].ins == stw && assemble_list[j].Rd == assemble_list[i].Rd) assemble_list[j].Rd = assemble_list[i].Rm_Imm;
+					else if(assemble_list[j].Rn == assemble_list[i].Rd){
+						if((assemble_list[j].ins == ldw || assemble_list[j].ins == stw) && assemble_list[j].Rm_Imm == assemble_list[i].Rm_Imm);
+						else assemble_list[j].Rn = assemble_list[i].Rm_Imm;
+					}
+					else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm == assemble_list[i].Rd){
+						if((assemble_list[j].ins == ldw || assemble_list[j].ins == stw) && assemble_list[j].Rn == assemble_list[i].Rm_Imm);
+						else assemble_list[j].Rm_Imm = assemble_list[i].Rm_Imm;
+					}
+				}
+				else{
+					if(assemble_list[j].ins == stw && assemble_list[j].Rd == assemble_list[i].Rd) able_to_delete = 0;
+					else if(assemble_list[j].Rn == assemble_list[i].Rd){
+						able_to_delete = 0;
+					}
+					else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm == assemble_list[i].Rd){
+						able_to_delete = 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+int defined_before_used(int r, int current_inst, int current_block)
+{
+	int begin, end, i, temp_block;
+	begin = current_inst+1;
+	end = instruction_blocks[current_block*2+1];
+	temp_block = current_block;
+	for(i = 0 ; i < instruction_block_num ; i++){
+		visited[i] = 0;
+	}	
+	while(1){
+		visited[temp_block] = 1;
+		for(i = begin ; i <= end; i ++)
+		{
+			if(assemble_list[i].ins != stw && assemble_list[i].Rd == r)
+				return 1;
+			if((assemble_list[i].ins == stw && assemble_list[i].Rd == r) || assemble_list[i].Rn == r || (assemble_list[i].Rm_or_Imm ==0 && assemble_list[i].Rm_Imm == r ) ||(assemble_list[i].Rs_or_Imm==0 && assemble_list[i].Rs_Imm == r)) 
+				return 0;		
+		}
+		if(next_list[temp_block] == -1 || visited[next_list[temp_block]] == 1)
+			break;
+		else{
+			temp_block = next_list[temp_block];
+			begin = instruction_blocks[2*temp_block];
+			end = instruction_blocks[2*temp_block+1];
+		}
+	}
+	return 1;
 }
