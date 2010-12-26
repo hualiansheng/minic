@@ -50,8 +50,9 @@ int array_shift_code(func_block *fb, int i);
 int Imm_code(func_block *fb, int i);
 int r_shift_code(func_block *fb, int i);
 int c_str_code(func_block *fb, int i);
+int lshift_code(func_block *fb, int i);
 int (*g[37])(func_block*, int) = {
-	if_goto_code, if_goto_code, goto_code, negative_code, not_code, address_code, star_code, positive_code, assign_code, star_assign_code, add_code, minus_code, multiply_code, char_int_code, equal_code, less_code, larger_code, eqlarger_code, eqless_code, noteq_code, or_code, and_code, get_rb_code, set_rb_code, call_code, param_code, enterF_code, enterS_code, leaveF_code, leaveS_code, rtn_code, array_shift_code, char_int_code, Imm_code, array_shift_code, r_shift_code, c_str_code
+	if_goto_code, if_goto_code, goto_code, negative_code, not_code, address_code, star_code, positive_code, assign_code, star_assign_code, add_code, minus_code, multiply_code, char_int_code, equal_code, less_code, larger_code, eqlarger_code, eqless_code, noteq_code, or_code, and_code, get_rb_code, set_rb_code, call_code, param_code, enterF_code, enterS_code, leaveF_code, leaveS_code, rtn_code, array_shift_code, char_int_code, Imm_code, array_shift_code, r_shift_code, c_str_code, lshift_code
 };
 enum instruction map_ins[6][2] = {{bsl, beg}, {bel, bsg}, {beq, bne}, {bne, beq}, {beg, bsl}, {bsg, bel}};
 char **c_str_list;
@@ -1542,6 +1543,20 @@ int c_str_code(func_block *fb, int i)
 			add_assemble(fb->global_label, ldw, -1, r0, 0, 0, -1, 1, off);
 			add_assemble_imm(fb, stw, 27, r0, fb->uni_table[u0]->offset);
 		}
+	}
+	return 0;
+}
+
+int lshift_code(func_block *fb, int i)
+{
+	int u0, u1, r0, r1;
+	if (check_live(fb, i, 1))
+	{
+		u0 = triple_list[index_index[i]].tmp_uni;
+		u1 = triple_list[index_index[i]].arg1_uni;
+		r0 = fb->reg_alloc[u0];
+		r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
+		store_result(fb, i, mov, u0, -1, r0, 0, 1, 2, 0, r1);
 	}
 	return 0;
 }
