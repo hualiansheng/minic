@@ -222,7 +222,7 @@ int main(int argc, char** argv)
 	fprintf(stderr,"done.\n");
 	if(dbg_print_intermediate_code)
 	{
-		print_intermediate_code();
+	
 		return 0;
 	}
 	
@@ -231,6 +231,8 @@ int main(int argc, char** argv)
 	peephole_on_intermediate_code();
 	fprintf(stderr,"done.\n");
 #endif
+
+	print_intermediate_code();
 
 	//generate basic block
 	fprintf(stderr,"Generating basic block...");
