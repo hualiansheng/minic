@@ -78,6 +78,8 @@ int gen_uni_table()
 		}
 		for (i = begin; i <= end; i++)
 		{
+			if (triple_list[index_index[i]].is_deleted)
+				continue;
 			tmp_op = triple_list[index_index[i]].op;
 			if (tmp_op != if_op && tmp_op != if_not_op && tmp_op != goto_op && tmp_op != set_rb && tmp_op != param && tmp_op != enterS && tmp_op != enterF && tmp_op != leaveS && tmp_op != leaveF && tmp_op != return_op)
 				triple_list[index_index[i]].tmp_uni = gen_tmp_item(fb, i);
