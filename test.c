@@ -1,12 +1,17 @@
-int print_int(int x);
-
+int f()
+{
+	int i;
+	if(i > 1) return 1;
+	else return 0;
+}
 int main()
 {
-	int a[10],x;
-	a[0] = 255;
-	a[1] = 100;
-	a[1] = a[1]*512;
-	x = a[1];
-	print_int(x);
-	return 0;
+	int a[10], b[10], i;
+	int temp;
+	for(i = 0 ; i < 10 ; i ++){
+		temp = a[i];
+		a[i] = b[i];
+		b[i] = temp;
+	}
+	return f();
 }
