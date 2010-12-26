@@ -1,0 +1,45 @@
+#! /bin/bash
+
+if [ $# -lt 3 ]; then
+	echo 'Usage : ' $0 ' <compiler location> <simulator location> <test file list file>'
+	exit
+fi
+
+data=`cat $3`
+while [ "$data" != "" ] ; do
+	file=${data%%:*}
+	echo "Compiling  "$1" -o "$file".out "$file".c"
+	cmd=$1" -o "$file".out "$file".c"
+	$cmd
+	echo ""
+	data=${data#*:}
+done
+
+echo ""
+echo "=========================================="
+echo ""
+
+data=`cat $3`
+while [ "$data" != "" ] ; do
+	file=${data%%:*}
+	echo "Simulating  "$2" "$file".out -r >result"
+	cmd=$2" "$file".out -r >result"
+	$cmd >result
+	cmd="diff -w result "$file".ans"
+	result=`$cmd`
+	if ! [ -f $file".out" ] ; then
+		echo $file" Compile error."
+	elif [ "$result" == "" ]; then
+		echo $file" PASSED!"
+	else
+		echo $file" NOT PASSED!"
+		echo $result
+		vimdiff result $file".ans"
+		exit
+	fi
+	rm -f result
+	echo ""
+	data=${data#*:}
+done
+
+

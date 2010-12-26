@@ -52,7 +52,8 @@ int main(int argc, char **argv){
     cpu = process_start(argv[optind]);
     //auto run mode
     if(auto_run_mode == 1){
-        printf("MiniC Simulator Auto Run Mode:\n");
+        //printf("MiniC Simulator Auto Run Mode:\n");
+		memset(pipline_output_invalid, 0, PIPLINE_LEVEL*sizeof(int));
         console_run(cpu, argv[optind], 0);
         return 0;
     }
