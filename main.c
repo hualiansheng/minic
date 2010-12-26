@@ -226,9 +226,9 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	
-	//fprintf(stderr,"Intermediate code peephole optimization...");
-	//peephole_on_intermediate_code();
-	//fprintf(stderr,"done.\n");
+	fprintf(stderr,"Applying intermediate code peephole optimization...");
+	peephole_on_intermediate_code();
+	fprintf(stderr,"done.\n");
 
 
 	//generate basic block
@@ -296,8 +296,10 @@ int main(int argc, char** argv)
 #ifndef DEBUG
 	target_file = fopen(strcat(srcfile_name,".s"),"w+");
 #endif
-
-	//peephole_on_target_code();
+	
+	fprintf(stderr,"Applying target code peephole optimization...");
+	peephole_on_target_code();
+	fprintf(stderr,"done.\n");
 	print_target_code(target_file,dispatch_flag);
 	fclose(target_file);
 	return 0;

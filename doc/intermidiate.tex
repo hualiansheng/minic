@@ -348,8 +348,27 @@ MiniC在三元式表示上进行了如下优化：
 \subsection{窥孔优化}
 \label{peephole:intermidiate}
 我们首先对三元式进行了简单的窥孔优化：
-\paragraph*{常量表达式计算} 对于操作数都是常量的三元式，我们计算出该三元式的值，并且将之后所有用到该式的结果的三元式的相应操作数都替换成计算好的立即数
-\paragraph*{简单的强度削减} 虽然这部分是机器相关的（在Unicore32中，乘法指令需要2 CPU cycles，而移位指令仅需要1 CPU cycle），但在三元式部分做较为简单，即把乘以2的幂次的三元式都替换成左移幂次位数的三元式。
+\subsubsection{常量表达式计算} 对于操作数都是常量的三元式，我们计算出该三元式的值，如果用到该三元式值的三元式又能够直接计算，那么要迭代地进行这个过程，直到结果是编译时不可计算的为止。由于目标代码生成方面的需要，这个优化不考虑对于带有常数的布尔运算。
+\paragraph*{算法}
+
+\paragraph*{示例}
+下面左图是优化前的一段三元式，右图是优化后的结果：
+\begin{center}
+\begin{minipage}{0.4\textwidth}
+\begin{center}
+	\includegraphics[scale=0.50]{before_const_expr.png}
+	\label{fig:beforconstexpr}
+\end{center}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{center}
+	\includegraphics[scale=0.50]{after_const_expr.png}
+	\label{fig:afterconstexpr}
+\end{center}
+\end{minipage}
+\captionof{figure}{常量表达式优化示例}
+\end{center}
+\paragraph*{简单的强度削减} 虽然这部分是机器相关的（在Unicore32中，乘法指令需要2 CPU cycles，而移位指令仅需要1 CPU cycle），但在三元式部分做较为简单，即把乘以2的幂次的三元式都替换成左移幂次位数的三元式。在目标代码生成阶段，左移的三元式会被翻译成移位\verb|mov|，然后通过目标代码的窥孔优化将其和其它代码合并。
 
 \subsection{数据流分析及相关优化}
 \label{dataflow}
@@ -431,7 +450,7 @@ typedef struct func_block {
 \paragraph*{缺陷}
 若某个三元式所计算的表达式在该点可用，但这些可用表达式没有公共的可用表达式前驱，则这种算法不能省去该三元式。例如，如果去掉上图中的(1)句，虽然插入赋值语句后再运用复写传播仍然能够将(9)省掉，但由于本算法的只进行简单的替换而不进行语句的插入，所以不能确定应当将(9)替换成(4)还是(7)。这个缺陷的更深层次的原因请见本章的\hyperref[pitfallc2]{“谬误与陷阱”}。\\
 
-{\it \anchor 有可用表达式传播的代码，请参阅：\verb|available_expr.c|}\\
+{\it \anchor 有关可用表达式传播的代码，请参阅：\verb|available_expr.c|}\\
 \subsubsection{指针分析}
 在面向RISC结构的处理器的C编译器实现中，为了提高运算性能，大部分的变量留在寄存器中以减少访存次数。但是指针能够直接访问变量所属的内存位置。因此，需要保证在指针操作后，某个变量在寄存器中的值和其在栈帧中的值同步，为了掌握需要将哪些变量在内存中的值更新这一信息，我们需要对三元式代码进行指针分析。
 为此，我们设计了一个基于数据流分析的算法，来相对精确地得到在某一点每个指针可能指向哪些变量。
@@ -472,6 +491,12 @@ int f()
 
 可以看出，基于数据流分析的指针分析具有更好的精确性，因此能够节省更多的内存操作的次数。\\
 {\it \anchor 有关指针分析的代码，请参阅：\verb|pointer_analysis.c|}\\
+
+\subsubsection{一些对数据流分析的改进设想}
+\paragraph*{全局指针分析}
+当前MiniC的指针分析算法只能得到函数内的指针可能指向的变量，但是将指针作为参数传入另一个函数后，由于得不到该指针可能指向的地址，只能在调用函数时保存所有局部变量。如果能将指针分析的范围扩大到整个源文件，那么就能够得到完整的指向信息，从而彻底地解决正确、节约地同步寄存器和内存的问题。
+\paragraph*{全局活跃变量分析}
+当前MiniC的活跃变量分析算法只能得到函数内的活跃变量信息。改进的可能同样来自函数调用：如果能够得到被调用的函数将占用哪些寄存器，就能够在调用前只保护这些寄存器，从而节省一些访存语句。这有赖于全局的（跨函数的）活跃变量分析。
 \section{谬误与陷阱}
 \label{pitfallc2}
 \subsection*{中间表示设计的小缺陷将会引起许多不便}
@@ -488,10 +513,3 @@ MiniC建立的AST没有经过任何修剪，从图\ref{fig:grammertree}的示例
 \item 在翻译布尔表达式时，必须允许某个标志变量被赋值两次，否则布尔表达式的赋值（如\verb|a=b&&c|）将无法实现。因此我们向三元式中添加了\verb|setrb|和\verb|getrb|两条语句。虽然在目标代码生成阶段没有直接翻译这两条语句，而是转换成了效率更高，更易读的汇编代码，这种表示仍然给我们带来了不少麻烦。
 \item 在进行基于三元式的优化时，由于发现了可用表达式但无法在多处插入给同一个临时变量赋值的三元式（见\cite{sunjiasu}第216页），我们只好放弃性能更为强大的可用表达式-复写传播来消除冗余中间代码，改为使用可用表达式传播的算法。
 \end{itemize}
-
-\begin{thebibliography}{99}
-\bibitem{sunjiasu}孙家骕，编译原理，北京大学出版社，2008
-\end{thebibliography}
-
-
-

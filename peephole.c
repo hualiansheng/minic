@@ -25,7 +25,7 @@ void peephole_on_intermediate_code()
 void peephole_on_target_code()
 {
 	array_operation_optimize();
-	delete_redundant_mov();
+	//delete_redundant_mov();
 }
 void calc_const()
 {
@@ -114,6 +114,7 @@ void calc_const()
 						for(j = 0 ; j < 32 ;j ++){
 							if(triple_list[i].arg2.imm_value == 1<<j){
 								triple_list[i].op = lshift_op;
+								triple_list[i].arg2_type = 2;
 								triple_list[i].arg2 = (union arg)j;
 							}
 						}
@@ -232,9 +233,9 @@ void array_operation_optimize()
 					if(assemble_list[j].ins == add && assemble_list[j].Rd == assemble_list[i].Rn){
 						assemble_list[j].is_deleted = 1;
 						assemble_list[i].Rn =assemble_list[j].Rn;
-						assemble_list[i].Rm_or_Imm = 0;
-						assemble_list[i].Rm_Imm = assemble_list[i].Rm_Imm;
-						assemble_list[i].Rs_or_Imm = 1;
+						assemble_list[i].Rm_or_Imm = assemble_list[j].Rm_or_Imm;
+						assemble_list[i].Rm_Imm = assemble_list[j].Rm_Imm;
+						assemble_list[i].Rs_or_Imm = assemble_list[j].Rs_or_Imm;
 						assemble_list[i].Rs_Imm = assemble_list[j].Rs_Imm;
 						break;
 					}
