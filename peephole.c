@@ -332,7 +332,7 @@ void delete_redundant_mov()
 			}
 			able_to_change = 1;
 			able_to_delete = 0;
-			change_mov_target(i, i+1, current_block, visited, next_list, jump_list);
+		//	change_mov_target(i, i+1, current_block, visited, next_list, jump_list);
 			if(able_to_delete == 1) assemble_list[i].is_deleted = 1;
 			//target operand
 			/*
