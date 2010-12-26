@@ -315,12 +315,21 @@ void delete_redundant_mov()
 				}
 			}
 		//source operand
-			flag = 0;
+			flag = 1;
 			for(j = i-1 ; j >= instruction_blocks[2*current_block] ; j --){
+				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rd) break;
 				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rm_Imm && assemble_list[i].Rm_or_Imm == 0){
 					for(k = 0 ; k < instruction_block_num ; k++){
 						visited[k] = 0;
-					}	
+					}
+					for(k = j+1 ; k < i ; k++){
+						if((assemble_list[k].ins == stw && assemble_list[k].Rd == assemble_list[i].Rm_Imm) || assemble_list[k].Rn == assemble_list[i].Rm_Imm|| (assemble_list[k].Rm_or_Imm ==0 && assemble_list[k].Rm_Imm ==  assemble_list[i].Rm_Imm) ||(assemble_list[k].Rs_or_Imm==0 && assemble_list[k].Rs_Imm == assemble_list[i].Rm_Imm))
+						{
+							flag = 0;
+							break;
+						}
+					}
+					if(flag == 0) break;
 					if(defined_before_used(assemble_list[i].Rm_Imm, i+1, current_block, visited, next_list, jump_list))
 					{
 						assemble_list[j].Rd = assemble_list[i].Rd;
@@ -330,10 +339,10 @@ void delete_redundant_mov()
 					break;
 				}
 			}
-			able_to_change = 1;
-			able_to_delete = 0;
+	//		able_to_change = 1;
+	//		able_to_delete = 0;
 		//	change_mov_target(i, i+1, current_block, visited, next_list, jump_list);
-			if(able_to_delete == 1) assemble_list[i].is_deleted = 1;
+	//		if(able_to_delete == 1) assemble_list[i].is_deleted = 1;
 			//target operand
 			/*
 			if(flag == 1) continue;
