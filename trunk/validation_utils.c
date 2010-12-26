@@ -306,7 +306,10 @@ void print_target_code(FILE* target_file, int dispatch_flag)
 					fprintf(target_file, "r");
 				else
 					fprintf(target_file, "#");
-				fprintf(target_file, "%d\n", assemble_list[i].Rm_Imm);
+				fprintf(target_file, "%d", assemble_list[i].Rm_Imm);
+				if (assemble_list[i].Rs_or_Imm == 1)
+					fprintf(target_file, "%d", assemble_list[i].Rs_Imm);
+				fprintf(target_file, "\n");
 			}
 			continue;
 		}

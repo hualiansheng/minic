@@ -31,6 +31,11 @@ typedef struct CStrList {
 	struct CStrList* next;
 }CStrList;
 
+typedef struct ImmList {
+	int imm;
+	struct ImmList* next;
+}ImmList;
+
 typedef struct func_block {
 	basic_block* start;
 	basic_block* over;
@@ -71,8 +76,10 @@ typedef struct func_block {
 	int reg_var[32];
 	int min_stack_size;
 	int global_label;
-	int const_off;
-	CStrList *c_str_used;
+	int const_str_off;
+	CStrList* c_str_used;
+	int large_imm_off;
+	ImmList* imm_used;
 }func_block;
 
 #endif
