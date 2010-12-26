@@ -29,6 +29,7 @@ while [ "$data" != "" ] ; do
 	result=`$cmd`
 	if ! [ -f $file".out" ] ; then
 		echo $file" Compile error."
+		exit
 	elif [ "$result" == "" ]; then
 		echo $file" PASSED!"
 	else
