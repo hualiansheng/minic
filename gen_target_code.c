@@ -541,8 +541,8 @@ int load_operator(func_block *fb, int u, int r, int _r)
 				add_assemble(fb->global_label, ldw, -1, r, 0, 0, -1, 1, fb->uni_table[u]->offset);
 			else
 			{
-				add_assemble(fb->global_label, ldw, -1, 1, 0, 0, -1, 1, fb->uni_table[u]->offset);
-				add_assemble(-1, ldw, 1, r, 0, 0, -1, 1, 0);
+				add_assemble(fb->global_label, ldw, -1, 26, 0, 0, -1, 1, fb->uni_table[u]->offset);
+				add_assemble(-1, ldw, 26, r, 0, 0, -1, 1, 0);
 			}
 		}
 	}
