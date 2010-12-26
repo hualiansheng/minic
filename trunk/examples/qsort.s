@@ -58,15 +58,12 @@ qsort:
 	mov	r1, r7
 	b.l	qsort
 	ldw	r4, [r27+], #-32
-	ldw	r7, [r27+], #-28
-	ldw	r6, [r27+], #-24
-	ldw	r7, [r27+], #-20
-	ldw	r8, [r27+], #-16
 	ldw	r5, [r27+], #-28
 	ldw	r6, [r27+], #-24
 	ldw	r7, [r27+], #-20
 	ldw	r8, [r27+], #-16
 	ldw	r11, [r27+], #-36
+	mov	r7, r5
 	b	.L1
 .L9:
 	ldw	r30, [r27+], #-4
@@ -129,9 +126,10 @@ main:
 	stw	r7, [r27+], #-16
 	mov	r0, #10
 	b.l	print_char
-	ldw	r0, [r27+], #-532
+	ldw	r5, [r27+], #-532
 	ldw	r7, [r27+], #-16
 	stw	r5, [r27+], #-532
+	mov	r0, r5
 	mov	r1, #0
 	mov	r2, #128
 	b.l	qsort
