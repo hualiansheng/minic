@@ -53,6 +53,7 @@ void instruction_dispatch()
 		printf("%d ",assemble_dispatch_index[i]);
 	}
 	printf("\n");*/
+	free(instruction_blocks);
 }
 
 void create_dep_graph(int begin, int end)
