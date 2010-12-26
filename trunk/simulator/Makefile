@@ -6,7 +6,7 @@ simulator:$(OBJECT)
 simulator.o:simulator.c config.h console.o
 	gcc $(ARGS) -c simulator.c
 ELF_parser.o:ELF_parser.h ELF_parser.c
-	gcc $(ARGS) $(LIBS) -c ELF_parser.c
+	gcc $(ARGS) $(LIBS)  -c ELF_parser.c
 register.o:register.h register.c
 	gcc $(ARGS) -c register.c
 mem.o:mem.h mem.c
@@ -34,3 +34,4 @@ interpret.o:interpret.h interpret.c process.h process.o decode.h decode.o debugg
 
 clean:
 	rm -f *.o simulator
+
