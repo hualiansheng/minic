@@ -226,9 +226,9 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	
-	fprintf(stderr,"Intermediate code peephole optimization...");
-	peephole_on_intermediate_code();
-	fprintf(stderr,"done.\n");
+	//fprintf(stderr,"Intermediate code peephole optimization...");
+	//peephole_on_intermediate_code();
+	//fprintf(stderr,"done.\n");
 
 
 	//generate basic block
