@@ -1556,7 +1556,7 @@ int lshift_code(func_block *fb, int i)
 		u1 = triple_list[index_index[i]].arg1_uni;
 		r0 = fb->reg_alloc[u0];
 		r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
-		store_result(fb, i, mov, u0, -1, r0, 0, 1, 2, 0, r1);
+		store_result(fb, i, mov, u0, -1, r0, 0, 1, triple_list[index_index[i]].arg2.imm_value, 0, r1);
 	}
 	return 0;
 }
