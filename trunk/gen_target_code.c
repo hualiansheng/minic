@@ -1317,7 +1317,6 @@ int call_code(func_block *fb, int i)
 			{
 				if (!fb->uni_table[u]->isGlobal)
 					add_assemble_imm(fb, stw, 27, j, fb->uni_table[u]->offset);
-				fb->reg_var[j] = -1;
 			}
 		}
 		tmp_reg_var[j] = fb->reg_var[j];
@@ -1366,10 +1365,28 @@ int call_code(func_block *fb, int i)
 			break;
 		fb->reg_var[j] = tmp_reg_var[j];
 		u = fb->reg_var[j];
-		if (u != -1 && fb->mapping[u].isTmp == 1 && (live[u/32] >> (31-u%32)) % 2 == 1)
+		if (u != -1 && (live[u/32] >> (31-u%32)) % 2 == 1)
 		{
-			k++;
-			add_assemble_imm(fb, ldw, 29, j, -k*4);
+			if (fb->mapping[u].isTmp == 1)
+			{
+				k++;
+				add_assemble_imm(fb, ldw, 29, j, -k*4);
+			}
+			else
+			{
+				if (!fb->uni_table[u]->isGlobal)
+					add_assemble_imm(fb, ldw, 27, j, fb->uni_table[u]->offset);
+				else
+				{
+					if (fb->uni_table[u]->size != -1)
+						add_assemble(fb->global_label, ldw, -1, j, 0, 0, -1, 1, fb->uni_table[u]->offset);
+					else
+					{
+						add_assemble(fb->global_label, ldw, -1, 1, 0, 0, -1, 1, fb->uni_table[u]->offset);
+						add_assemble(-1, ldw, 1, j, 0, 0, -1, 1, 0);
+					}
+				}
+			}
 		}
 	}
 	tmp = triple_list[index_index[i]].tmp_uni;
