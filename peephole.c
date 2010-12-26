@@ -58,7 +58,7 @@ void calc_const()
 							triple_list[j].arg1 = triple_list[i].arg1;
 						}
 						else if(triple_list[j].arg2_type == 1 && triple_list[j].arg2.temp_index == i){
-							triple_list[j].arg2_type = triple_list[i].arg1_type;
+							triple_list[j].arg2_type = triple_list[i].arg2_type;
 							triple_list[j].arg2 = triple_list[i].arg2;
 						}
 					}
