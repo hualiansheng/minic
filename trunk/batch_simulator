@@ -16,7 +16,7 @@ while [ "$data" != "" ] ; do
 	file=${data%%:*}
 	rm -f $file_list_path$file".out" >/dev/null
 	echo "Compiling  "$1" -o "$file_list_path$file".out "$file_list_path$file".c"
-	cmd=$1" -o "$file_list_path$file".out "$file_list_path$file".c"
+	cmd=$1" -o "$file_list_path$file".out -O3 "$file_list_path$file".c"
 	$cmd
 	if ! [ -f $file_list_path$file".out" ] ; then
 		echo ""
