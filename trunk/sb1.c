@@ -1,8 +1,8 @@
-int main()
+int a[10];
+int f()
 {
-	int a[10];
-	int b;
-	int *p;
-	b = a - p;
-	b = b*8;
+	int i;
+	i = 4;
+	a[i] = 1;
+	return a;
 }

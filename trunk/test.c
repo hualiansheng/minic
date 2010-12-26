@@ -1,9 +1,12 @@
-char *p;
+int print_int(int x);
+
 int main()
 {
-	int a;
-	a = -21474;
-	a = 12431241;
-	p = "wangkan";
-	return a;
+	int a[10],x;
+	a[0] = 255;
+	a[1] = 100;
+	a[1] = a[1]*512;
+	x = a[1];
+	print_int(x);
+	return 0;
 }
