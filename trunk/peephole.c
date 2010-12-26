@@ -1,11 +1,14 @@
 #include "register.h"
 #include "gen_intermediate_code.h"
+#include <stdlib.h>
+#include <memory.h>
 void peephole_on_intermediate_code();
 void peephole_on_target_code();
 void calc_const();
 void array_operation_optimize();
 void inst_block();
-void delete_rebundant_mov();
+void delete_redundant_mov();
+int defined_before_used(int r, int current_inst, int current_block,int* visited, int* next_list);
 
 extern triple* triple_list;
 extern int triple_list_index;
@@ -242,14 +245,15 @@ void array_operation_optimize()
 
 
 
-void delete_rebundant_mov()
+void delete_redundant_mov()
 {
 	int *next_list;
 	int *visited;
-	int i, j, k, flag, able_to_change;
+	int i, j, k, flag, able_to_change, able_to_delete;
 	int temp, current_block;
 	inst_block();
 	next_list = malloc(sizeof(int)*instruction_block_num);
+	visited = malloc(sizeof(int)*instruction_block_num);
 	//create next list
 	for(i = 0 ; i < instruction_block_num; i ++){
 		next_list[i] = -1;
@@ -280,7 +284,7 @@ void delete_rebundant_mov()
 			flag = 0;
 			for(j = i-1 ; j >= instruction_blocks[2*current_block] ; j --){
 				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rm_Imm){
-					if(defined_before_used(assemble_list[i].Rm_Imm, i, current_block))
+					if(defined_before_used(assemble_list[i].Rm_Imm, i, current_block, visited, next_list))
 					{
 						assemble_list[j].Rd = assemble_list[i].Rd;
 						assemble_list[i].is_deleted = 1;
@@ -330,7 +334,7 @@ void delete_rebundant_mov()
 	}
 }
 
-int defined_before_used(int r, int current_inst, int current_block)
+int defined_before_used(int r, int current_inst, int current_block,int* visited, int* next_list)
 {
 	int begin, end, i, temp_block;
 	begin = current_inst+1;
