@@ -226,10 +226,11 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	
+#ifndef DISABLE_PEEPHOLE
 	fprintf(stderr,"Applying intermediate code peephole optimization...");
 	peephole_on_intermediate_code();
 	fprintf(stderr,"done.\n");
-
+#endif
 
 	//generate basic block
 	fprintf(stderr,"Generating basic block...");
@@ -296,10 +297,12 @@ int main(int argc, char** argv)
 #ifndef DEBUG
 	target_file = fopen(strcat(srcfile_name,".s"),"w+");
 #endif
-	
+
+#ifndef DISABLE_PEEPHOLE
 	fprintf(stderr,"Applying target code peephole optimization...");
 	peephole_on_target_code();
 	fprintf(stderr,"done.\n");
+#endif
 	print_target_code(target_file,dispatch_flag);
 	fclose(target_file);
 	return 0;

@@ -513,6 +513,7 @@ int add_special(char *content, enum instruction ins)
 	assemble_list[assemble_num].Rs_Imm = -1;
 	assemble_list[assemble_num].Rm_or_Imm = 0;
 	assemble_list[assemble_num].Rm_Imm = -1;
+	assemble_list[assemble_num].is_deleted = 0;
 	assemble_num++;
 	return 0;
 }
