@@ -225,18 +225,24 @@ void calc_const()
 
 void array_operation_optimize()
 {
-	int i, j;
+	int i, j, k, flag;
 	for(i = 0; i < assemble_num; i++){
 		if(assemble_list[i].ins == ldw || assemble_list[i].ins == stw){
 			if(assemble_list[i].Rn != 27){
 				for(j = i-1 ; j >=0 ; j--){
 					if(assemble_list[j].ins == add && assemble_list[j].Rd == assemble_list[i].Rn){
-						assemble_list[j].is_deleted = 1;
-						assemble_list[i].Rn =assemble_list[j].Rn;
-						assemble_list[i].Rm_or_Imm = assemble_list[j].Rm_or_Imm;
-						assemble_list[i].Rm_Imm = assemble_list[j].Rm_Imm;
-						assemble_list[i].Rs_or_Imm = assemble_list[j].Rs_or_Imm;
-						assemble_list[i].Rs_Imm = assemble_list[j].Rs_Imm;
+						flag = 1;
+						for(k = j ; k < i ; k ++){
+							if(assemble_list[k].ins != stw && (assemble_list[k].Rd == assemble_list[j].Rn || (assemble_list[j].Rm_or_Imm == 0 && assemble_list[k].Rd == assemble_list[j].Rm_Imm))) flag = 0;
+						}
+						if(flag == 1){
+							assemble_list[j].is_deleted = 1;
+							assemble_list[i].Rn =assemble_list[j].Rn;
+							assemble_list[i].Rm_or_Imm = assemble_list[j].Rm_or_Imm;
+							assemble_list[i].Rm_Imm = assemble_list[j].Rm_Imm;
+							assemble_list[i].Rs_or_Imm = assemble_list[j].Rs_or_Imm;
+							assemble_list[i].Rs_Imm = assemble_list[j].Rs_Imm;
+						}
 						break;
 					}
 				}
