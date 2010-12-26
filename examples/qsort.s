@@ -90,19 +90,19 @@ main:
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
-	sub	r29, r29, #4024
+	sub	r29, r29, #536
 	ldw	r28, .L22+0
 	add	r3, r27, r28
-	stw	r3, [r27+], #-4020
+	stw	r3, [r27+], #-532
 .L11:
-	ldw	r5, [r27+], #-4020
+	ldw	r5, [r27+], #-532
 	mov	r7, #0
 .L14:
-	cmpsub.a	r7, #1000
+	cmpsub.a	r7, #128
 	beg	.L13
 .L12:
 	add	r6, r5, r7<<#2
-	rsub	r4, r7, #1000
+	rsub	r4, r7, #128
 	stw	r4, [r6+], #0
 	add	r4, r7, #1
 	mov	r7, r4
@@ -110,64 +110,64 @@ main:
 .L13:
 	mov	r7, #0
 .L17:
-	cmpsub.a	r7, #1000
+	cmpsub.a	r7, #128
 	beg	.L16
 .L15:
 	add	r4, r5, r7<<#2
 	ldw	r4, [r4+], #0
-	stw	r5, [r27+], #-4020
+	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, r4
 	b.l	print_int
 	ldw	r7, [r27+], #-16
-	ldw	r5, [r27+], #-4020
-	stw	r5, [r27+], #-4020
+	ldw	r5, [r27+], #-532
+	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, #32
 	b.l	print_char
 	ldw	r7, [r27+], #-16
-	ldw	r5, [r27+], #-4020
+	ldw	r5, [r27+], #-532
 	add	r4, r7, #1
 	mov	r7, r4
 	b	.L17
 .L16:
-	stw	r5, [r27+], #-4020
+	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, #10
 	b.l	print_char
 	ldw	r7, [r27+], #-16
-	ldw	r5, [r27+], #-4020
-	stw	r5, [r27+], #-4020
+	ldw	r5, [r27+], #-532
+	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, #10
 	b.l	print_char
 	ldw	r7, [r27+], #-16
-	ldw	r5, [r27+], #-4020
-	stw	r5, [r27+], #-4020
+	ldw	r5, [r27+], #-532
+	stw	r5, [r27+], #-532
 	mov	r0, r5
 	mov	r1, #0
-	mov	r2, #1000
+	mov	r2, #128
 	b.l	qsort
-	ldw	r5, [r27+], #-4020
+	ldw	r5, [r27+], #-532
 	mov	r7, #0
 .L20:
-	cmpsub.a	r7, #1000
+	cmpsub.a	r7, #128
 	beg	.L19
 .L18:
 	add	r4, r5, r7<<#2
 	ldw	r4, [r4+], #0
-	stw	r5, [r27+], #-4020
+	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, r4
 	b.l	print_int
 	ldw	r7, [r27+], #-16
-	ldw	r5, [r27+], #-4020
-	stw	r5, [r27+], #-4020
+	ldw	r5, [r27+], #-532
+	stw	r5, [r27+], #-532
 	stw	r7, [r27+], #-16
 	mov	r0, #32
 	b.l	print_char
 	ldw	r7, [r27+], #-16
-	ldw	r5, [r27+], #-4020
+	ldw	r5, [r27+], #-532
 	add	r4, r7, #1
 	mov	r7, r4
 	b	.L20
@@ -183,4 +183,4 @@ main:
 	ldw	r27, [r27+], #-12
 	jump	r30
 .L22:
-	.word	-4016
+	.word	-528
