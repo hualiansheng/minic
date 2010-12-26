@@ -8,14 +8,16 @@ main:
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
 	sub	r29, r29, #544
-	add	r3, r27, #-528
+	ldw	r28, .L20+0
+	add	r3, r27, r28
 	stw	r3, [r27+], #-532
+.L1:
 	ldw	r4, [r27+], #-532
 	mov	r5, #0
-.L3:
+.L4:
 	cmpsub.a	r5, #128
-	beg	.L2
-.L1:
+	beg	.L3
+.L2:
 	add	r7, r4, r5<<#2
 	stw	r4, [r27+], #-532
 	stw	r5, [r27+], #-16
@@ -24,38 +26,37 @@ main:
 	mov	r0, #128
 	b.l	rand_int
 	add	r29, r29, #4
+	ldw	r4, [r27+], #-532
+	ldw	r5, [r27+], #-16
 	ldw	r7, [r29+], #-4
 	mov	r6, r0
-	ldw	r5, [r27+], #-16
-	ldw	r4, [r27+], #-532
 	stw	r6, [r7+], #0
 	add	r5, r5, #1
-	b	.L3
-.L2:
+	b	.L4
+.L3:
 	mov	r5, #0
-.L6:
+.L7:
 	cmpsub.a	r5, #128
-	beg	.L5
+	beg	.L6
+.L5:
 	ldw	r9, [r27+], #-536
 	ldw	r8, [r27+], #-540
-.L4:
-	add	r6, r4, r5<<#2
-	ldw	r6, [r6+], #0
+	ldw	r6, [r4+], r5<<#2
 	stw	r4, [r27+], #-532
 	stw	r5, [r27+], #-16
 	mov	r0, r6
 	b.l	print_int
-	ldw	r5, [r27+], #-16
 	ldw	r4, [r27+], #-532
+	ldw	r5, [r27+], #-16
 	stw	r4, [r27+], #-532
 	stw	r5, [r27+], #-16
 	mov	r0, #10
 	b.l	print_char
-	ldw	r5, [r27+], #-16
 	ldw	r4, [r27+], #-532
+	ldw	r5, [r27+], #-16
 	add	r5, r5, #1
-	b	.L6
-.L5:
+	b	.L7
+.L6:
 	stw	r4, [r27+], #-532
 	mov	r0, #10
 	b.l	print_char
@@ -65,68 +66,62 @@ main:
 	b.l	print_char
 	ldw	r4, [r27+], #-532
 	mov	r5, #0
-.L14:
+.L15:
 	cmpsub.a	r5, #128
-	beg	.L8
-.L7:
+	beg	.L9
+.L8:
 	add	r6, r5, #1
 	mov	r9, r6
-.L13:
+.L14:
 	cmpsub.a	r9, #128
-	beg	.L10
-.L9:
-	add	r6, r4, r9<<#2
-	ldw	r7, [r6+], #0
-	add	r6, r4, r5<<#2
-	ldw	r6, [r6+], #0
+	beg	.L11
+.L10:
+	ldw	r7, [r4+], r9<<#2
+	ldw	r6, [r4+], r5<<#2
 	cmpsub.a	r7, r6
-	beg	.L12
-.L11:
-	add	r6, r4, r5<<#2
-	ldw	r6, [r6+], #0
-	mov	r8, r6
-	add	r7, r4, r5<<#2
-	add	r6, r4, r9<<#2
-	ldw	r6, [r6+], #0
-	stw	r6, [r7+], #0
-	add	r6, r4, r9<<#2
-	stw	r8, [r6+], #0
+	beg	.L13
 .L12:
+	ldw	r6, [r4+], r5<<#2
+	mov	r8, r6
+	ldw	r6, [r4+], r9<<#2
+	stw	r6, [r4+], r5<<#2
+	stw	r8, [r4+], r9<<#2
+.L13:
 	add	r6, r9, #1
 	mov	r9, r6
-	b	.L13
-.L10:
-	add	r5, r5, #1
 	b	.L14
-.L8:
+.L11:
+	add	r5, r5, #1
+	b	.L15
+.L9:
 	mov	r5, #0
-.L17:
+.L18:
 	cmpsub.a	r5, #128
-	beg	.L16
-.L15:
-	add	r6, r4, r5<<#2
-	ldw	r6, [r6+], #0
+	beg	.L17
+.L16:
+	ldw	r6, [r4+], r5<<#2
 	stw	r4, [r27+], #-532
 	stw	r5, [r27+], #-16
 	mov	r0, r6
 	b.l	print_int
-	ldw	r5, [r27+], #-16
 	ldw	r4, [r27+], #-532
+	ldw	r5, [r27+], #-16
 	stw	r4, [r27+], #-532
 	stw	r5, [r27+], #-16
 	mov	r0, #10
 	b.l	print_char
-	ldw	r5, [r27+], #-16
 	ldw	r4, [r27+], #-532
+	ldw	r5, [r27+], #-16
 	add	r5, r5, #1
-	b	.L17
-.L16:
+	b	.L18
+.L17:
 	b.l	print_ln
 	b.l	print_ln
 	mov	r0, #0
-.L18:
+.L19:
 	ldw	r30, [r27+], #-4
 	ldw	r29, [r27+], #-8
 	ldw	r27, [r27+], #-12
 	jump	r30
-.L19:
+.L20:
+	.word	-528

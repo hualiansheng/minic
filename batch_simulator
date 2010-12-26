@@ -5,14 +5,20 @@ if [ $# -lt 3 ]; then
 	exit
 fi
 
+file_list_path=${3%/*}
+if [ "$file_list_path" == "$3" ]; then
+	file_list_path="."
+fi
+file_list_path=$file_list_path"/"
+
 data=`cat $3`
 while [ "$data" != "" ] ; do
 	file=${data%%:*}
-	rm -f $file".out"
-	echo "Compiling  "$1" -o "$file".out "$file".c"
-	cmd=$1" -o "$file".out "$file".c"
+	rm -f $file_list_path$file".out" >/dev/null
+	echo "Compiling  "$1" -o "$file_list_path$file".out "$file_list_path$file".c"
+	cmd=$1" -o "$file_list_path$file".out "$file_list_path$file".c"
 	$cmd
-	if ! [ -f $file".out" ] ; then
+	if ! [ -f $file_list_path$file".out" ] ; then
 		echo ""
 		echo $file".c Compile error!"
 		exit
@@ -28,18 +34,19 @@ echo ""
 data=`cat $3`
 while [ "$data" != "" ] ; do
 	file=${data%%:*}
-	echo "Simulating  "$2" "$file".out -r >result"
-	cmd=$2" "$file".out -r >result"
+	echo "Simulating  "$2" "$file_list_path$file".out -r >result"
+	cmd=$2" "$file_list_path$file".out -r >result"
 	$cmd >result
-	cmd="diff -wB result "$file".ans"
+	cmd="diff -wB result "$file_list_path$file".ans"
 	result=`$cmd`
 	if [ "$result" == "" ]; then
-		echo $file" PASSED!"
+		echo $file_list_path$file" PASSED!"
 	else
-		echo $file" NOT PASSED!"
+		echo $file_list_path$file" NOT PASSED!"
 		echo $result
 		read
-		vimdiff result $file".ans"
+		vimdiff result $file_list_path$file".ans"
+		rm -f result
 		exit
 	fi
 	rm -f result
