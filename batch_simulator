@@ -8,9 +8,15 @@ fi
 data=`cat $3`
 while [ "$data" != "" ] ; do
 	file=${data%%:*}
+	rm -f $file".out"
 	echo "Compiling  "$1" -o "$file".out "$file".c"
 	cmd=$1" -o "$file".out "$file".c"
 	$cmd
+	if ! [ -f $file".out" ] ; then
+		echo ""
+		echo $file".c Compile error!"
+		exit
+	fi
 	echo ""
 	data=${data#*:}
 done
@@ -25,16 +31,14 @@ while [ "$data" != "" ] ; do
 	echo "Simulating  "$2" "$file".out -r >result"
 	cmd=$2" "$file".out -r >result"
 	$cmd >result
-	cmd="diff -w result "$file".ans"
+	cmd="diff -wB result "$file".ans"
 	result=`$cmd`
-	if ! [ -f $file".out" ] ; then
-		echo $file" Compile error."
-		exit
-	elif [ "$result" == "" ]; then
+	if [ "$result" == "" ]; then
 		echo $file" PASSED!"
 	else
 		echo $file" NOT PASSED!"
 		echo $result
+		read
 		vimdiff result $file".ans"
 		exit
 	fi
@@ -42,5 +46,7 @@ while [ "$data" != "" ] ; do
 	echo ""
 	data=${data#*:}
 done
+
+echo "Congratulations, all testcases are passed."
 
 
