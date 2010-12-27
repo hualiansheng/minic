@@ -326,8 +326,6 @@ void delete_redundant_mov()
 			}
 		//source operand
 //			flag = 1;
-			able_to_change = 1;
-			able_to_delete = 1;
 			for(j = i-1 ; j >= instruction_blocks[2*current_block] ; j --){
 				if(assemble_list[j].is_deleted == 1) continue;
 				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rd) break;
@@ -346,6 +344,8 @@ void delete_redundant_mov()
 						}
 					}
 					if(flag == 0) break;
+					able_to_change = 1;
+					able_to_delete = 1;
 					if(defined_before_used(assemble_list[i].Rm_Imm, i+1, current_block, visited, next_list, jump_list, cir_enter, 0, assemble_list[i].Rd))
 					{
 						assemble_list[j].Rd = assemble_list[i].Rd;
@@ -428,16 +428,28 @@ int defined_before_used(int r, int begin, int current_block,int* visited, int* n
 		{
 			if(assemble_list[i].ins != stw && assemble_list[i].Rd == r)
 				return 1;
-			/*if((assemble_list[i].ins == stw && assemble_list[i].Rd == r) || assemble_list[i].Rn == r || (assemble_list[i].Rm_or_Imm ==0 && assemble_list[i].Rm_Imm == r ) ||(assemble_list[i].Rs_or_Imm==0 && assemble_list[i].Rs_Imm == r)) 
+			if(assemble_list[i].ins != stw && assemble_list[i].Rd == mov_rd)
+				able_to_change = 0 ;
+				/*if((assemble_list[i].ins == stw && assemble_list[i].Rd == r) || assemble_list[i].Rn == r || (assemble_list[i].Rm_or_Imm ==0 && assemble_list[i].Rm_Imm == r ) ||(assemble_list[i].Rs_or_Imm==0 && assemble_list[i].Rs_Imm == r)) 
 				return 0;	*/
-			if(assemble_list[i].ins == stw && assemble_list[i].Rd == r)
-				assemble_list[i].Rd = mov_rd;
-			if(assemble_list[i].Rn == r)
-				assemble_list[i].Rn = mov_rd;
+			if(assemble_list[i].ins == stw && assemble_list[i].Rd == r){
+				if(able_to_change == 1)	assemble_list[i].Rd = mov_rd;
+				else return 0;
+			}
+			if(assemble_list[i].Rn == r){
+				if(able_to_change) assemble_list[i].Rn = mov_rd;
+				else return 0;
+			}
 			if(assemble_list[i].Rm_or_Imm == 0 && assemble_list[i].Rm_Imm == r)
-				assemble_list[i].Rm_Imm = mov_rd;
+			{
+				if(able_to_change) assemble_list[i].Rm_Imm = mov_rd;
+				else return 0;
+			}
 			if(assemble_list[i].Rs_or_Imm == 0 && assemble_list[i].Rs_Imm == r)
-				assemble_list[i].Rs_Imm = mov_rd;
+			{
+				if(able_to_change) assemble_list[i].Rs_Imm = mov_rd;
+				else return 0;
+			}
 		}
 	}
 	else{
