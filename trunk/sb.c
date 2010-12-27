@@ -1,11 +1,17 @@
+// test sb
 void print_bin(int x)
 {
-	int i;
+	int i;// loop variant
 	for (i = 0; i < 32; i++)
-		printf("%d", (x>>(31-i)) & 1);
+		printf("abcdefg%bhikilmn'aa'a", (x>>(31-i)) & 1);
 	printf("\n");
 }
 
+/*
+ * afdsadfa
+ * asfsadf
+ * asdfsaf
+ */
 int main()
 {
 	int a;
@@ -21,3 +27,4 @@ int main()
 	print_bin(a);
 	return 0;
 }
+//the last line
