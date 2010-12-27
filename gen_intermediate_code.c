@@ -26,7 +26,7 @@ extern char name[][30];
 int adjustSize(void** p_old, int* max);
 
 int rb;//全局变量，布尔表达式的专用寄存器
-const int initsize = 100;
+const int initsize = 1000;
 extern AST_NODE* tree_root;
 
 int const_value;
@@ -47,6 +47,9 @@ int triple_list_size;
 int triple_list_index=0;
 int scope_top=0;
 int scope_size;
+
+int sbtemp = 0;
+
 
 void gen_intermediate_code(AST_NODE *root);
 int statement_code(AST_NODE *p);
@@ -109,6 +112,7 @@ stack_item pop()
 void add_triple(enum operator op, int arg1, int arg2, int result_type, int arg1_type, int arg2_type)
 {
 	int i;
+	sbtemp += 1;
 	if(triple_list_index == triple_list_size){
 		i = triple_list_size * sizeof(triple);
 		adjustSize((void**)&triple_list, &i);
