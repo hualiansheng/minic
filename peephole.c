@@ -329,6 +329,7 @@ void delete_redundant_mov()
 			able_to_change = 1;
 			able_to_delete = 1;
 			for(j = i-1 ; j >= instruction_blocks[2*current_block] ; j --){
+				if(assemble_list[j].is_deleted == 1) continue;
 				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rd) break;
 				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rm_Imm && assemble_list[i].Rm_or_Imm == 0){
 					for(k = 0 ; k < instruction_block_num ; k++){
