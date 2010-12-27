@@ -7,7 +7,7 @@ void pre_compile(char* filename){
 	char *src, *dst;
 	FILE *fr, *fw;
 	char input[500], output[500];
-	int i, j;
+	int i;
 	int len;
 	int pos;
 	sprintf(input, "%s.c", filename);
@@ -24,7 +24,7 @@ void pre_compile(char* filename){
 	}
 	fseek(fr, 0, SEEK_END);
 	len = ftell(fr);
-	printf("length : %d\n", len);
+	//printf("length : %d\n", len);
 	src = malloc(len * sizeof(char) + 1);
 	dst = malloc(len * sizeof(char)) + 1;
 	fseek(fr, 0, SEEK_SET);

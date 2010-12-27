@@ -23,4 +23,5 @@ int available_expr();
 int gen_uni_table();
 void peephole_on_intermediate_code();
 void peephole_on_target_code();
+void pre_compile(char*);
 #endif

@@ -10,6 +10,8 @@
 #include <unistd.h> //getopt() support
 #include <assert.h>
 #include <string.h>
+
+#define PREPROCESSOR_TMP_SUFFIX ".p"
 int error_number;
 void usage()
 {
@@ -168,12 +170,19 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	parse_file_name(srcfile_name, argv[optind]);
-	source_file = fopen (argv[optind], "r");
+	
+	/**
+	 *call preprocessor
+	 */
+	pre_compile(srcfile_name);
+
+	source_file = fopen (strcat(srcfile_name,PREPROCESSOR_TMP_SUFFIX), "r");
 	if (!source_file) //file open error
 	{
 		fprintf(stderr,"%s: open error!\n",argv[optind]);
 		return -1;
 	}
+	
 	yyin = source_file;
 	//call bison parser
 	if (yyparse() || error_number)
@@ -181,6 +190,10 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Parser: terminated, %d error(s).\n",error_number);
 		return -1;
 	}
+
+	//delete preprocesser temp file
+	fclose(source_file);
+	remove(strcat(srcfile_name,PREPROCESSOR_TMP_SUFFIX));
 	
 	if(dbg_print_tree)
 		print_AST(tree_root,0);
@@ -249,7 +262,7 @@ int main(int argc, char** argv)
 		fprintf(stderr,"Running available expression analysis...");
 		iteration_count = available_expr();
 		fprintf(stderr,"done, iteration count: %d\n",iteration_count);
-		print_available_expr();
+	//	print_available_expr();
 	}
 	//live variable analyzing
 	fprintf(stderr,"Analyzing lively variables...");
@@ -294,6 +307,7 @@ int main(int argc, char** argv)
 	/* get code output!*/
 	target_file = stdout;
 #ifndef DEBUG
+	parse_file_name(srcfile_name, argv[optind]);
 	target_file = fopen(strcat(srcfile_name,".s"),"w+");
 #endif
 
