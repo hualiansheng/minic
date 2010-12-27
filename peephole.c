@@ -2,6 +2,7 @@
 #include "gen_intermediate_code.h"
 #include <stdlib.h>
 #include <memory.h>
+#include <stdio.h>
 void peephole_on_intermediate_code();
 void peephole_on_target_code();
 void calc_const();
@@ -10,6 +11,7 @@ void inst_block();
 void delete_redundant_mov();
 int defined_before_used(int r, int current_inst, int current_block,int* visited, int* next_list, int* jump_list,int* cir_enter, int in_circulating, int mov_rd);
 void change_mov_target(int mov_inst, int begin, int current_block,  int *visited, int* next_list, int* jump_list);
+//void print_target_code(FILE* target_file, int dispatch_flag);
 
 extern triple* triple_list;
 extern int triple_list_index;
@@ -261,6 +263,7 @@ void delete_redundant_mov()
 	int *jump_list;
 	int *visited;
 	int *cir_enter;
+	FILE *debug;
 	int i, j, k, flag;
 	int temp, current_block;
 	inst_block();
@@ -354,12 +357,15 @@ void delete_redundant_mov()
 								assemble_list[k].Rn = assemble_list[i].Rd;
 							}
 							else if(assemble_list[k].Rm_or_Imm ==0 && assemble_list[k].Rm_Imm ==  assemble_list[i].Rm_Imm){
-								assemble_list[k].Rm_Imm=assemble_list[k].Rd;
+								assemble_list[k].Rm_Imm=assemble_list[i].Rd;
 							}
 							else if(assemble_list[k].Rs_or_Imm==0 && assemble_list[k].Rs_Imm == assemble_list[i].Rm_Imm){
-								assemble_list[k].Rs_Imm=assemble_list[k].Rd;
+								assemble_list[k].Rs_Imm=assemble_list[i].Rd;
 							}
 						}
+					//	debug = fopen("debug.s", "w");
+					//	print_target_code(debug,0);
+					//	fclose(debug);
 					}
 					break;
 				}
