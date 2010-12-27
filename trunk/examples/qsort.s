@@ -75,9 +75,9 @@ main:
 	stw	r30, [r29+], #-8
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
+	ldw	r28, .L22+0
 	sub	r27, r29, #4
 	sub	r29, r29, #536
-	ldw	r28, .L22+0
 	add	r3, r27, r28
 	stw	r3, [r27+], #-532
 .L11:
