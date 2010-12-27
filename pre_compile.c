@@ -83,8 +83,8 @@ void pre_compile(char* filename){
 		}
 	}
 	dst[pos] = '\0';
-	printf("Initial : \n%s\n", src);
-	printf("\n\nTarget : %s\n", dst);
+	//printf("Initial : \n%s\n", src);
+	//printf("\n\nTarget : %s\n", dst);
 	fputs(dst, fw);
 	fclose(fr);
 	fclose(fw);
