@@ -337,30 +337,31 @@ void delete_redundant_mov()
 					}
 			
 					//	after j and before i;
-					/*
+					flag = 1;	
 					for(k = j+1 ; k < i ; k++){
-						if((assemble_list[k].ins == stw && assemble_list[k].Rd == assemble_list[i].Rm_Imm) || assemble_list[k].Rn == assemble_list[i].Rm_Imm|| (assemble_list[k].Rm_or_Imm ==0 && assemble_list[k].Rm_Imm ==  assemble_list[i].Rm_Imm) ||(assemble_list[k].Rs_or_Imm==0 && assemble_list[k].Rs_Imm == assemble_list[i].Rm_Imm))
+						if((assemble_list[k].ins == stw && assemble_list[k].Rd == assemble_list[i].Rd) || assemble_list[k].Rn == assemble_list[i].Rd|| (assemble_list[k].Rm_or_Imm ==0 && assemble_list[k].Rm_Imm ==  assemble_list[i].Rd) ||(assemble_list[k].Rs_or_Imm==0 && assemble_list[k].Rs_Imm == assemble_list[i].Rd))
 						{
 							flag = 0;
 							break;
 						}
 					}
-					if(flag == 0) break;*/
+					if(flag == 0) break;
 					if(defined_before_used(assemble_list[i].Rm_Imm, i+1, current_block, visited, next_list, jump_list, cir_enter, 0, assemble_list[i].Rd))
 					{
 						assemble_list[j].Rd = assemble_list[i].Rd;
 						assemble_list[i].is_deleted = 1;
+						
 						for(k = j+1; k < i ;k ++){
 							if(assemble_list[k].ins == stw && assemble_list[k].Rd == assemble_list[i].Rm_Imm){
 								assemble_list[k].Rd = assemble_list[i].Rd;
 							}
-							else if(assemble_list[k].Rn == assemble_list[i].Rm_Imm){
+							if(assemble_list[k].Rn == assemble_list[i].Rm_Imm){
 								assemble_list[k].Rn = assemble_list[i].Rd;
 							}
-							else if(assemble_list[k].Rm_or_Imm ==0 && assemble_list[k].Rm_Imm ==  assemble_list[i].Rm_Imm){
+							if(assemble_list[k].Rm_or_Imm ==0 && assemble_list[k].Rm_Imm ==  assemble_list[i].Rm_Imm){
 								assemble_list[k].Rm_Imm=assemble_list[i].Rd;
 							}
-							else if(assemble_list[k].Rs_or_Imm==0 && assemble_list[k].Rs_Imm == assemble_list[i].Rm_Imm){
+							if(assemble_list[k].Rs_or_Imm==0 && assemble_list[k].Rs_Imm == assemble_list[i].Rm_Imm){
 								assemble_list[k].Rs_Imm=assemble_list[i].Rd;
 							}
 						}
@@ -431,11 +432,11 @@ int defined_before_used(int r, int begin, int current_block,int* visited, int* n
 				return 0;	*/
 			if(assemble_list[i].ins == stw && assemble_list[i].Rd == r)
 				assemble_list[i].Rd = mov_rd;
-			else if(assemble_list[i].Rn == r)
+			if(assemble_list[i].Rn == r)
 				assemble_list[i].Rn = mov_rd;
-			else if(assemble_list[i].Rm_or_Imm == 0 && assemble_list[i].Rm_Imm == r)
+			if(assemble_list[i].Rm_or_Imm == 0 && assemble_list[i].Rm_Imm == r)
 				assemble_list[i].Rm_Imm = mov_rd;
-			else if(assemble_list[i].Rs_or_Imm == 0 && assemble_list[i].Rs_Imm == r)
+			if(assemble_list[i].Rs_or_Imm == 0 && assemble_list[i].Rs_Imm == r)
 				assemble_list[i].Rs_Imm = mov_rd;
 		}
 	}
