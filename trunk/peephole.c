@@ -8,7 +8,7 @@ void calc_const();
 void array_operation_optimize();
 void inst_block();
 void delete_redundant_mov();
-int defined_before_used(int r, int current_inst, int current_block,int* visited, int* next_list, int* jump_list);
+int defined_before_used(int r, int current_inst, int current_block,int* visited, int* next_list, int* jump_list,int* cir_enter, int in_circulating, int mov_rd);
 void change_mov_target(int mov_inst, int begin, int current_block,  int *visited, int* next_list, int* jump_list);
 
 extern triple* triple_list;
@@ -260,12 +260,14 @@ void delete_redundant_mov()
 	int *next_list;
 	int *jump_list;
 	int *visited;
+	int *cir_enter;
 	int i, j, k, flag;
 	int temp, current_block;
 	inst_block();
 	next_list = malloc(sizeof(int)*instruction_block_num);
 	jump_list = malloc(sizeof(int)*instruction_block_num);
 	visited = malloc(sizeof(int)*instruction_block_num);
+	cir_enter = malloc(sizeof(int)*instruction_block_num);
 	//create next list
 	for(i = 0 ; i < instruction_block_num; i ++){
 		next_list[i] = i+1;
@@ -304,6 +306,11 @@ void delete_redundant_mov()
 			jump_list[i] = -1;
 		}
 	}
+	//create cir_enter
+	memset(cir_enter, 0, sizeof(int)*instruction_block_num);
+	for(i = 0 ; i < instruction_block_num ; i ++){
+		if(jump_list[i] < i) cir_enter[jump_list[i]] = 1;
+	}
 
 	for(i = 0 ; i < assemble_num ; i++){
 		if(assemble_list[i].ins == mov){
@@ -315,13 +322,18 @@ void delete_redundant_mov()
 				}
 			}
 		//source operand
-			flag = 1;
+//			flag = 1;
+			able_to_change = 1;
+			able_to_delete = 1;
 			for(j = i-1 ; j >= instruction_blocks[2*current_block] ; j --){
 				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rd) break;
 				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rm_Imm && assemble_list[i].Rm_or_Imm == 0){
 					for(k = 0 ; k < instruction_block_num ; k++){
 						visited[k] = 0;
 					}
+			
+					//	after j and before i;
+					/*
 					for(k = j+1 ; k < i ; k++){
 						if((assemble_list[k].ins == stw && assemble_list[k].Rd == assemble_list[i].Rm_Imm) || assemble_list[k].Rn == assemble_list[i].Rm_Imm|| (assemble_list[k].Rm_or_Imm ==0 && assemble_list[k].Rm_Imm ==  assemble_list[i].Rm_Imm) ||(assemble_list[k].Rs_or_Imm==0 && assemble_list[k].Rs_Imm == assemble_list[i].Rm_Imm))
 						{
@@ -329,76 +341,107 @@ void delete_redundant_mov()
 							break;
 						}
 					}
-					if(flag == 0) break;
-					if(defined_before_used(assemble_list[i].Rm_Imm, i+1, current_block, visited, next_list, jump_list))
+					if(flag == 0) break;*/
+					if(defined_before_used(assemble_list[i].Rm_Imm, i+1, current_block, visited, next_list, jump_list, cir_enter, 0, assemble_list[i].Rd))
 					{
 						assemble_list[j].Rd = assemble_list[i].Rd;
 						assemble_list[i].is_deleted = 1;
-						flag = 1;
+						for(k = j+1; k < i ;k ++){
+							if(assemble_list[k].ins == stw && assemble_list[k].Rd == assemble_list[i].Rm_Imm){
+								assemble_list[k].Rd = assemble_list[i].Rd;
+							}
+							else if(assemble_list[k].Rn == assemble_list[i].Rm_Imm){
+								assemble_list[k].Rn = assemble_list[i].Rd;
+							}
+							else if(assemble_list[k].Rm_or_Imm ==0 && assemble_list[k].Rm_Imm ==  assemble_list[i].Rm_Imm){
+								assemble_list[k].Rm_Imm=assemble_list[k].Rd;
+							}
+							else if(assemble_list[k].Rs_or_Imm==0 && assemble_list[k].Rs_Imm == assemble_list[i].Rm_Imm){
+								assemble_list[k].Rs_Imm=assemble_list[k].Rd;
+							}
+						}
 					}
 					break;
 				}
 			}
-	//		able_to_change = 1;
-	//		able_to_delete = 0;
-		//	change_mov_target(i, i+1, current_block, visited, next_list, jump_list);
-	//		if(able_to_delete == 1) assemble_list[i].is_deleted = 1;
+			//		able_to_change = 1;
+			//		able_to_delete = 0;
+			//	change_mov_target(i, i+1, current_block, visited, next_list, jump_list);
+			//		if(able_to_delete == 1) assemble_list[i].is_deleted = 1;
 			//target operand
 			/*
-			if(flag == 1) continue;
-			for(j = i+1; j <= instruction_blocks[2*current_block+1] ; j ++)
-			{
-				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rm_Imm){
-					able_to_change = 0;
-				}
-				if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rd){
-					if(able_to_delete){
-						assemble_list[i].is_deleted = 1;
-					}
-					break;
-				}
+			   if(flag == 1) continue;
+			   for(j = i+1; j <= instruction_blocks[2*current_block+1] ; j ++)
+			   {
+			   if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rm_Imm){
+			   able_to_change = 0;
+			   }
+			   if(assemble_list[j].ins != stw && assemble_list[j].Rd == assemble_list[i].Rd){
+			   if(able_to_delete){
+			   assemble_list[i].is_deleted = 1;
+			   }
+			   break;
+			   }
 
-				if(able_to_change){
-					if(assemble_list[j].ins == stw && assemble_list[j].Rd == assemble_list[i].Rd) assemble_list[j].Rd = assemble_list[i].Rm_Imm;
-					else if(assemble_list[j].Rn == assemble_list[i].Rd){
-						if((assemble_list[j].ins == ldw || assemble_list[j].ins == stw) && assemble_list[j].Rm_Imm == assemble_list[i].Rm_Imm);
-						else assemble_list[j].Rn = assemble_list[i].Rm_Imm;
-					}
-					else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm == assemble_list[i].Rd){
-						if((assemble_list[j].ins == ldw || assemble_list[j].ins == stw) && assemble_list[j].Rn == assemble_list[i].Rm_Imm);
-						else assemble_list[j].Rm_Imm = assemble_list[i].Rm_Imm;
-					}
-				}
-				else{
-					if(assemble_list[j].ins == stw && assemble_list[j].Rd == assemble_list[i].Rd) able_to_delete = 0;
-					else if(assemble_list[j].Rn == assemble_list[i].Rd){
-						able_to_delete = 0;
-					}
-					else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm == assemble_list[i].Rd){
-						able_to_delete = 0;
-					}
-				}
-			}*/
+			   if(able_to_change){
+			   if(assemble_list[j].ins == stw && assemble_list[j].Rd == assemble_list[i].Rd) assemble_list[j].Rd = assemble_list[i].Rm_Imm;
+			   else if(assemble_list[j].Rn == assemble_list[i].Rd){
+			   if((assemble_list[j].ins == ldw || assemble_list[j].ins == stw) && assemble_list[j].Rm_Imm == assemble_list[i].Rm_Imm);
+			   else assemble_list[j].Rn = assemble_list[i].Rm_Imm;
+			   }
+			   else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm == assemble_list[i].Rd){
+			   if((assemble_list[j].ins == ldw || assemble_list[j].ins == stw) && assemble_list[j].Rn == assemble_list[i].Rm_Imm);
+			   else assemble_list[j].Rm_Imm = assemble_list[i].Rm_Imm;
+			   }
+			   }
+			   else{
+			   if(assemble_list[j].ins == stw && assemble_list[j].Rd == assemble_list[i].Rd) able_to_delete = 0;
+			   else if(assemble_list[j].Rn == assemble_list[i].Rd){
+			   able_to_delete = 0;
+			   }
+			   else if(assemble_list[j].Rm_or_Imm == 0 && assemble_list[j].Rm_Imm == assemble_list[i].Rd){
+			   able_to_delete = 0;
+			   }
+			   }
+			   }*/
 		}
 	}
 }
 
-int defined_before_used(int r, int begin, int current_block,int* visited, int* next_list, int* jump_list)
+int defined_before_used(int r, int begin, int current_block,int* visited, int* next_list, int* jump_list, int* cir_enter, int in_circulation, int mov_rd)
 {
 	int end, i;
 	int result = 1;
 	end = instruction_blocks[current_block*2+1];
 	if(visited[current_block] == 1) return 1;
 	visited[current_block] = 1;
-	for(i = begin ; i <= end; i ++)
-	{
-		if(assemble_list[i].ins != stw && assemble_list[i].Rd == r)
-			return 1;
-		if((assemble_list[i].ins == stw && assemble_list[i].Rd == r) || assemble_list[i].Rn == r || (assemble_list[i].Rm_or_Imm ==0 && assemble_list[i].Rm_Imm == r ) ||(assemble_list[i].Rs_or_Imm==0 && assemble_list[i].Rs_Imm == r)) 
-			return 0;		
+	if(!in_circulation){
+		for(i = begin ; i <= end; i ++)
+		{
+			if(assemble_list[i].ins != stw && assemble_list[i].Rd == r)
+				return 1;
+			/*if((assemble_list[i].ins == stw && assemble_list[i].Rd == r) || assemble_list[i].Rn == r || (assemble_list[i].Rm_or_Imm ==0 && assemble_list[i].Rm_Imm == r ) ||(assemble_list[i].Rs_or_Imm==0 && assemble_list[i].Rs_Imm == r)) 
+				return 0;	*/
+			if(assemble_list[i].ins == stw && assemble_list[i].Rd == r)
+				assemble_list[i].Rd = mov_rd;
+			else if(assemble_list[i].Rn == r)
+				assemble_list[i].Rn = mov_rd;
+			else if(assemble_list[i].Rm_or_Imm == 0 && assemble_list[i].Rm_Imm == r)
+				assemble_list[i].Rm_Imm = mov_rd;
+			else if(assemble_list[i].Rs_or_Imm == 0 && assemble_list[i].Rs_Imm == r)
+				assemble_list[i].Rs_Imm = mov_rd;
+		}
 	}
-	if(next_list[current_block] != -1) result = result && defined_before_used(r, instruction_blocks[2*next_list[current_block]], next_list[current_block], visited,next_list, jump_list);
-	if(jump_list[current_block] != -1) result = result && defined_before_used(r, instruction_blocks[2*jump_list[current_block]], jump_list[current_block], visited, next_list, jump_list);
+	else{
+		for(i = begin ; i < end; i++){
+			if(assemble_list[i].ins != stw && assemble_list[i].Rd == r)
+				return 1;
+			if((assemble_list[i].ins == stw && assemble_list[i].Rd == r) || assemble_list[i].Rn == r || (assemble_list[i].Rm_or_Imm ==0 && assemble_list[i].Rm_Imm == r ) ||(assemble_list[i].Rs_or_Imm==0 && assemble_list[i].Rs_Imm == r)) 
+				return 0;
+		}
+	}
+	if(next_list[current_block] != -1) result = result && defined_before_used(r, instruction_blocks[2*next_list[current_block]], next_list[current_block], visited,next_list, jump_list, cir_enter, cir_enter[next_list[current_block]], mov_rd);
+	if(jump_list[current_block] != -1) result = result && defined_before_used(r, instruction_blocks[2*jump_list[current_block]], jump_list[current_block], visited, next_list, jump_list, cir_enter, cir_enter[next_list[current_block]], mov_rd);
 	return result;
 }
 
