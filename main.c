@@ -12,6 +12,8 @@
 #include <string.h>
 
 #define PREPROCESSOR_TMP_SUFFIX ".p"
+int debug_mode= 0;
+int peephole_disabled = 0;
 int error_number;
 void usage()
 {
@@ -35,6 +37,10 @@ Options:\n\
 	CALLEE_REG_START,
 	CALLEE_REG_END,
 	AVALIABLE_REG_NUM);
+	if(debug_mode)
+		printf("***Caution: DEBUG MODE ***\n");
+	if(peephole_disabled)
+		printf("***Peephole optimization DISABLED!\n");
 }
 /**
  * parse the input file name, cut out the extend name.
@@ -61,9 +67,14 @@ int main(int argc, char** argv)
 		dbg_print_intermediate_code = 0,
 		dbg_print_live_var = 0,
 		dbg_print_register_allocation = 0;
+		debug_mode = 0;
 #ifdef DEBUG
 	dbg_print_live_var = 1;
 	dbg_print_register_allocation = 1;
+	debug_mode = 1;
+#endif
+#ifdef DISABLE_PEEPHOLE
+	peephole_disabled = 1;
 #endif
 	/**
 	 *Optimizing arguments:
@@ -256,6 +267,13 @@ int main(int argc, char** argv)
 	}
 	//作数据流分析的准备：建立联合符号表
 	gen_uni_table();
+	//指针分析
+	pointer_anal();
+
+	/**
+	 * DEBUG
+	 */
+	print_ptr_anal();
 	//可用表达式分析
 	if(data_flow_flag)
 	{

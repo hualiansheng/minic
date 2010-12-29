@@ -1,6 +1,6 @@
 ARGS = $(CFLAG)
 ARGS += -g -Wall
-OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o instruction_dispatch.o available_expr.o prepare_dataflow.o peephole.o pre_compile.o
+OBJECT = minic.tab.o lex.yy.o AST_operation.o main.o validation_utils.o gen_symtbl.o symtbl_operation.o type_verification.o gen_intermediate_code.o gen_basic_block.o live_var_anal.o register_allocation.o gen_target_code.o instruction_dispatch.o available_expr.o prepare_dataflow.o peephole.o pre_compile.o pointer_anal.o
 CSCOPE = *.c *.h *.l *.y
 #ARGS = -g -Wall -DDISABLE_PEEPHOLE
 minic: $(OBJECT)
@@ -47,6 +47,8 @@ available_expr.o: available_expr.c basic_block.h
 	gcc $(ARGS) -c available_expr.c
 peephole.o: peephole.c gen_intermediate_code.h register.h
 	gcc $(ARGS) -c peephole.c
+pointer_anal.o: pointer_anal.c register.h gen_intermediate_code.h
+	gcc $(ARGS) -c pointer_anal.c
 cscope: $(CSCOPE)
 	cscope -Rbq
 clean:
