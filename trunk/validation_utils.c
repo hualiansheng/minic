@@ -375,3 +375,46 @@ void print_available_expr()
 		fprintf(stderr,"------------------\n");
 	}
 }
+
+void print_ptr_anal()
+{
+	FILE *out = fopen("ptr_anal.debug", "w");
+	func_block *fb;
+	PtrInfo *p
+	int i, j;
+	for (fb = fblist; fb != NULL; fb = fb->next)
+	{
+		for (i = fb->start->begin; i <= fb->over->end; i++)
+		{
+			for (j = 0; j < fb->uni_item_num; j++)
+				fprintf(out, "%d\t", (fb->live_status[i-fb->start->begin][j/32] << j%32) >> 31);
+			fprintf(out, "(%d) : ", i);
+			fprintf(out, "%s ",operator_name[triple_list[i].op - 3000]);
+			if(triple_list[i].arg1_type == 0 || triple_list[i].arg1_type == 3) 
+				fprintf(out, "%s ", triple_list[i].arg1.var_name);
+			else	if (triple_list[i].arg1_type == 1)
+					fprintf(out, "(%d) ", triple_list[i].arg1.temp_index);
+				else	fprintf(out, "%d ", triple_list[i].arg1.temp_index);
+			if(triple_list[i].arg2_type == 0 || triple_list[i].arg2_type == 3) 
+				fprintf(out, "%s ", triple_list[i].arg2.var_name);
+			else	if (triple_list[i].arg2_type == 1) 
+					fprintf(out, "(%d) ", triple_list[i].arg2.temp_index);
+				else	fprintf(out, "%d ", triple_list[i].arg2.temp_index);
+			fprintf(out, "\t\t");
+			for (p = fb->pointer_status[i]; p != NULL; p = p->next)
+			{
+				fprintf(out, "(%s ->", fb->mapping[p->ptr_uni].var_name);
+				for (j = 0; j < fb->uni_item_num; j++)
+				{
+					if ((p->point_to[j/32] >> (31-j%32)) & 1)
+						fprintf(out, " %s", fb->mapping[j].var_name);
+				}
+				fprintf(out, ")    ");
+			}
+			fprintf(out, "\n");
+		}
+		fprintf(out, "---------------------------------------------------------------------------------------------------\n");
+	}
+	fclose(out);
+}
+

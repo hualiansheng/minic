@@ -36,6 +36,12 @@ typedef struct ImmList {
 	struct ImmList* next;
 }ImmList;
 
+typedef struct PtrInfo {
+	int ptr_uni;
+	unsigned int* point_to;
+	struct PtrInfo* next;
+}PtrInfo;
+
 typedef struct func_block {
 	basic_block* start;
 	basic_block* over;
@@ -47,6 +53,15 @@ typedef struct func_block {
 	symtbl_item** uni_table;
 	int uni_item_num;
 	int uni_table_size;
+	
+	PtrInfo** p_in;
+	PtrInfo** p_out;
+	PtrInfo** pointer_status;
+	int *ptr_list;
+	int ptr_list_size;
+	int pointer_num;
+	unsigned int **pointed_var;
+
 	unsigned int **live_status;
 	unsigned int **v_out;
 	unsigned int **v_in;

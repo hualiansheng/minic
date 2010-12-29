@@ -136,7 +136,6 @@ int set_prepare(func_block *fb)
 	int i,j;
 	basic_block *bb;
 	int *def_use;
-	fb->width = (fb->uni_item_num + 31) / 32;
 	fb->live_status = (unsigned int**)malloc(fb->code_num*sizeof(unsigned int*));
 	for (i = 0; i < fb->code_num; i++)
 	{
@@ -254,7 +253,6 @@ int analyze_live(func_block *fb)
 	basic_block *bb;
 	int i, j, base, tmp, arg1, arg2;
 	base = fb->start->begin;
-	bb = fb->over;
 	for (bb = fb->over; ; bb = bb->prev)
 	{
 		for (j = 0; j < fb->width; j++)
