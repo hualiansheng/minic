@@ -268,16 +268,6 @@ int analyze_live(func_block *fb)
 					change_live(fb, i-base, 1, tmp);
 				if (arg1 != -1 && triple_list[index_index[i]].op != address_op)
 				{
-					if (triple_list[index_index[i]].op == star_op)
-					{
-						for (j = 0; j < fb->uni_item_num; j++)
-						{
-							if (fb->mapping[j].isTmp != 1)
-								change_live(fb, i-base, 0, j);
-						}
-					}
-					if (triple_list[index_index[i]].op == param)
-						check_para_ptr(fb, i, base);
 					if (triple_list[index_index[i]].op == assign_op)
 						change_live(fb, i-base, 1, arg1);
 					else
@@ -307,7 +297,7 @@ int change_live(func_block *fb, int code_k, int def_or_use, int uni_k)
 	return 0;
 }
 
-int check_para_ptr(func_block *fb, int i, int base)
+/*int check_para_ptr(func_block *fb, int i, int base)
 {
 	int j = 1, l;
 	symtbl_hdr *p;
@@ -331,4 +321,4 @@ int check_para_ptr(func_block *fb, int i, int base)
 		}
 	}
 	return 0;
-}
+}*/
