@@ -107,6 +107,7 @@ int gen_uni_table()
 				triple_list[index_index[i]].arg2_uni = triple_list[index_index[triple_list[index_index[i]].arg2.temp_index]].tmp_uni;
 			else triple_list[index_index[i]].arg2_uni = -1;
 		}
+		fb->width = (fb->uni_item_num + 31) / 32;
 	}
 	return 0;
 }
