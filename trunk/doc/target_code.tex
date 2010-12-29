@@ -24,11 +24,11 @@
 	\hline
 		r17-r25 & callee save & callee save，个数可调$^*$\\
 	\hline
-		r26 & 静态基址 & 未使用\\
+		r26 & 静态基址 & 装入立即数地址\\
 	\hline
 		r27 & 栈帧基址 & 栈帧基址\\
 	\hline  
-		r28 & 调用者SP & 传参时用于装入和运算（由于此时r0-r3不能用于运算）\\
+		r28 & 调用者SP & 传参时用于装入和运算（由于此时r0-r3不能用于运算）；生成立即数\\
 	\hline 
 		r29 & 栈基址 & 栈基址 \\
 	\hline
@@ -87,9 +87,28 @@ int f()
 \end{lstlisting}
 我们将生成如下的汇编代码：
 \begin{verbatim}
-	TODO: assemble code
+	.comm	b, 4, 4
+	.comm	a, 4, 4
+	.text
+	.global	main
+	.type	main,function
+main:
+	@Create stack frame
+.L1:
+	ldw	r3, .L3+8
+	ldw	r1, .L3+0
+	stw	r3, [r1+], #0
+	ldw	r3, .L3+8
+	ldw	r1, .L3+4
+	stw	r3, [r1+], #0
+	@End of program
+.L3:
+	.word	a
+	.word	b
+	.word	25500
 \end{verbatim}
 \section{寄存器分配}
+\label{registeralloc}
 Unicore32采用RISC结构，具有31个通用寄存器，所以对于大部分程序，几乎所有变量都可以保存在这些寄存器中，以减少对内存的读写。因此需要一个方法来给每个变量关联一个寄存器，该方法需要保证能用最节约的方式分配，同时变量之间不能互相污染。
 
 MiniC采用了启发式的图染色寄存器分配算法。该算法依赖于在三元式上进行的活跃变量分析的结果，即需要在某个程序点上每个变量的活跃信息，然后建立一个干涉图$G(V,E)$，其中$V$是变量的集合，$(v_1,v_2)\in E$当且仅当存在某个程序点，使得在此处$v_1$和$v_2$同时活跃。给变量分配寄存器就相当于给这张干涉图着色。
@@ -128,22 +147,23 @@ MiniC采用了启发式的图染色寄存器分配算法。该算法依赖于在
 	\end{tabular}
 	\captionof{table}{寄存器分配示例}
 \end{center}
-注意到在只有2个可用寄存器时，出现了寄存器不足的情况。对于这种情况MiniC会选择将某些变量保存在内存（即在干涉图中删除该顶点）。这些保存在内存的变量每次引用都需要读取内存；每次赋值都需要写入内存。在\cite{sunjiasu}中介绍的算法采用的选择策略是总选择度数最大的点删除，但是在一些对数组频繁操作的程序实例（如排序算法）中，采用这种策略将会使得数组基址被保存在内存中，使得每次读取数组元素之前要先读取基址，大大影响了性能。为此，MiniC采用了一个改进的策略：\\
-
-%TODO:改进的删点策略
+注意到在只有2个可用寄存器时，出现了寄存器不足的情况。对于这种情况MiniC会选择将某些变量保存在内存（即在干涉图中删除该顶点）。这些保存在内存的变量每次引用都需要读取内存；每次赋值都需要写入内存。在\cite{sunjiasu}中介绍的算法采用的选择策略是总选择度数最大的点删除，但是在一些对数组频繁操作的程序实例（如排序算法）中，采用这种策略将会使得数组基址被保存在内存中，使得每次读取数组元素之前要先读取基址，大大影响了性能。我们认为可以采用一种更为折衷的办法：综合考虑变量的使用频率和它的干涉边数，给出一个权衡后的解。但由于时间关系，这一想法没有实现。\\
 {\it \anchor 有关寄存器分配和活跃变量分析的代码，请参阅：\verb|register_allocation.c|, \verb|live_var_anal.c|}\\
 %TODO:三元式转换为目标代码
 \section{将三元式转换为目标代码}
-
+\label{tripletotarget}
 \subsection{控制流语句的翻译}
 
 \subsection{翻译过程中对寄存器的保护}
 
 \subsection{立即数的处理}
 
+{\it \anchor 有关三元式转换为目标汇编码的代码，请参阅：\verb|gen_target_code.c|}\\
 \section{机器相关优化}
+\label{depopt}
 在生成目标代码的过程中，我们已经对一些潜在的代码冗余进行了清理，但是受到中间表示和翻译方法的限制，生成出的目标代码仍有改进的余地，下面介绍我们在目标代码上，配合Unicore32指令系统进行的优化。
 \subsection{窥孔优化}
+\label{peephole:target}
 {\it \anchor 有关目标代码上的窥孔优化的代码，请参阅：\verb|peephole.c|}\\
 \subsubsection{合并访存语句}
 如\verb|a[i] = 1|这样的MiniC语句翻译成的三元式如下：
@@ -167,9 +187,34 @@ stw r3, [r4+],r5<<#2
 
 这项简单的优化在循环地对数组访问的情况下对性能的提升比较明显。
 \subsubsection{消除冗余的\lstinline|mov|}
+由于三元式的一些局限，翻译得到的目标代码在读取内存操作的附近可能会有一些冗余的\verb|mov|语句，本优化类似于复写传播，目的是将这些\verb|mov|删除。
 
+能被删除的\verb|mov|具有以下条件：
+\begin{itemize}
+	\item 从mov指令的源操作数最近的一次定值开始，到mov指令之间没有对mov的目标操作数引用。
+	\item 从mov指令开始，将mov指令的源操作数替换为目标操作数时不会产生冲突。
+\end{itemize}
+\paragraph*{算法}
+\begin{enumerate}
+\item 对目标代码划分基本块（以跳转指令为标志），并在基本块上做一个简单的跳转关系图，每个基本块中记录每个它接下来可能执行的基本块。
+\item 扫描代码。对每个mov语句，其目标寄存器为$Rd_{mov}$，源寄存器为$Rm_{mov}$。从该条语句向上寻找最近一条语句i，语句i的目标寄存器为$Rm_{mov}$。（语句$i$对$Rm_{mov}$定值）
+\item 判断语句$i$是否可以被删除。原则有：
+	\begin{itemize}
+		\item 若$mov$语句到语句i之间有对$Rd_{mov}$的引用，则不可删除。
+		\item 从语句$i$开始，根据跳转关系图向后扫描代码（深度优先的遍历）。若进入循环块则停止，语句$i$不可删除。
+		\item 扫描过程中，若某调语句引用了$Rm_{mov}$，则将它替换为$Rd_{mov}$。若某条语句对$Rm_{mov}$定值，则这条扫描路径终止。若某条语句对$Rd_{mov}$定值，并在这之后又引用$Rm_{mov}$，则扫描停止，语句$i$不可删除。
+	\end{itemize}
+\item 若上述扫描完成后，没有出现语句$i$不可删除的情况，则删除$mov$语句，将语句$i$的目标寄存器改为$Rd_{mov}$。
+\end{enumerate}
+
+\paragraph*{示例}
+注意到在进行消除后，使用\verb|r4|作为源寄存器的\verb|add|语句改为使用\verb|r5|。
+\begin{center}
+\includegraphics[scale= 0.6]{redundent_mov_remove.png}
+\end{center}
 
 \subsection{尾递归优化}
+\label{tailrecursion}
 尾递归优化能将符合下面条件的函数调用转化成迭代：
 \begin{itemize}
 	\item 递归调用
@@ -200,9 +245,67 @@ void qsort(int* data, int begin, int end)
 {\it \anchor 有关尾递归优化的代码，请参阅：\verb|gen_target_code.c|}\\
 
 \subsection{指令调度}
+\label{assembledispatch}
 根据Unicore32指令系统体系结构，除了载入和运算指令可能产生的数据相关无法转发，需要等待一个cycle以外，其它指令的数据相关均已通过转发解决。指令调度的目的是减少甚至消除因载入指令而造成的数据相关。
-%TODO:指令调度相关
-\paragraph*{算法}
 
+\paragraph*{算法}
+\begin{enumerate}
+	\item 在目标代码上划分基本块（以跳转指令和标签作为标记）。指令调度在基本块内完成。
+	\item 对每个基本块，根据指令间的数据依赖关系，建立数据依赖图。若指令$i$的源操作数依赖于指令$j$的执行结果，则建立$j$到
+$i$的一条边。
+	\item 根据数据依赖图，进行变种的拓扑排序：扫描块中所有指令。遇到\verb|ldw|指令，则开始执行所有\verb|ldw|指令依赖的指令（即在图上可达这条\verb|ldw|指令的指令）；之后，从所有本块中未执行过的指令中取出一条入度为0的指令（不依赖于任何指令），排在这条\verb|ldw|指令后面。特别地，这条指令的源操作数应该尽量和\verb|ldw|指令的目标操作数不相等。
+	\item 扫描一遍\verb|ldw|指令之后，所有可能调开的\verb|ldw|指令都已经被调开。再对未执行的指令进行拓扑排序即可。
+\end{enumerate}
 \paragraph*{示例}
+下面是一段汇编指令：
+\begin{verbatim}
+	ldw	r4, [r6+], #4
+	add	r5, r4, r5
+	ldw	r4, [r6+], #4
+	sub	r4, r4, r5
+	ldw	r30, [r27+], #-4
+\end{verbatim}
+它的依赖关系图如下：
+\begin{center}
+	\includegraphics[scale=0.35]{assemble_rely_graph.png}
+\end{center}
+调度后的指令序列：
+\begin{verbatim}
+	ldw	r4, [r6+], #4
+	add	r5, r4, r5
+	ldw	r4, [r6+], #4
+	ldw	r30, [r27+], #-4
+	sub	r4, r4, r5
+\end{verbatim}
+{\it \anchor 有关指令调度的代码，请参阅：\verb|instruction_dispatch.c|}\\
+\section{谬误与陷阱}
+\label{tarpitc3}
+\subsection*{编译优化与结果正确性}
+教科书上对编译优化的要求是：以\emph{正确}为前提，尽可能地提升目标代码的效率。然而在实践中，存在着一些对“正确”定义不清的灰色地带，如果一味地追求绝对正确，将大大损失性能。例如对如下的一段C代码：
+\begin{lstlisting}
+void f(int* p)
+{
+	*p = 1;
+}
+int main()
+{
+	int a,b,c,*p;
+	p = &b;
+	p += 1;
+	//*p = c 
+	f(p);
+}
+\end{lstlisting}
+按照原则上来说，如果一个程序员对他所面对的目标机器足够了解的话，\verb|p += 1|的使用也许是为了指向\verb|a|（或\verb|c|），因此在调用函数\verb|f|的时候应当将\verb|a|（或\verb|c|）的值同步到内存中以保证“正确”。
+
+然而\verb|unicore32-linux-gcc|使用\verb|-O2|编译参数的结果却是错误的：它没有做任何的访存操作来保护内存和寄存器的同步。
+
+原因是\verb|gcc|在性能和“绝对正确”之间做出了权衡：应该由程序员而不是编译器应该保证这种极为特殊的情况的正确性。
+
+这样做所换来的性能提升也是可观的：在不考虑指针计算的情况下，简单的数据流指针分析就能够精确地得到应该同步的变量。
+
+为了在绝大部分情况下提高性能，MiniC也要求这种特殊情况由程序员自行保证。（去掉上面代码中的注释即可）
+
+当然，在“保证绝对正确”的编译选项下，情况又不同了，这时候就算牺牲性能也要保证没有任何差错。
+
 

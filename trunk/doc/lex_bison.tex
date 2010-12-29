@@ -42,7 +42,7 @@ postfix_expr := postfix_expr ( expression )
 	\item \verb|f()=1;|
 \end{itemize}
 而这些语法实际上是语言所不能处理的，因为“计算结果”和“代表一个存储位置的符号”是完全不同的概念，前者没有地方存储也因此不能被赋值。
-
+\label{lrvalue}
 我们修改后的表达式文法基于“左值”——代表一个存储区域的符号和“右值”——计算结果，并且是二义性文法：
 \begin{verbatim}
 expression := rvalue | assignment_expression

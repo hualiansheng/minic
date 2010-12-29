@@ -33,15 +33,16 @@
 .4 \hyperref[dataflow]{数据流分析}.
 .3 \hyperref[pitfallc2]{谬误与陷阱}.
 .2 \hyperref[targetcode]{目标代码}.
-.3 \hyperref[targetmachine]编译器-目标机器接口, 二进制规范.
-.3 寄存器分配.
-.3 运行时内存分配，栈帧，全局区，立即数.
-.3 机器相关优化.
-.4 特殊指令的使用.
-.4 指令调度.
-.3 谬误与陷阱.
-.2 编译-体系联合实验.
-.3 系统调用.
+.3 \hyperref[targetmachine]{编译器-目标机器接口与二进制规范}.
+.3 \hyperref[registeralloc]{寄存器分配}.
+.3 \hyperref[tripletotarget]{三元式转换为目标代码}.
+.3 \hyperref[depopt]{机器相关优化}.
+.4 \hyperref[peephole:target]{窥孔优化}.
+.4 \hyperref[tailrecursion]{尾递归优化}.
+.4 \hyperref[assembledispatch]{指令调度}.
+.3 \hyperref[tarpitc3]{谬误与陷阱}.
+%.2 编译-体系联合实验.
+%.3 系统调用.
 }
 \section*{本文档包括的内容}
 本文档的目标\emph{并不是}用于展示MiniC冗杂的代码，而是提供一个概括的全局视角来了解这个实习项目。\\
@@ -75,7 +76,7 @@
 \end{enumerate}
 与此同时，还有错误处理模块，用于在源文件有误时产生出错提示；中间验证工具集，用于检查工程进展的每一个步骤的正确性。
 
-在下面的章节中，我们将一一介绍以上模块，并且还将在最后一章展示MiniC编译器是如何与体系实习的模拟器项目配合，进行一系列编译-体系相关的实验和评测。
+在下面的章节中，我们将一一介绍以上模块。%并且还将在最后一章展示MiniC编译器是如何与体系实习的模拟器项目配合，进行一系列编译-体系相关的实验和评测。
 
 \section*{致谢}
 \begin{itemize}
