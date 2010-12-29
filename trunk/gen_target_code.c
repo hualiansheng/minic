@@ -381,6 +381,36 @@ int func_assem_end(func_block *fb)
 	return 0;
 }
 
+int load_pointed_var(func_block *fb, int i, int r, int u)
+{
+	if ((fb->pointed_var[i-fb->start->begin][u/32] >> (31-u%32)) & 1)
+	{
+		if (fb->uni_table[u]->isGlobal)
+		{
+			add_assemble(fb->global_label, ldw, -1, 26, 0, 0, -1, 1, fb->uni_table[u]->offset);
+			add_assemble(-1, ldw, 26, r, 0, 0, -1, 1, 0);		
+		}
+		else
+			add_assemble_imm(fb, ldw, 27, r, fb->uni_table[u]->offset);
+	}
+	return 0;
+}
+
+int save_pointed_var(func_block *fb, int i, int r, int u)
+{
+	if ((fb->pointed_var[i-fb->start->begin][u/32] >> (31-u%32)) & 1)
+	{
+		if (fb->uni_table[u]->isGlobal)
+		{
+			add_assemble(fb->global_label, ldw, -1, 26, 0, 0, -1, 1, fb->uni_table[u]->offset);
+			add_assemble(-1, stw, 26, r, 0, 0, -1, 1, 0);		
+		}
+		else
+			add_assemble_imm(fb, stw, 27, r, fb->uni_table[u]->offset);
+	}
+	return 0;
+}
+
 int load_live(func_block *fb, int i)
 {
 	int j, r;
@@ -392,6 +422,7 @@ int load_live(func_block *fb, int i)
 			r = fb->reg_alloc[j];
 			if (r != -1 && fb->reg_var[r] != j)
 			{
+				save_pointed_var(fb, i, r, fb->reg_var[r]);
 				fb->reg_var[r] = j;
 				if (!fb->uni_table[j]->isGlobal)
 					add_assemble_imm(fb, ldw, 27, r, fb->uni_table[j]->offset);
@@ -401,8 +432,8 @@ int load_live(func_block *fb, int i)
 						add_assemble(fb->global_label, ldw, -1, r, 0, 0, -1, 1, fb->uni_table[j]->offset);
 					else
 					{
-						add_assemble(fb->global_label, ldw, -1, 1, 0, 0, -1, 1, fb->uni_table[j]->offset);
-						add_assemble(-1, ldw, 1, r, 0, 0, -1, 1, 0);
+						add_assemble(fb->global_label, ldw, -1, 26, 0, 0, -1, 1, fb->uni_table[j]->offset);
+						add_assemble(-1, ldw, 26, r, 0, 0, -1, 1, 0);
 					}
 				}
 			}
@@ -564,8 +595,8 @@ int store_result(func_block *fb, int i, enum instruction ins, int u, int Rs, int
 			add_assemble_imm(fb, stw, 27, Rd, fb->uni_table[u]->offset);
 		else
 		{
-			add_assemble(fb->global_label, ldw, -1, 1, 0, 0, -1, 1, fb->uni_table[u]->offset);
-			add_assemble(-1, stw, 1, Rd, 0, 0, -1, 1, 0);
+			add_assemble(fb->global_label, ldw, -1, 26, 0, 0, -1, 1, fb->uni_table[u]->offset);
+			add_assemble(-1, stw, 26, Rd, 0, 0, -1, 1, 0);
 		}
 	}
 	else
@@ -573,18 +604,24 @@ int store_result(func_block *fb, int i, enum instruction ins, int u, int Rs, int
 		if (fb->uni_table[u]->isGlobal)
 		{
 			if ((fb->live_status[i+1-fb->start->begin][u/32]>>(31-u%32)) % 2 == 1)
+			{
+				if (fb->reg_var[Rd] != u)
+					save_pointed_var(fb, i, Rd, fb->reg_var[Rd]);
 				fb->reg_var[Rd] = u;
+			}
 			else
 				Rd = 3;
 			if (Rm_or_Imm == 0)
 				add_assemble(-1, ins, Rs, Rd, shift_direct, Rs_or_Imm, Rs_Imm, Rm_or_Imm, Rm_Imm);
 			else
 				add_assemble_imm(fb, ins, Rs, Rd, Rm_Imm);
-			add_assemble(fb->global_label, ldw, -1, 1, 0, 0, -1, 1, fb->uni_table[u]->offset);
-			add_assemble(-1, stw, 1, Rd, 0, 0, -1, 1, 0);
+			add_assemble(fb->global_label, ldw, -1, 26, 0, 0, -1, 1, fb->uni_table[u]->offset);
+			add_assemble(-1, stw, 26, Rd, 0, 0, -1, 1, 0);
 		}
 		else
 		{
+			if (fb->reg_var[Rd] != u)
+				save_pointed_var(fb, i, Rd, fb->reg_var[Rd]);
 			fb->reg_var[Rd] = u;
 			if (!(ins == mov && Rm_or_Imm == 0 && Rd == Rm_Imm && Rs_or_Imm == 0 && Rs_Imm == -1))
 			{
@@ -674,6 +711,8 @@ int assign_bool_value(enum instruction ins, func_block *fb, int i)
 	}
 	else
 	{
+		if (fb->reg_var[r0] != u0)
+			save_pointed_var(fb, i, r0, fb->reg_var[r0]);
 		fb->reg_var[r0] = u0;
 		add_assemble(-1, mov, -1, r0, 0, 0, -1, 1, 0);
 		add_assemble(-1, ins, -1, r0, 0, 0, -1, 1, 1);
@@ -938,6 +977,8 @@ int not_code(func_block *fb, int i)
 				}
 				else
 				{
+					if (fb->reg_var[r0] != u0)
+						save_pointed_var(fb, i, r0, fb->reg_var[r0]);
 					fb->reg_var[r0] = u0;
 					if (not_flag)
 						add_assemble(-1, cmoveq, -1, r0, 0, 0, -1, 1, 1);
@@ -973,12 +1014,14 @@ int address_code(func_block *fb, int i)
 		{
 			if (r0 != -1)
 			{
+				if (fb->reg_var[r0] != u0)
+					save_pointed_var(fb, i, r0, fb->reg_var[r0]);
 				fb->reg_var[r0] = u0;
 				add_assemble(fb->global_label, ldw, -1, r0, 0, 0, -1, 1, fb->uni_table[u1]->offset);
 			}
 			else
 			{
-				r0 = 3;
+				r0 = 26;
 				add_assemble(fb->global_label, ldw, -1, r0, 0, 0, -1, 1, fb->uni_table[u1]->offset);
 				add_assemble_imm(fb, stw, 27, r0, fb->uni_table[u0]->offset);
 			}
@@ -989,14 +1032,23 @@ int address_code(func_block *fb, int i)
 
 int star_code(func_block *fb, int i)
 {
-	int u0, u1, r0, r1;
+	int u0, u1, r0, r1, j;
+	PtrInfo *p;
 	if (check_live(fb, i, 1))
 	{
 		u0 = triple_list[index_index[i]].tmp_uni;
-		r0 = fb->reg_alloc[u0];
 		u1 = triple_list[index_index[i]].arg1_uni;
-		r1 = fb->reg_alloc[u1];
-		r1 = load_operator(fb, u1, r1, 1);
+		p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
+		for (j = 0; j < fb->uni_item_num; j++)
+		{
+			if (p->point_to[j/32] >> (31-j%32)) & 1)
+			{
+				if (fb->reg_alloc[j] != -1 && fb->reg_var[fb->reg_alloc[j]] == j)
+					save_pointed_var(fb, i, fb->reg_alloc[j], j);
+			}
+		}
+		r0 = fb->reg_alloc[u0];
+		r1 = load_operator(fb, u1, fb->reg_alloc[u1], 1);
 		if (triple_list[index_index[i]].result_type != 0)
 			store_result(fb, i, ldw, u0, r1, r0, 0, 0, -1, 1, 0);
 		else
@@ -1039,7 +1091,8 @@ int assign_code(func_block *fb, int i)
 
 int star_assign_code(func_block *fb, int i)
 {
-	int u0, u1, u2, r0, r1, r2;
+	int u0, u1, u2, r0, r1, r2, j;
+	PtrInfo *p;
 	u0 = triple_list[index_index[i]].tmp_uni;
 	u1 = triple_list[index_index[i]].arg1_uni;
 	u2 = triple_list[index_index[i]].arg2_uni;
@@ -1060,8 +1113,19 @@ int star_assign_code(func_block *fb, int i)
 		add_assemble(-1, stw, r1, r2, 0, 0, -1, 1, 0);
 	else
 		add_assemble(-1, stb, r1, r2, 0, 0, -1, 1, 0);
+	p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
+	for (j = 0; j < fb->uni_item_num; j++)
+	{
+		if (p->point_to[j/32] >> (31-j%32)) & 1)
+		{
+			if (fb->reg_alloc[j] != -1 && fb->reg_var[fb->reg_alloc[j]] == j)
+				load_pointed_var(fb, i, fb->reg_alloc[j], j);
+		}
+	}
 	if (check_live(fb, i, 1))
 	{
+		if (fb->reg_var[r0] != u0)
+			save_pointed_var(fb, i, r0, fb->reg_var[r0]);
 		r0 = fb->reg_alloc[u0];
 		store_result(fb, i, mov, u0, -1, r0, 0, 0, -1, 0, r2);
 	}
@@ -1299,14 +1363,34 @@ int call_code(func_block *fb, int i)
 	}
 	int j, k, tmp, m, rtn_reg, idx, para_num, u;
 	int tmp_reg_var[32];
-	unsigned int *live = fb->live_status[i+1-fb->start->begin];
+	int base = fb->start->begin;
+	unsigned int *live = fb->live_status[i+1-base];
 	idx = triple_list[index_index[i]].arg1.temp_index;
 	for (j = CALLER_REG_START, k = 0; j <= CALLER_REG_END; j++)
 	{
 		if (idx != -1 && j > (triple_list[index_index[idx]].block)->fb->reg_used+CALLER_REG_START-1)
 			break;
 		u = fb->reg_var[j];
-		if (u != -1 && (live[u/32] >> (31-u%32)) % 2 == 1)
+		if (u != -1)
+		{
+			if (fb->mapping[u].isTmp == 1)
+			{
+				if ((live[u/32] >> (31-u%32)) & 1)
+				{
+					k++;
+					add_assemble_imm(fb, stw, 29, j, -k*4);
+				}
+			}
+			else
+			{
+				if (!fb->uni_table[u]->isGlobal)
+				{
+					if (((live[u/32] >> (31-u%32)) & 1) || ((fb->pointed_var[i-base][u/32] >> (31-u%32)) & 1))
+						add_assemble_imm(fb, stw, 27, j, fb->uni_table[u]->offset);
+				}
+			}
+		}
+		/*if (u != -1 && (live[u/32] >> (31-u%32)) % 2 == 1)
 		{
 			if (fb->mapping[u].isTmp == 1)
 			{
@@ -1318,7 +1402,7 @@ int call_code(func_block *fb, int i)
 				if (!fb->uni_table[u]->isGlobal)
 					add_assemble_imm(fb, stw, 27, j, fb->uni_table[u]->offset);
 			}
-		}
+		}*/
 		tmp_reg_var[j] = fb->reg_var[j];
 	}
 	for (para_num = 0; triple_list[index_index[i-1-para_num]].op == param; para_num++)
@@ -1382,8 +1466,8 @@ int call_code(func_block *fb, int i)
 						add_assemble(fb->global_label, ldw, -1, j, 0, 0, -1, 1, fb->uni_table[u]->offset);
 					else
 					{
-						add_assemble(fb->global_label, ldw, -1, 1, 0, 0, -1, 1, fb->uni_table[u]->offset);
-						add_assemble(-1, ldw, 1, j, 0, 0, -1, 1, 0);
+						add_assemble(fb->global_label, ldw, -1, 26, 0, 0, -1, 1, fb->uni_table[u]->offset);
+						add_assemble(-1, ldw, 26, j, 0, 0, -1, 1, 0);
 					}
 				}
 			}
@@ -1557,7 +1641,7 @@ int c_str_code(func_block *fb, int i)
 			add_assemble(fb->global_label, ldw, -1, r0, 0, 0, -1, 1, off);
 		else
 		{
-			r0 = 3;
+			r0 = 26;
 			add_assemble(fb->global_label, ldw, -1, r0, 0, 0, -1, 1, off);
 			add_assemble_imm(fb, stw, 27, r0, fb->uni_table[u0]->offset);
 		}

@@ -185,7 +185,7 @@ int ptrlist_assign(func_block *fb, PtrInfo *x, PtrInfo *y, int type)
 
 PtrInfo* get_ptr(PtrInfo *p, int u)
 {
-	while (p->ptr_uni != u)
+	while (p != NULL && p->ptr_uni != u)
 		p = p->next;
 	return p;
 }
@@ -233,8 +233,9 @@ int check_change(func_block *fb, PtrInfo *p, PtrInfo *q)
 
 int gen_pointed_var(func_block *fb)
 {
-	int i, j, l, u;
+	int base, i, j, l, u;
 	PtrInfo *p;
+	base = fb->start->begin;
 	fb->pointed_var = (unsigned int**)malloc(fb->code_num*sizeof(unsigned int*));
 	for (i = 0; i < fb->code_num; i++)
 	{
@@ -245,17 +246,27 @@ int gen_pointed_var(func_block *fb)
 			for (j = 0; j < fb->width; j++)
 				fb->pointed_var[i][j] |= p->point_to[j];
 		}
-		if (triple_list[index_index[i+fb->start->begin]].op == call)
+		if (triple_list[index_index[i+base]].op == call)
 		{
-			for (j = i-1; triple_list[index_index[j]].op == param; j--)
+			for (j = i-1+base; triple_list[index_index[j]].op == param; j--)
 			{
+				if (triple_list[index_index[j]].arg1_type == 0)
+				{
+					u = triple_list[index_index[j]].arg1_uni;
+					if (fb->uni_table[u]->star_num > 0)
+					{
+						p = get_ptr(fb->pointer_status[i], u);
+						for (l = 0; l < fb->width; l++)
+							fb->pointed_var[i][l] |= p->point_to[l];
+					}
+				}
 				if (triple_list[index_index[j]].arg1_type == 1)
 				{
 					l = triple_list[index_index[j]].arg1.temp_index;
 					if (triple_list[index_index[l]].op == address_op)
 					{
 						u = triple_list[index_index[l]].arg1_uni;
-						fb->pointed_var[i][u/32] &= 1<<(31-u%32);
+						fb->pointed_var[i][u/32] |= 1<<(31-u%32);
 					}
 				}
 			}
