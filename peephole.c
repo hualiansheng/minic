@@ -236,7 +236,7 @@ void array_operation_optimize()
 				for(j = i-1 ; j >=0 ; j--){
 					if(assemble_list[j].ins == add && assemble_list[j].Rd == assemble_list[i].Rn){
 						flag = 1;
-						for(k = j ; k < i ; k ++){
+						for(k = j+1 ; k < i ; k ++){
 							if(assemble_list[k].ins != stw && (assemble_list[k].Rd == assemble_list[j].Rn || (assemble_list[j].Rm_or_Imm == 0 && assemble_list[k].Rd == assemble_list[j].Rm_Imm))) flag = 0;
 						}
 						if(flag == 1){
