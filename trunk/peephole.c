@@ -263,7 +263,7 @@ void delete_redundant_mov()
 	int *jump_list;
 	int *visited;
 	int *cir_enter;
-	FILE *debug;
+//	FILE *debug;
 	int i, j, k, flag, cflag;
 	int temp, current_block;
 	inst_block();
@@ -313,7 +313,7 @@ void delete_redundant_mov()
 	//create cir_enter
 	memset(cir_enter, 0, sizeof(int)*instruction_block_num);
 	for(i = 0 ; i < instruction_block_num ; i ++){
-		if(jump_list[i] < i) cir_enter[jump_list[i]] = 1;
+		if(jump_list[i] < i && jump_list[i] != -1) cir_enter[jump_list[i]] = 1;
 	}
 
 	for(i = 0 ; i < assemble_num ; i++){
@@ -437,6 +437,12 @@ void delete_redundant_mov()
 			}
 		}
 	}
+	free(cir_enter);
+	free(next_list);
+	free(jump_list);
+	free(visited);
+	free(instruction_blocks);
+
 }
 
 int defined_before_used(int r, int begin, int current_block,int* visited, int* next_list, int* jump_list, int* cir_enter, int in_circulation, int mov_rd)
