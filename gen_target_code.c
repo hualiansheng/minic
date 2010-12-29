@@ -1324,6 +1324,12 @@ int tail_recursion(func_block *fb, int i)
 {
 	int j, k, r, u;
 	int para_num = (triple_list[index_index[fb->start->begin]].symtbl)->para_num;
+	for (j = CALLER_REG_START, k = 0; j <= CALLER_REG_END && j < fb->reg_used+CALLER_REG_START; j++)
+	{
+		u = fb->reg_var[j];
+		if (u != -1 && ((fb->pointed_var[i-fb->start->begin][u/32] >> (31-u%32)) & 1) && !fb->uni_table[u]->isGlobal)
+			add_assemble_imm(fb, stw, 27, j, fb->uni_table[u]->offset);
+	}
 	for (j = 0, k = 4; j < para_num; j++)
 	{
 		if (!((fb->live_status[1][j/32]>>(31-j%32)) & 1))
