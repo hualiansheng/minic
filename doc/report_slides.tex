@@ -228,11 +228,11 @@ AST是MiniC的第一重中间表示，符号表生成和类型检查检查在AST
 	\hline
 		r17-r25 & callee save & callee save$^*$\\
 	\hline
-		r26 & 静态基址 & \alert{未使用}\\
+		r26 & 静态基址 & \alert{用于读取大立即数地址}\\
 	\hline
 		r27 & 栈帧基址 & 栈帧基址\\
 	\hline  
-		r28 & 调用者SP & \alert{传参时用于装入和运算}\\
+		r28 & 调用者SP & \alert{传参时用于装入和运算；生成立即数}\\
 	\hline 
 		r29 & 栈基址 & 栈基址 \\
 	\hline
@@ -397,11 +397,17 @@ AST是MiniC的第一重中间表示，符号表生成和类型检查检查在AST
 	\frametitle{删除冗余的mov}
 	\begin{itemize}
 		\item 由于三元式直接翻译到Unicore32汇编不能很好的利用三个操作数的汇编指令，会产生出很多冗余的\lstinline|mov|
-		\item 我们做了简单的窥孔优化，将符合以下条件的\lstinline|mov|删除：
+		\item 我们做了窥孔优化来找到符合以下条件的\lstinline|mov|，删除它，并修改其后用到它的目标寄存器的语句的源寄存器：
 		\begin{itemize}
-			\item 条件1
+			\item 从\lstinline|mov|指令的源寄存器最近的一次定值开始，到\lstinline|mov|指令之间没有对\lstinline|mov|的目标寄存器引用。
+			\item 从\lstinline|mov|指令开始，将\lstinline|mov|指令的源寄存器替换为目标寄存器时不会产生冲突。
 		\end{itemize}
 	\end{itemize}
+	
+	\begin{center}
+	\includegraphics[scale=0.5]{redundent_mov_remove.png}
+	
+	\end{center}
 \end{frame}
 \subsection{尾递归优化}
 \begin{frame}
@@ -430,10 +436,22 @@ AST是MiniC的第一重中间表示，符号表生成和类型检查检查在AST
 \subsection{指令调度}
 \begin{frame}
 	\frametitle{指令调度}
+	根据Unicore32指令系统体系结构，只有载入指令和运算指令可能产生的数据相关无法转发，需要等待一个cycle。指令调度的目的就是尽量让这种数据相关不发生。
+	
+	算法作用范围是目标代码上的基本块，基于一个“数据依赖图”：若指令\lstinline|i|的源操作数依赖于指令\lstinline|j|的执行结果，则建立\lstinline|j|到\lstinline|i|的一条边；算法的思想是先按顺序对\lstinline|ldw|执行一种带优先级的拓扑排序：遇到\lstinline|ldw|则安排执行所有它依赖的指令（包括反依赖关系），然后从未安排执行过的指令中，取一条入度为0的指令，要求它尽量不依赖于\lstinline|ldw|的结果，排在\lstinline|ldw|之后；最后对还未被安排的非\lstinline|ldw|指令再进行一次拓扑排序即可。
+\begin{columns}
+	\column{0.2\textwidth}
+		\includegraphics[scale=0.4]{before_assemble_dispatch.png}
+	\column{0.4\textwidth}
+		\includegraphics[scale=0.3]{assemble_rely_graph.png}
+	\column{0.3\textwidth}
+		\includegraphics[scale=0.4]{after_assemble_dispatch.png}
+\end{columns}
 \end{frame}
+
 \begin{frame}
 	\begin{center}
-	\Large{Q\&A}
+	\Large{演示与Q\&A}
 	\end{center}
 \end{frame}
 \end{document}
