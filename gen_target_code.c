@@ -1041,13 +1041,16 @@ int star_code(func_block *fb, int i)
 	{
 		u0 = triple_list[index_index[i]].tmp_uni;
 		u1 = triple_list[index_index[i]].arg1_uni;
-		p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
-		for (j = 0; j < fb->uni_item_num; j++)
+		if (fb->mapping[u1].isTmp == 0)
 		{
-			if ((p->point_to[j/32] >> (31-j%32)) & 1)
+			p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
+			for (j = 0; j < fb->uni_item_num; j++)
 			{
-				if (fb->reg_alloc[j] != -1 && fb->reg_var[fb->reg_alloc[j]] == j)
-					save_pointed_var(fb, i, fb->reg_alloc[j], j);
+				if ((p->point_to[j/32] >> (31-j%32)) & 1)
+				{
+					if (fb->reg_alloc[j] != -1 && fb->reg_var[fb->reg_alloc[j]] == j)
+						save_pointed_var(fb, i, fb->reg_alloc[j], j);
+				}
 			}
 		}
 		r0 = fb->reg_alloc[u0];
@@ -1116,13 +1119,16 @@ int star_assign_code(func_block *fb, int i)
 		add_assemble(-1, stw, r1, r2, 0, 0, -1, 1, 0);
 	else
 		add_assemble(-1, stb, r1, r2, 0, 0, -1, 1, 0);
-	p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
-	for (j = 0; j < fb->uni_item_num; j++)
+	if (fb->mapping[u1].isTmp == 0)
 	{
-		if ((p->point_to[j/32] >> (31-j%32)) & 1)
+		p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
+		for (j = 0; j < fb->uni_item_num; j++)
 		{
-			if (fb->reg_alloc[j] != -1 && fb->reg_var[fb->reg_alloc[j]] == j)
-				load_pointed_var(fb, i, fb->reg_alloc[j], j);
+			if ((p->point_to[j/32] >> (31-j%32)) & 1)
+			{
+				if (fb->reg_alloc[j] != -1 && fb->reg_var[fb->reg_alloc[j]] == j)
+					load_pointed_var(fb, i, fb->reg_alloc[j], j);
+			}
 		}
 	}
 	if (check_live(fb, i, 1))
