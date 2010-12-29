@@ -1,6 +1,17 @@
 int main()
 {
-	int a[10], b;
-	b = a[1] + b;
-	b = a[1] - b;
+	int a,b,c,*p,*q;
+	if(a == 1)
+		p = &a;
+	else 
+		p = &b;
+	*p = 1;
+	while(a)
+	{
+		*p = 2;
+		q = p;
+		*q = 1;
+		q = &c;
+		*q = 0;
+	}
 }

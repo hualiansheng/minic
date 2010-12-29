@@ -380,14 +380,12 @@ void print_ptr_anal()
 {
 	FILE *out = fopen("ptr_anal.debug", "w");
 	func_block *fb;
-	PtrInfo *p
+	PtrInfo *p;
 	int i, j;
 	for (fb = fblist; fb != NULL; fb = fb->next)
 	{
 		for (i = fb->start->begin; i <= fb->over->end; i++)
 		{
-			for (j = 0; j < fb->uni_item_num; j++)
-				fprintf(out, "%d\t", (fb->live_status[i-fb->start->begin][j/32] << j%32) >> 31);
 			fprintf(out, "(%d) : ", i);
 			fprintf(out, "%s ",operator_name[triple_list[i].op - 3000]);
 			if(triple_list[i].arg1_type == 0 || triple_list[i].arg1_type == 3) 

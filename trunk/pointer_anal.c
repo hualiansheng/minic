@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <memory.h>
 #include "basic_block.h"
 #include "gen_intermediate_code.h"
 
@@ -9,6 +12,17 @@ extern basic_block *bblist;
 extern func_block *fblist;
 extern int block_num;
 
+int pointer_anal();
+int init_ptrlist(func_block *fb, PtrInfo **ptr);
+int ptr_anal_init(func_block *fb);
+int ptr_iter_anal(func_block *fb);
+int ptr_op(int type, unsigned int *x,unsigned int *y);
+int ptrlist_assign(func_block *fb, PtrInfo *x, PtrInfo *y, int type);
+PtrInfo* get_ptr(PtrInfo *p, int u);
+int assign_ptr(func_block *fb, PtrInfo *p, int u1, int u2);
+int assign_address(func_block *fb, PtrInfo *p, int u1, int u2);
+int check_change(func_block *fb, PtrInfo *p, PtrInfo *q);
+int gen_pointed_var(func_block *fb);
 int pointer_anal()
 {
 	func_block *fb;
@@ -25,6 +39,11 @@ int init_ptrlist(func_block *fb, PtrInfo **ptr)
 {
 	int j;
 	PtrInfo *p;
+	if (fb->pointer_num == 0)
+	{
+		*ptr = NULL;
+		return 0;
+	}
 	for (j = 0; j < fb->pointer_num; j++)
 	{
 		if (j == 0)
@@ -51,7 +70,7 @@ int init_ptrlist(func_block *fb, PtrInfo **ptr)
 
 int ptr_anal_init(func_block *fb)
 {
-	int i, j;
+	int i;
 	fb->pointer_status = (PtrInfo**)malloc(fb->code_num*sizeof(PtrInfo*));
 	fb->p_in = (PtrInfo**)malloc(fb->bb_num*sizeof(PtrInfo*));
 	fb->p_out = (PtrInfo**)malloc(fb->bb_num*sizeof(PtrInfo*));
@@ -80,13 +99,17 @@ int ptr_anal_init(func_block *fb)
 int ptr_iter_anal(func_block *fb)
 {
 	basic_block *bb;
-	PreList *pre, *temp, *next;
+	PtrInfo *temp, *next;
+	PreList *pre;
 	int i, j, l, base, change, u1, u2;
+	int count=0;
 	base = fb->start->begin;
 	init_ptrlist(fb, &temp);
 	change = 1;
 	while (change)
 	{
+		count ++;
+		fprintf(stderr,"Iteration: %d\n",count);
 		change = 0;
 		for (bb = fb->start, i = 0; i < fb->bb_num; bb = bb->next, i++)
 		{
@@ -97,7 +120,7 @@ int ptr_iter_anal(func_block *fb)
 			for (j = bb->begin; j <= bb->end; j++)
 			{
 				ptrlist_assign(fb, temp, fb->pointer_status[j-base], 0);
-				if (triple_list[index_index[j]].is_deleted)
+				if (!triple_list[index_index[j]].is_deleted)
 				{
 					u1 = triple_list[index_index[j]].arg1_uni;
 					if (triple_list[index_index[j]].op == assign_op && fb->uni_table[u1]->star_num > 0)
@@ -130,7 +153,7 @@ int ptr_iter_anal(func_block *fb)
 	return 0;
 }
 
-int ptr_op(int type, int *x, int *y)
+int ptr_op(int type, unsigned int *x, unsigned int *y)
 {
 	if (type == 0)
 		*x = *y;
@@ -148,7 +171,7 @@ int ptrlist_assign(func_block *fb, PtrInfo *x, PtrInfo *y, int type)
 		if (y != NULL)
 		{
 			for (i = 0; i < fb->width; i++)
-				ptr_op(type, &x->point_to[i], &y->point_to[i]);
+				ptr_op(type, &(p->point_to[i]), &(q->point_to[i]));
 			q = q->next;
 		}
 		else
@@ -167,7 +190,7 @@ PtrInfo* get_ptr(PtrInfo *p, int u)
 	return p;
 }
 
-int assign_ptr(func_block *fb, PreList *p, int u1, int u2)
+int assign_ptr(func_block *fb, PtrInfo *p, int u1, int u2)
 {
 	int i;
 	PtrInfo *p1, *p2;
@@ -178,7 +201,7 @@ int assign_ptr(func_block *fb, PreList *p, int u1, int u2)
 	return 0;
 }
 
-int assign_address(func_block *fb, PreList *p, int u1, int u2)
+int assign_address(func_block *fb, PtrInfo *p, int u1, int u2)
 {
 	int i;
 	PtrInfo *p1;
@@ -186,7 +209,7 @@ int assign_address(func_block *fb, PreList *p, int u1, int u2)
 	for (i = 0; i < fb->width; i++)
 		p1->point_to[i] = 0;
 	if (u2 != -1)
-		p1->point_to[u2/32] &= 1<<(31-u2%32);	
+		p1->point_to[u2/32] |= 1<<(31-u2%32);	
 	return 0;
 }
 
@@ -224,7 +247,7 @@ int gen_pointed_var(func_block *fb)
 		}
 		if (triple_list[index_index[i+fb->start->begin]].op == call)
 		{
-			for (j = i-1; triple_list[index_index[j].op == param; j--)
+			for (j = i-1; triple_list[index_index[j]].op == param; j--)
 			{
 				if (triple_list[index_index[j]].arg1_type == 1)
 				{
