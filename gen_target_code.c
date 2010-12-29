@@ -1041,7 +1041,7 @@ int star_code(func_block *fb, int i)
 	{
 		u0 = triple_list[index_index[i]].tmp_uni;
 		u1 = triple_list[index_index[i]].arg1_uni;
-		if (fb->mapping[u1].isTmp == 0)
+		if (fb->mapping[u1].isTmp == 0 && fb->uni_table[u1]->size == -1)
 		{
 			p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
 			for (j = 0; j < fb->uni_item_num; j++)
@@ -1119,7 +1119,7 @@ int star_assign_code(func_block *fb, int i)
 		add_assemble(-1, stw, r1, r2, 0, 0, -1, 1, 0);
 	else
 		add_assemble(-1, stb, r1, r2, 0, 0, -1, 1, 0);
-	if (fb->mapping[u1].isTmp == 0)
+	if (fb->mapping[u1].isTmp == 0 && fb->uni_table[u1]->size == -1)
 	{
 		p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
 		for (j = 0; j < fb->uni_item_num; j++)
