@@ -1041,7 +1041,7 @@ int star_code(func_block *fb, int i)
 		p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
 		for (j = 0; j < fb->uni_item_num; j++)
 		{
-			if (p->point_to[j/32] >> (31-j%32)) & 1)
+			if ((p->point_to[j/32] >> (31-j%32)) & 1)
 			{
 				if (fb->reg_alloc[j] != -1 && fb->reg_var[fb->reg_alloc[j]] == j)
 					save_pointed_var(fb, i, fb->reg_alloc[j], j);
@@ -1116,7 +1116,7 @@ int star_assign_code(func_block *fb, int i)
 	p = get_ptr(fb->pointer_status[i-fb->start->begin], u1);
 	for (j = 0; j < fb->uni_item_num; j++)
 	{
-		if (p->point_to[j/32] >> (31-j%32)) & 1)
+		if ((p->point_to[j/32] >> (31-j%32)) & 1)
 		{
 			if (fb->reg_alloc[j] != -1 && fb->reg_var[fb->reg_alloc[j]] == j)
 				load_pointed_var(fb, i, fb->reg_alloc[j], j);
@@ -1124,8 +1124,6 @@ int star_assign_code(func_block *fb, int i)
 	}
 	if (check_live(fb, i, 1))
 	{
-		if (fb->reg_var[r0] != u0)
-			save_pointed_var(fb, i, r0, fb->reg_var[r0]);
 		r0 = fb->reg_alloc[u0];
 		store_result(fb, i, mov, u0, -1, r0, 0, 0, -1, 0, r2);
 	}
