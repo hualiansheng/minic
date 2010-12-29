@@ -82,6 +82,9 @@ int search_label(func_block *fb, int i, int m, int not_flag);
 int check_tail_recursion(func_block *fb, int i);
 int tail_recursion(func_block *fb, int i);
 
+
+//from pointer_anal.c
+PtrInfo* get_ptr(PtrInfo* p, int u);
 int gen_target_code()
 {
 	initial();
