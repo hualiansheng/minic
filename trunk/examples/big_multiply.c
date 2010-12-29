@@ -1,3 +1,5 @@
+// big multiply
+//
 int print_int(int num);
 int print_char(char c);
 
@@ -15,7 +17,9 @@ int div(int x, int y)
 		x = x - y;
 	return k;
 }
-
+/*
+ * main function
+ */
 int main()
 {
 	int a[20], b[20], ans[40], len1, len2, i, j, jw, temp;
