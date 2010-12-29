@@ -128,7 +128,8 @@ int ptr_iter_anal(func_block *fb)
 						if (triple_list[index_index[j]].arg2_type == 0)
 						{
 							u2 = triple_list[index_index[j]].arg2_uni;
-							assign_ptr(fb, temp, u1, u2);
+							if (fb->uni_table[u2]->size == -1)
+								assign_ptr(fb, temp, u1, u2);
 						}
 						else
 						{
