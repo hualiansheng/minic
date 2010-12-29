@@ -253,7 +253,7 @@ int gen_pointed_var(func_block *fb)
 				if (triple_list[index_index[j]].arg1_type == 0)
 				{
 					u = triple_list[index_index[j]].arg1_uni;
-					if (fb->uni_table[u]->star_num > 0)
+					if (fb->uni_table[u]->star_num > 0 && fb->uni_table[u]->size == -1)
 					{
 						p = get_ptr(fb->pointer_status[i], u);
 						for (l = 0; l < fb->width; l++)
