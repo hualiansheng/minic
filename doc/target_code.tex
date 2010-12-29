@@ -132,6 +132,7 @@ MiniC采用了启发式的图染色寄存器分配算法。该算法依赖于在
 
 %TODO:改进的删点策略
 {\it \anchor 有关寄存器分配和活跃变量分析的代码，请参阅：\verb|register_allocation.c|, \verb|live_var_anal.c|}\\
+%TODO:三元式转换为目标代码
 \section{将三元式转换为目标代码}
 
 \subsection{控制流语句的翻译}
@@ -197,3 +198,11 @@ void qsort(int* data, int begin, int end)
 \end{center}
 可以看出，在第二个\verb|qsort|的调用时（24行-30行），进行尾递归优化的程序（右）直接将新值\verb|j|传入被修改的参数\verb|begin|所在的寄存器\verb|r7|中，然后无条件跳转到了函数的正文标号\verb|.L1|。节省了保存、恢复现场以及新调用建立栈帧的指令。\\
 {\it \anchor 有关尾递归优化的代码，请参阅：\verb|gen_target_code.c|}\\
+
+\subsection{指令调度}
+根据Unicore32指令系统体系结构，除了载入和运算指令可能产生的数据相关无法转发，需要等待一个cycle以外，其它指令的数据相关均已通过转发解决。指令调度的目的是减少甚至消除因载入指令而造成的数据相关。
+%TODO:指令调度相关
+\paragraph*{算法}
+
+\paragraph*{示例}
+

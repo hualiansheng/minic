@@ -174,10 +174,10 @@ int main(int argc, char** argv)
 	/**
 	 *call preprocessor
 	 */
-	//pre_compile(srcfile_name);
+	pre_compile(srcfile_name);
 
-	//source_file = fopen (strcat(srcfile_name,PREPROCESSOR_TMP_SUFFIX), "r");
-	source_file = fopen(argv[optind],"r");
+	source_file = fopen (strcat(srcfile_name,PREPROCESSOR_TMP_SUFFIX), "r");
+//	source_file = fopen(argv[optind],"r");
 	if (!source_file) //file open error
 	{
 		fprintf(stderr,"%s: open error!\n",argv[optind]);

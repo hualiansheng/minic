@@ -26,7 +26,7 @@ void pre_compile(char* filename){
 	len = ftell(fr);
 	//printf("length : %d\n", len);
 	src = malloc(len * sizeof(char) + 1);
-	dst = malloc(len * sizeof(char)) + 1;
+	dst = malloc(len * sizeof(char) + 1);
 	fseek(fr, 0, SEEK_SET);
 	fread(src, len*sizeof(char), 1, fr);
 	i = 0;
@@ -88,16 +88,7 @@ void pre_compile(char* filename){
 	fputs(dst, fw);
 	fclose(fr);
 	fclose(fw);
-	//free(src);
-	//free(dst);
+	free(src);
+	free(dst);
 }
-
-
-//int main(){
-//	char input[500];
-//	scanf("%s", input);
-//	printf("%s\n", input);
-//	pre_compile(input);
-//	return 0;
-//}
 
