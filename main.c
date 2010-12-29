@@ -30,7 +30,7 @@ Options:\n\
 	-O1 Enable instruction dispatch\n\
 	-O2 Enable available expression remove\n\
 	-O3 = both -O1 -O2\n\
-	-O0 = Disable both triple and assemble peephole optimization\n\
+	-O0 = Disable peephole optimization on target code\n\
 	----------------------------------\n\
 	Target machine register system info (corresponding with ABI):\n\
 		Caller save: r%d - r%d\n\
@@ -43,7 +43,7 @@ Options:\n\
 	if(debug_mode)
 		printf("***Caution: DEBUG MODE ***\n");
 	if(peephole_disabled)
-		printf("***Peephole optimization DISABLED!\n");
+		printf("***Peephole optimization on target DISABLED!\n");
 }
 /**
  * parse the input file name, cut out the extend name.
@@ -254,7 +254,7 @@ int main(int argc, char** argv)
 		print_intermediate_code();
 		return 0;
 	}
-	if(!peephole_disabled)
+//	if(!peephole_disabled)
 	{
 		fprintf(stderr,"Applying intermediate code peephole optimization...");
 		peephole_on_intermediate_code();
