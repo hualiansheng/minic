@@ -232,7 +232,7 @@ void array_operation_optimize()
 	int i, j, k, flag;
 	for(i = 0; i < assemble_num; i++){
 		if(assemble_list[i].ins == ldw || assemble_list[i].ins == stw){
-			if(assemble_list[i].Rn != 27){
+			if(assemble_list[i].Rn != 27 && assemble_list[i].Rn != 29){
 				for(j = i-1 ; j >=0 ; j--){
 					if(assemble_list[j].ins == add && assemble_list[j].Rd == assemble_list[i].Rn){
 						flag = 1;
