@@ -27,7 +27,10 @@ Options:\n\
 	-i Print intermediate code\n\
 	-b Print basic block in a DOT file\n\
 	-g Print interference graph\n\
-	-a All of above = -tds\n\
+	-O1 Enable instruction dispatch\n\
+	-O2 Enable available expression remove\n\
+	-O3 = both -O1 -O2\n\
+	-O0 = Disable both triple and assemble peephole optimization\n\
 	----------------------------------\n\
 	Target machine register system info (corresponding with ABI):\n\
 		Caller save: r%d - r%d\n\
@@ -164,7 +167,8 @@ int main(int argc, char** argv)
 						dispatch_flag = 1;
 						break;
 					case '0':
-						// No optmizing at all
+						// disable peephole at all
+						peephole_disabled = 1;
 						break;
 					default:
 						;
@@ -250,12 +254,12 @@ int main(int argc, char** argv)
 		print_intermediate_code();
 		return 0;
 	}
-	
-#ifndef DISABLE_PEEPHOLE
-	fprintf(stderr,"Applying intermediate code peephole optimization...");
-	peephole_on_intermediate_code();
-	fprintf(stderr,"done.\n");
-#endif
+	if(!peephole_disabled)
+	{
+		fprintf(stderr,"Applying intermediate code peephole optimization...");
+		peephole_on_intermediate_code();
+		fprintf(stderr,"done.\n");
+	}
 	//generate basic block
 	fprintf(stderr,"Generating basic block...");
 	gen_basic_block();
@@ -322,7 +326,12 @@ int main(int argc, char** argv)
 	fprintf(stderr,"done.\n");
 	if(dispatch_flag)
 		fprintf(stderr,"OPTIMIZATION: Will use dispatched assemble!\n");
-
+	if(!peephole_disabled)
+	{
+		fprintf(stderr,"Applying target code peephole optimization...");
+		peephole_on_target_code();
+		fprintf(stderr,"done.\n");
+	}
 	/* get code output!*/
 	target_file = stdout;
 #ifndef DEBUG
@@ -330,11 +339,6 @@ int main(int argc, char** argv)
 	target_file = fopen(strcat(srcfile_name,".s"),"w+");
 #endif
 
-#ifndef DISABLE_PEEPHOLE
-	fprintf(stderr,"Applying target code peephole optimization...");
-	peephole_on_target_code();
-	fprintf(stderr,"done.\n");
-#endif
 	print_target_code(target_file,dispatch_flag);
 	fclose(target_file);
 	return 0;

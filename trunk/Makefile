@@ -51,7 +51,13 @@ pointer_anal.o: pointer_anal.c register.h gen_intermediate_code.h
 	gcc $(ARGS) -c pointer_anal.c
 cscope: $(CSCOPE)
 	cscope -Rbq
+config-less:
+	rm -f register_stats.h
+	ln -s register_stats.h.less register_stats.h
+config-more:
+	rm -f register_stats.h
+	ln -s register_stats.h.more register_stats.h
 clean:
-	rm *.o; rm minic; rm lex.yy.c; rm minic.tab.*
+	rm *.o; rm minic; rm lex.yy.c; rm minic.tab.*;
 cleanw:
 	del *.o; del minic.exe; del lex.yy.c; del minic.tab.*

@@ -1,26 +1,26 @@
-/*
- * afdsadfa
- * asfsadf
- * asdfsaf
- */
+//1 2 3 4 6
+int a,b;
+int print_int(int x);
+int print_char(char x);
 int main()
 {
-	int a, b[2], *p;
-	p = b;
-	b[0] = 1;
-	b[1] = 10;
-	p = 1 + p;
-	printf("%d\n", *p);
-	a = -1431655765;
-	print_bin(a);
-	a = ~1430257664;
-	print_bin(a);
-	a = 1396736;
-	print_bin(a);
-	a = 1364;
-	print_bin(a);
-	a = -4016;
-	print_bin(a);
-	return 0;
+	int a[10],b,i,j,k;
+	i = 0;
+	j = 1;
+	b = i + j;
+	for(k = 0 ; k < 10; k++)
+	{
+		a[i+j] = i + j;
+		if(k<5)
+			i++;
+		else
+			b = i + j;
+		b = i + j;
+	}
+	for(i = 1 ; i < 5; i++)
+	{	
+		print_int(a[i]);
+		print_char('\n');
+	}
+	print_int(b);
 }
-//the last line
