@@ -490,10 +490,12 @@ void sim_print(PIPLINE* pipline, int32_t data, int type){
 void sim_scan(PIPLINE* pipline, int type){
 	char s[1024];
 	int len;
+	int num = 0;
 	if(type == INT){
-		int num;
 		//fflush(stdin);
-		scanf("%d", &num);
+		if(scanf("%d", &num)<=0){
+			fprintf(stderr, "Scanf Error.\n");
+		}
 		if(mem_invalid(pipline->proc->mem, pipline->regs->r[0]) != 0){
 			fprintf(stderr, "Invalid address, 0x%.8x\n",
 					pipline->regs->r[0]);
@@ -527,7 +529,9 @@ void sim_scan(PIPLINE* pipline, int type){
 		cache_update(pipline->d_cache, pipline->regs->r[0]);
 
 	}else if(type == STRING){
-		scanf("%s", s);
+		if(scanf("%s", s)<0){
+			fprintf(stderr, "Scanf Error.\n");
+		}
 		len = strlen(s);
 		if(mem_invalid(pipline->proc->mem, pipline->regs->r[0]) != 0 ||
 				mem_invalid(pipline->proc->mem, pipline->regs->r[0] + len -1) != 0){

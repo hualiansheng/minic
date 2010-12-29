@@ -28,6 +28,8 @@ CACHE_RETURN cache_miss(CACHE* cache, uint32_t addr){
     int in_block_index;
     uint32_t *presult;
     int in_block_count = 0;
+	c_r.cpu_cycles = -1;
+	c_r.data = 0;
 	//printf("cache miss 0x%.8x\n", addr);
     block_index = (addr % CACHE_SIZE)/CACHE_BLOCK_SIZE;
     mark_addr = addr >> ((int)(log(CACHE_SIZE)/log(2)));

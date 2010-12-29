@@ -40,7 +40,10 @@ PROCESS* proc_initial(char* filename){
         phdr = ELF_next_loadable_phdr();
         uint8_t* data = malloc(phdr->p_filesz + 1);
         fseek(fp, phdr->p_offset, 0);
-        fread(data, phdr->p_filesz, 1, fp);
+        if(fread(data, phdr->p_filesz, 1, fp) <= 0){
+			fprintf(stderr, "Fread Error.\n");
+			exit(1);
+		}
         segment_load(proc->mem, i, phdr->p_flags, phdr->p_vaddr,
                      phdr->p_memsz, (void *)data, phdr->p_filesz);
     }
