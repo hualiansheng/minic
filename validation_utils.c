@@ -381,9 +381,10 @@ void print_ptr_anal()
 	FILE *out = fopen("ptr_anal.debug", "w");
 	func_block *fb;
 	PtrInfo *p;
-	int i, j;
+	int i, j,base;
 	for (fb = fblist; fb != NULL; fb = fb->next)
 	{
+		base = fb->start->begin;
 		for (i = fb->start->begin; i <= fb->over->end; i++)
 		{
 			fprintf(out, "(%d) : ", i);
@@ -399,7 +400,7 @@ void print_ptr_anal()
 					fprintf(out, "(%d) ", triple_list[i].arg2.temp_index);
 				else	fprintf(out, "%d ", triple_list[i].arg2.temp_index);
 			fprintf(out, "\t\t");
-			for (p = fb->pointer_status[i]; p != NULL; p = p->next)
+			for (p = fb->pointer_status[i - base]; p != NULL; p = p->next)
 			{
 				fprintf(out, "(%s ->", fb->mapping[p->ptr_uni].var_name);
 				for (j = 0; j < fb->uni_item_num; j++)
