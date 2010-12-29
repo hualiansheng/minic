@@ -1,6 +1,6 @@
 int main()
 {
-	int a[10];
-	int i;
-	a[i] = 1;
+	int a[10], b;
+	b = a[1] + b;
+	b = a[1] - b;
 }
