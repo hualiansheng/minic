@@ -266,7 +266,7 @@ void delete_redundant_mov()
 //	FILE *debug;
 	int i, j, k, flag, cflag;
 	int temp, current_block;
-	inst_block();
+	inst_block(0);
 	cflag = 0;
 	next_list = malloc(sizeof(int)*instruction_block_num);
 	jump_list = malloc(sizeof(int)*instruction_block_num);
