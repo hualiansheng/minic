@@ -46,7 +46,9 @@ int console_next_cmd(CPU_d* cpu, char* filename){
     CMD cmd;
     printf(">");
     fflush(stdin);
-    fgets(input, 200, stdin);
+    if(fgets(input, 200, stdin) <= 0){
+		fprintf(stderr, "Fgets Error.\n");
+	}
     cmd = console_parse_cmd(input);
     if(strlen(cmd.command) == 0)
         return 1;
@@ -181,7 +183,9 @@ int console_run(CPU_d* cpu, char* filename, int mode){
     if(cpu->mode == CPU_NORMAL || cpu->mode == CPU_TRAP){
         printf("Progress is running, restart?(Y/N) ");
         char tmp[20]={0};
-        scanf("%s", tmp);
+        if(scanf("%s", tmp) < 0){
+			fprintf(stderr, "Scanf Error.\n");
+		}
         if(strcmp(tmp, "Y") == 0 || strcmp(tmp, "y") == 0 ||
            strcmp(tmp, "yes") == 0 || strcmp(tmp, "YES") == 0){
             process_restart(cpu, filename);

@@ -1,5 +1,5 @@
 OBJECT = simulator.o ELF_parser.o register.o mem.o process.o decode.o cache.o CPU.o pipline.o debugger.o instEx.o breakpoint.o console.o interpret.o
-ARGS = -O2 -Wall
+ARGS = -O2 -Wall 
 LIBS = -L/usr/local/lib -lelf
 simulator:$(OBJECT)
 	gcc $(ARGS) $(LIBS) -o simulator $(OBJECT)

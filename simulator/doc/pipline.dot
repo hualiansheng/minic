@@ -1,0 +1,8 @@
+digraph G {
+	Instruction_Fetch -> Instruction_Decoder;
+	Instuction_Decoder -> Execuation;
+	Execuation -> Memory_Visit;
+	Memory_Visit -> Write_Back;
+	
+}
+
