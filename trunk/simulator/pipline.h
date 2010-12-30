@@ -41,6 +41,7 @@ typedef struct{
 
 typedef struct{
     int cycles_total;//total cycles of cpu
+    int inst_total;//total instruction number
     //int cycles_idle;//idle cycles of cpu, include bubles and cache miss
     int cycles_work;//work cycles of cpu
     int bubbles;//bubbles of pipline
