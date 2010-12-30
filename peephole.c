@@ -271,6 +271,8 @@ void array_operation_optimize()
 		if(assemble_list[i].ins == ldw || assemble_list[i].ins == stw){
 			if(assemble_list[i].Rn != 27 && assemble_list[i].Rn != 29){
 				for(j = i-1 ; j >=0 ; j--){
+					if(assemble_list[j].ins == special || assemble_list[j].ins == label)
+						break;
 					if(assemble_list[j].ins == add && assemble_list[j].Rd == assemble_list[i].Rn){
 						flag = 1;
 						for(k = j+1 ; k < i ; k ++){
