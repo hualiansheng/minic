@@ -6,7 +6,7 @@
 void debugger_print_cpu_info(CPU_info* cpu_info){
     printf("CPU info:===========================\n");
     printf("\tCPU total cycle : %d\n", cpu_info->cycles_total);
-    printf("\tCPU idle cycle : %d\n", cpu_info->cycles_total - cpu_info->cycles_work);
+    printf("\tCPU idle cycle : %d\n", cpu_info->cycles_total - cpu_info->cycles_work + cpu_info->bubbles);
     printf("\tPipline bubbles : %d\n", cpu_info->bubbles);
     printf("\tRead memory times : %d\n", cpu_info->rd_mem_times);
     printf("\tWrite memory times : %d\n", cpu_info->wr_mem_times);
@@ -17,6 +17,7 @@ void debugger_print_cpu_info(CPU_info* cpu_info){
     printf("\tTotal Cache visit times : %d\n", cpu_info->i_cache_visit + cpu_info->d_cache_visit);
     printf("\tTotal Cache miss times : %d\n", cpu_info->i_cache_miss + cpu_info->d_cache_miss);
     printf("\t----------------\n");
+    printf("\tCPI : %.3lf\n", 1.0*cpu_info->cycles_total / (cpu_info->cycles_work - cpu_info->bubbles));
     printf("\tCPU idle rate : %.2lf%%\n", (cpu_info->cycles_total - cpu_info->cycles_work) * 100.0 /cpu_info->cycles_total);
     printf("\tI Cache miss rate : %.2lf%%\n", (double)(cpu_info->i_cache_miss) / (double)(cpu_info->i_cache_visit));
     printf("\tD Cache miss rate : %.2lf%%\n", (double)(cpu_info->d_cache_miss) / (double)(cpu_info->d_cache_visit));
@@ -182,7 +183,7 @@ void debugger_print_inst_statistic(PROCESS* proc){
            i_s.inst_d_imm_shift, 100.0*i_s.inst_d_imm_shift/i_s.inst_total);
     printf("\t\tD_reg_shift : %d  rate : %.4f%%\n",
            i_s.inst_d_reg_shift, 100.0*i_s.inst_d_reg_shift/i_s.inst_total);
-    printf("\t\tD_imm_shift : %d  rate : %.4f%%\n",
+    printf("\t\tD_immediate : %d  rate : %.4f%%\n",
            i_s.inst_d_immediate, 100.0*i_s.inst_d_immediate/i_s.inst_total);
     printf("\t\tD_multiply : %d  rate : %.4f%%\n",
            i_s.inst_multiply, 100.0*i_s.inst_multiply/i_s.inst_total);
