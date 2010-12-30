@@ -4,11 +4,11 @@ void print_string(char* s);
 void print_ln();
 int rand_int(int num);
 char data[128];
-void qsort(int begin, int end){
+int qsort(int begin, int end){
   int i, j;
   char tmp;
   if(end <= begin + 1)
-    return;
+    return 0;
   j=begin+1;
   for(i=begin+1; i<end; i++){
     if(data[i] < data[begin]){
@@ -23,7 +23,7 @@ void qsort(int begin, int end){
   data[j-1] = tmp;
   qsort(begin, j-1);
   qsort(j, end);
-  return;
+  return 0;
 }
 
 int main(){

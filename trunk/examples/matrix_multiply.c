@@ -18,20 +18,20 @@ int main(){
 		matrix2[i] = rand_int(10);
 	}
 	// caculate
-	for(i=0; i<20; i++){
-		tmp2=i*20;
-		for(j=0; j<20; j++){
+	for(i=0; i<5; i++){
+		tmp2=i*5;
+		for(j=0; j<5; j++){
 			tmp = 0;
-			for(k=0; k<20; k++)
-				tmp = tmp + matrix1[tmp2+k]*matrix2[k*20+j];
+			for(k=0; k<5; k++)
+				tmp = tmp + matrix1[tmp2+k]*matrix2[k*5+j];
 			result[tmp2+j] = tmp;
 		}
 	}
 	// output
 	print_string("Matrix1:\n");
-	for(i=0; i<20; i++){
-		tmp2=i*20;
-		for(j=0; j<20; j++){
+	for(i=0; i<5; i++){
+		tmp2=i*5;
+		for(j=0; j<5; j++){
 			print_int(matrix1[tmp2+j]);
 			print_char(' ');
 		}
@@ -39,9 +39,9 @@ int main(){
 	}
 	print_char('\n');
 	print_string("Matrix2:\n");
-	for(i=0; i<20; i++){
-		tmp2=i*20;
-		for(j=0; j<20; j++){
+	for(i=0; i<5; i++){
+		tmp2=i*5;
+		for(j=0; j<5; j++){
 			print_int(matrix2[tmp2+j]);
 			print_char(' ');
 		}
@@ -49,9 +49,9 @@ int main(){
 	}
 	print_char('\n');
 	print_string("Result:\n");
-	for(i=0; i<20; i++){
-		tmp2=i*20;
-		for(j=0; j<20; j++){
+	for(i=0; i<5; i++){
+		tmp2=i*5;
+		for(j=0; j<5; j++){
 			print_int(result[tmp2+j]);
 			print_char(' ');
 		}

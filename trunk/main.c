@@ -285,7 +285,7 @@ int main(int argc, char** argv)
 		fprintf(stderr,"Running available expression analysis...");
 		iteration_count = available_expr();
 		fprintf(stderr,"done, iteration count: %d\n",iteration_count);
-		print_available_expr();
+	//	print_available_expr();
 	}
 	//live variable analyzing
 	fprintf(stderr,"Analyzing lively variables...");
