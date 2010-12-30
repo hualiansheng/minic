@@ -22,6 +22,17 @@ d. File operation is supported.
 
 Besides, a simulator for compilation file is also implemented for test of validation.
 
+***********************
+Document File View:
+
+Final Report : doc/final_report.pdf
+Final Report Slides : doc/final_report_slides.pdf
+General Design Document : doc/Simulator整体设计文档（草案）.pdf
+Middle Report : doc/mid_report.pdf
+Open Project Report : doc/initial_report.ppt
+Verification Outline : doc/验证大纲.txt
+
+***********************
 All rights reserved.
 
 ==============================
@@ -30,13 +41,11 @@ Usage:
 a.Install libelf library with following steps
 	1)cd lib
 	2)tar xvf libelf-0.8.13.tar
-	3)cd libelf-0.8.13.tar
-	4)./configure
+	3)cd libelf-0.8.13
+	4)./configure --enable-gnu-names --prefix=/usr/local
 	5)make
 	6)make install (need root privilege)
-b.Load libelf library into system, with the following command:
-	ldconfig (need root privilege)
-c.Run command: make
-d.Then the program can be run in the current directory.
+b.Run command: make
+c.Then the program can be run in the current directory.
 
 ===============================
