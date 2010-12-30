@@ -285,7 +285,7 @@ int main(int argc, char** argv)
 	/**
 	 * DEBUG
 	 */
-	print_ptr_anal();
+//	print_ptr_anal();
 	//可用表达式分析
 	if(data_flow_flag)
 	{

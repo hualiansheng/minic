@@ -243,6 +243,8 @@ void qsort(int* data, int begin, int end)
 	\label{fig:tailrecursion}
 \end{center}
 可以看出，在第二个\verb|qsort|的调用时（24行-30行），进行尾递归优化的程序（右）直接将新值\verb|j|传入被修改的参数\verb|begin|所在的寄存器\verb|r7|中，然后无条件跳转到了函数的正文标号\verb|.L1|。节省了保存、恢复现场以及新调用建立栈帧的指令。\\
+\paragraph*{缺陷}
+如果对一个通过传入自己局部变量指针的而修改上一栈帧局部变量内存内容的函数进行尾递归优化将产生执行结果的错误。因此MiniC默认关闭了尾递归优化，只有当程序员保证没有上述情况时可以选用开启。\\
 {\it \anchor 有关尾递归优化的代码，请参阅：\verb|gen_target_code.c|}\\
 
 \subsection{指令调度}

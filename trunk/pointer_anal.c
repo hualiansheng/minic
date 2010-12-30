@@ -102,14 +102,11 @@ int ptr_iter_anal(func_block *fb)
 	PtrInfo *temp, *next;
 	PreList *pre;
 	int i, j, l, base, change, u1, u2;
-	int count=0;
 	base = fb->start->begin;
 	init_ptrlist(fb, &temp);
 	change = 1;
 	while (change)
 	{
-		count ++;
-		fprintf(stderr,"Iteration: %d\n",count);
 		change = 0;
 		for (bb = fb->start, i = 0; i < fb->bb_num; bb = bb->next, i++)
 		{
