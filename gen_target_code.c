@@ -85,6 +85,8 @@ int tail_recursion(func_block *fb, int i);
 
 //from pointer_anal.c
 PtrInfo* get_ptr(PtrInfo* p, int u);
+//from main.c
+extern int tail_recursion_flag;
 int gen_target_code()
 {
 	initial();
@@ -1369,7 +1371,7 @@ int tail_recursion(func_block *fb, int i)
 
 int call_code(func_block *fb, int i)
 {
-	if (check_tail_recursion(fb, i))
+	if (check_tail_recursion(fb, i) && tail_recursion_flag)
 	{
 		tail_recursion(fb, i);
 		return 0;

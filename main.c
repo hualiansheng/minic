@@ -15,6 +15,7 @@
 int debug_mode= 0;
 int peephole_disabled = 0;
 int error_number;
+int tail_recursion_flag = 0;
 void usage()
 {
 	printf("MiniC compiler:\n\
@@ -31,6 +32,7 @@ Options:\n\
 	-O2 Enable available expression remove\n\
 	-O3 = both -O1 -O2\n\
 	-O0 = Disable peephole optimization on target code\n\
+	-Ox = Enable tail recursion optimizationi. WARNING: MAY GENERATE WRONG TARGET CODE, PLEASE REFER TO THE MANUAL!\n\
 	----------------------------------\n\
 	Target machine register system info (corresponding with ABI):\n\
 		Caller save: r%d - r%d\n\
@@ -159,16 +161,22 @@ int main(int argc, char** argv)
 					case '3':
 						data_flow_flag = 1;
 						dispatch_flag = 1;
+						peephole_disabled = 0;
 						break;
 					case '2':
 						data_flow_flag = 1;
+						peephole_disabled = 1;
 						break;
 					case '1':
 						dispatch_flag = 1;
+						peephole_disabled = 1;
 						break;
 					case '0':
 						// disable peephole at all
 						peephole_disabled = 1;
+						break;
+					case 'x':
+						tail_recursion_flag = 1;
 						break;
 					default:
 						;
@@ -318,6 +326,8 @@ int main(int argc, char** argv)
 	 * TODO: Optimizing
 	 */
 	fprintf(stderr,"Generating target code...");
+	if(tail_recursion_flag)
+		fprintf(stderr,"with tail recursion enabled...");
 	gen_target_code();
 	fprintf(stderr,"done.\n");
 	

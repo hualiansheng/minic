@@ -7,55 +7,72 @@ qsort:
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
-	sub	r29, r29, #40
-	mov	r7, r0
-	mov	r6, r1
-	mov	r5, r2
+	sub	r29, r29, #52
+	stw	r17, [r27+], #-16
+	stw	r18, [r27+], #-20
+	stw	r19, [r27+], #-24
+	stw	r0, [r27+], #-28
+	stw	r1, [r27+], #-32
+	mov	r19, r2
 .L1:
-	add	r4, r6, #1
-	cmpsub.a	r5, r4
+	ldw	r1, [r27+], #-32
+	add	r5, r1, #1
+	cmpsub.a	r19, r5
 	bsg	.L3
 .L2:
 	b	.L9
 .L3:
-	add	r4, r6, #1
-	add	r11, r6, #1
+	mov	r18, r5
+	mov	r17, r5
 .L8:
-	cmpsub.a	r11, r5
+	cmpsub.a	r17, r19
 	beg	.L5
 .L4:
-	ldw	r9, [r7+], r11<<#2
-	ldw	r8, [r7+], r6<<#2
-	cmpsub.a	r9, r8
+	ldw	r1, [r27+], #-28
+	ldw	r6, [r1+], r17<<#2
+	ldw	r1, [r27+], #-28
+	ldw	r2, [r27+], #-32
+	ldw	r5, [r1+], r2<<#2
+	cmpsub.a	r6, r5
 	beg	.L7
 .L6:
-	ldw	r10, [r7+], r4<<#2
-	ldw	r8, [r7+], r11<<#2
-	stw	r8, [r7+], r4<<#2
-	stw	r10, [r7+], r11<<#2
-	add	r4, r4, #1
+	ldw	r1, [r27+], #-28
+	ldw	r6, [r1+], r18<<#2
+	ldw	r1, [r27+], #-28
+	add	r5, r1, r18<<#2
+	ldw	r1, [r27+], #-28
+	ldw	r4, [r1+], r17<<#2
+	stw	r4, [r5+], #0
+	ldw	r1, [r27+], #-28
+	stw	r6, [r1+], r17<<#2
+	add	r18, r18, #1
 .L7:
-	add	r11, r11, #1
+	add	r17, r17, #1
 	b	.L8
 .L5:
-	ldw	r10, [r7+], r6<<#2
-	sub	r8, r4, #1
-	ldw	r8, [r7+], r8<<#2
-	stw	r8, [r7+], r6<<#2
-	sub	r8, r4, #1
-	stw	r10, [r7+], r8<<#2
-	sub	r2, r4, #1
-	stw	r4, [r27+], #-28
-	stw	r5, [r27+], #-24
-	stw	r7, [r27+], #-16
-	mov	r0, r7
-	mov	r1, r6
+	ldw	r1, [r27+], #-28
+	ldw	r2, [r27+], #-32
+	ldw	r6, [r1+], r2<<#2
+	ldw	r1, [r27+], #-28
+	ldw	r2, [r27+], #-32
+	add	r17, r1, r2<<#2
+	ldw	r1, [r27+], #-28
+	sub	r2, r18, #1
+	ldw	r5, [r1+], r2<<#2
+	stw	r5, [r17+], #0
+	ldw	r1, [r27+], #-28
+	stw	r6, [r1+], r2<<#2
+	ldw	r0, [r27+], #-28
+	ldw	r1, [r27+], #-32
 	b.l	qsort
-	ldw	r6, [r27+], #-28
-	ldw	r5, [r27+], #-24
-	ldw	r7, [r27+], #-16
+	ldw	r28, [r27+], #-28
+	mov	r3, r18
+	stw	r3, [r27+], #-32
 	b	.L1
 .L9:
+	ldw	r17, [r27+], #-16
+	ldw	r18, [r27+], #-20
+	ldw	r19, [r27+], #-24
 	ldw	r30, [r27+], #-4
 	ldw	r29, [r27+], #-8
 	ldw	r27, [r27+], #-12
@@ -70,73 +87,74 @@ main:
 	stw	r29, [r29+], #-12
 	stw	r27, [r29+], #-16
 	sub	r27, r29, #4
-	sub	r29, r29, #536
+	stw	r17, [r27+], #-16
 	ldw	r28, .L22+0
+	sub	r29, r29, #540
 	add	r3, r27, r28
-	stw	r3, [r27+], #-532
+	stw	r3, [r27+], #-536
 .L11:
-	ldw	r5, [r27+], #-532
-	mov	r7, #0
+	ldw	r4, [r27+], #-536
+	mov	r5, #0
 .L14:
-	cmpsub.a	r7, #128
+	cmpsub.a	r5, #128
 	beg	.L13
 .L12:
-	rsub	r4, r7, #128
-	stw	r4, [r5+], r7<<#2
-	add	r7, r7, #1
+	rsub	r6, r5, #128
+	stw	r6, [r4+], r5<<#2
+	add	r5, r5, #1
 	b	.L14
 .L13:
-	mov	r7, #0
+	mov	r5, #0
 .L17:
-	cmpsub.a	r7, #128
+	cmpsub.a	r5, #128
 	beg	.L16
 .L15:
-	ldw	r0, [r5+], r7<<#2
-	stw	r5, [r27+], #-532
-	stw	r7, [r27+], #-16
+	ldw	r0, [r4+], r5<<#2
+	stw	r4, [r27+], #-536
+	stw	r5, [r27+], #-20
 	b.l	print_int
-	ldw	r5, [r27+], #-532
-	ldw	r7, [r27+], #-16
-	stw	r5, [r27+], #-532
-	stw	r7, [r27+], #-16
+	ldw	r4, [r27+], #-536
+	ldw	r5, [r27+], #-20
+	stw	r4, [r27+], #-536
+	stw	r5, [r27+], #-20
 	mov	r0, #32
 	b.l	print_char
-	ldw	r5, [r27+], #-532
-	ldw	r7, [r27+], #-16
-	add	r7, r7, #1
+	ldw	r4, [r27+], #-536
+	ldw	r5, [r27+], #-20
+	add	r5, r5, #1
 	b	.L17
 .L16:
-	stw	r5, [r27+], #-532
+	stw	r4, [r27+], #-536
 	mov	r0, #10
 	b.l	print_char
-	ldw	r5, [r27+], #-532
-	stw	r5, [r27+], #-532
+	ldw	r4, [r27+], #-536
+	stw	r4, [r27+], #-536
 	mov	r0, #10
 	b.l	print_char
-	ldw	r0, [r27+], #-532
-	stw	r0, [r27+], #-532
+	ldw	r0, [r27+], #-536
+	stw	r0, [r27+], #-536
 	mov	r1, #0
 	mov	r2, #128
 	b.l	qsort
-	ldw	r5, [r27+], #-532
-	mov	r7, #0
+	ldw	r4, [r27+], #-536
+	mov	r5, #0
 .L20:
-	cmpsub.a	r7, #128
+	cmpsub.a	r5, #128
 	beg	.L19
 .L18:
-	ldw	r0, [r5+], r7<<#2
-	stw	r5, [r27+], #-532
-	stw	r7, [r27+], #-16
+	ldw	r0, [r4+], r5<<#2
+	stw	r4, [r27+], #-536
+	stw	r5, [r27+], #-20
 	b.l	print_int
-	ldw	r5, [r27+], #-532
-	ldw	r7, [r27+], #-16
-	stw	r5, [r27+], #-532
-	stw	r7, [r27+], #-16
+	ldw	r4, [r27+], #-536
+	ldw	r5, [r27+], #-20
+	stw	r4, [r27+], #-536
+	stw	r5, [r27+], #-20
 	mov	r0, #32
 	b.l	print_char
-	ldw	r5, [r27+], #-532
-	ldw	r7, [r27+], #-16
-	add	r7, r7, #1
+	ldw	r4, [r27+], #-536
+	ldw	r5, [r27+], #-20
+	add	r5, r5, #1
 	b	.L20
 .L19:
 	mov	r0, #10
@@ -145,9 +163,10 @@ main:
 	b.l	print_char
 	mov	r0, #0
 .L21:
+	ldw	r17, [r27+], #-16
 	ldw	r30, [r27+], #-4
 	ldw	r29, [r27+], #-8
 	ldw	r27, [r27+], #-12
 	jump	r30
 .L22:
-	.word	-528
+	.word	-532

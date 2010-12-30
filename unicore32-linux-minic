@@ -5,7 +5,7 @@ if [ $# -lt 1 ]; then
 	exit
 fi
 
-arg_O=0
+arg_O=""
 output_file=""
 while getopts :O:o:? OPT; do
 	case $OPT in
@@ -40,6 +40,20 @@ if [ "$arg_O" = "3" ];then
 	args=" -O3 "
 fi
 
+if [ "$arg_O" = "0" ];then
+	args=" -O0 "
+fi
+if [ "$arg_O" = "x" ];then
+	args=" -Ox "
+fi
+
+if [ "$arg_O" = "0x" ];then
+	args=" -Ox -O0 "
+fi
+
+if [ "$arg_O" = "3x" ];then
+	args=" -Ox -O3 "
+fi
 cmd_path="${0%/*}/"
 cmd="${0%/*}/minic"
 path=`pwd`"/"
