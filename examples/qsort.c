@@ -6,7 +6,7 @@ int rand_int(int num);
 void qsort(int *data,int begin, int end){
   int i, j, tmp;
   if(end <= begin + 1)
-    return;
+    return ;
   j=begin+1;
   for(i=begin+1; i<end; i++){
     if(data[i] < data[begin]){
@@ -21,7 +21,7 @@ void qsort(int *data,int begin, int end){
   data[j-1] = tmp;
   qsort(data,begin, j-1);
   qsort(data,j, end);
-  return;
+  return ;
 }
 
 int main(){

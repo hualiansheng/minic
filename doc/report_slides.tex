@@ -283,11 +283,18 @@ AST是MiniC的第一重中间表示，符号表生成和类型检查检查在AST
 \begin{frame}
 %TODO:registers push/pop
 	\frametitle{寄存器保护-推栈策略}
+	\begin{itemize}
+		\item 局部变量
+		\item 临时变量
+		\item 全局变量
+	\end{itemize}
 \end{frame}
 \subsection{setrb/getrb的处理}
 \begin{frame}
 \frametitle{setrb/getrb的处理}
-%TODO:setrb/getrb
+\begin{center}
+\includegraphics[scale=0.5]{setrb.png}
+\end{center}
 \end{frame}
 
 \section{编译优化}
