@@ -379,6 +379,8 @@ int rvalue_code(AST_NODE *p)
 	//int* arg_size_list;不一定需要
 	int i, arg_num;
 	//union arg temp1,temp2,dest;
+
+	int resume_of_double;
 	for(ptr = p->leftChild ; ptr!=NULL ; ptr = ptr->rightSibling)
 		childNum++;
 	switch(childNum){
@@ -502,13 +504,105 @@ int rvalue_code(AST_NODE *p)
 								add_triple(star_op,temp_rvalue,-1,0,1,0);
 							else add_triple(star_op,temp_rvalue,-1,1,1,0);
 							temp_index = triple_list_index-1;
-							add_triple(add_op,temp_index,1,triple_list[temp_index].result_type,1,2);
+							if(p->leftChild->content.i_content == PLUSPLUS)
+							{
+								add_triple(add_op,temp_index,1,triple_list[temp_index].result_type,1,2);
+							}
+							else add_triple(minus_op,temp_index,1,triple_list[temp_index].result_type,1,2);
 							temp_index = triple_list_index-1;
 							add_triple(star_assign_op, temp_rvalue, temp_index, triple_list[temp_index].result_type, 1, 1);                         
 						}
 						return triple_list_index-2;
 					}
 					else{//a ++
+						ptr = p ->leftChild ;
+						temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
+						if(temp_rvalue == -1){
+							/**
+							 * Brills modified here:
+							 * currently, ptr is LVALUE,not IDENT, so without s_content
+							 * ptr->leftChild is IDENT
+							 */
+							temp_symtbl = symtbl_query(ptr->leftChild->symtbl, ptr->leftChild->content.s_content, 0);
+							assert(temp_symtbl != NULL);
+							/**
+							 * Brills modified here:
+							 * what is the difference between CHAR_T and INT_T here??
+							 */ 
+							if(temp_symtbl->type == CHAR_T&& temp_symtbl->star_num ==0){
+								if(p->leftChild->rightSibling->content.i_content == PLUSPLUS){
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 0, 0, 0, 2);
+									resume_of_double = triple_list_index - 1;
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 1, 0, 0, 2);
+								}
+								else{
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 0, 0, 0, 2);
+									resume_of_double = triple_list_index - 1;
+									add_triple(minus_op, (int)ptr->leftChild->content.s_content, 1, 0, 0, 2);
+								}
+								temp_index = triple_list_index-1;
+								add_triple(assign_op, (int)ptr->leftChild->content.s_content, temp_index, 0, 0, 1);
+							}
+							else if(temp_symtbl->type == CHAR_T && temp_symtbl->star_num == 1){                                   
+								if(p->leftChild->rightSibling->content.i_content == PLUSPLUS){
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 0, 2, 0, 2);
+									resume_of_double = triple_list_index -1;
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 1, 2, 0, 2);
+								}
+								else{
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 0, 2, 0, 2);
+									resume_of_double = triple_list_index - 1;
+									add_triple(minus_op, (int)ptr->leftChild->content.s_content, 1, 2, 0, 2);
+								}
+								temp_index = triple_list_index-1;
+								add_triple(assign_op, (int)ptr->leftChild->content.s_content, temp_index, 2, 0, 1);
+							}                                       
+							else if(temp_symtbl->type ==INT_T && temp_symtbl->star_num == 1){                                   
+								if(p->leftChild->rightSibling->content.i_content == PLUSPLUS){
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 0, 3, 0, 2);
+									resume_of_double = triple_list_index -1;
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 4, 3, 0, 2);
+								}
+								else{
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 0, 3, 0, 2);
+									resume_of_double = triple_list_index - 1;
+									add_triple(minus_op, (int)ptr->leftChild->content.s_content, 4, 3, 0, 2);
+								}
+								temp_index = triple_list_index-1;
+								add_triple(assign_op, (int)ptr->leftChild->content.s_content, temp_index, 3, 0, 1);
+							}                                       
+							else{                                   
+								if(p->leftChild->rightSibling->content.i_content == PLUSPLUS){
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 0, 1, 0, 2);
+									resume_of_double = triple_list_index -1;
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 1, 1, 0, 2);
+								}
+								else{
+									add_triple(add_op, (int)ptr->leftChild->content.s_content, 0, 1, 0, 2);
+									resume_of_double = triple_list_index - 1;
+									add_triple(minus_op, (int)ptr->leftChild->content.s_content, 1, 1, 0, 2);
+								}
+								temp_index = triple_list_index-1;
+								add_triple(assign_op, (int)ptr->leftChild->content.s_content, temp_index, 1, 0, 1);
+							}                                       
+						}
+						else{
+							if(triple_list[temp_rvalue].result_type == 2)
+								add_triple(star_op,temp_rvalue,-1,0,1,-1);
+							else add_triple(star_op,temp_rvalue,-1,1,1,-1);
+							temp_index = triple_list_index-1;
+							add_triple(add_op,temp_index,0,triple_list[temp_index].result_type,1,2);
+							resume_of_double = triple_list_index -1;
+							if(p->leftChild->rightSibling->content.i_content == PLUSPLUS){
+							add_triple(add_op,temp_index,1,triple_list[temp_index].result_type,1,2);
+							}
+							else add_triple(minus_op,temp_index,1,triple_list[temp_index].result_type,1,2);
+							temp_index = triple_list_index-1;
+							add_triple(star_assign_op, temp_rvalue, temp_index, triple_list[temp_index].result_type, 1, 1);                         
+						}
+						return resume_of_double;
+					}
+						/*
 						ptr = p ->leftChild;
 						temp_rvalue = gen_triple_code[ptr->nodeType-FUNC_OFFSET](ptr);
 						if(temp_rvalue == -1){
@@ -535,7 +629,7 @@ int rvalue_code(AST_NODE *p)
 							return triple_list_index - 1;
 						}
 
-					}
+					}*/
 				}//end case 2;
 		case 3:
 				{               
@@ -1264,7 +1358,7 @@ void add_triple_double_op(int temp_rvalue1, int temp_rvalue2, enum operator op, 
 	else if (op == and_op){
 		//              add_triple(set_rb,0,-1, 1,2,-1);
 		//              add_triple(if_not_op, var1, triple_list_index + 3, 1, var_type1, 2);//if_not跳转指令 第三个操作数是一个立即数
-		add_triple(if_not_op, var2, triple_list_index + 2, 1, var_type2, 1);
+		add_triple(if_not_op, var2, triple_list_index + 2, -1, var_type2, 1);
 		backpatch2 = triple_list_index -1;
 		add_triple(set_rb,1,-1,1,2,-1);
 		add_triple(get_rb,-1,-1,1,-1,-1);
