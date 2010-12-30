@@ -13,6 +13,7 @@ int defined_before_used(int r, int current_inst, int current_block,int* visited,
 void change_mov_target(int mov_inst, int begin, int current_block,  int *visited, int* next_list, int* jump_list, int* cir_center, int in_circulation);
 //void print_target_code(FILE* target_file, int dispatch_flag);
 void calc_star();
+void clear_double();
 
 extern triple* triple_list;
 extern int triple_list_index;
@@ -27,11 +28,24 @@ void peephole_on_intermediate_code()
 {
 	calc_star();
 	calc_const();
+	clear_double();
 }
 void peephole_on_target_code()
 {
 	array_operation_optimize();
 	delete_redundant_mov();
+}
+void clear_double()
+{
+	int i, j;
+	for(i = 0 ; i < triple_list_index ; i ++){
+		if(triple_list[i].op == add_op && triple_list[i].arg2_type == 2 && triple_list[i].arg2.imm_value == 0){
+			for(j = i ; j < triple_list_index ; j++){
+				if((triple_list[j].arg1.temp_index == i && triple_list[j].arg1_type == 1 ) || (triple_list[j].arg2.temp_index == i && triple_list[j].arg2_type == 1)) break;			
+			}
+			if(j == triple_list_index) triple_list[i].is_deleted = 1;
+		}
+	}
 }
 void calc_star(){
 	int i, j;

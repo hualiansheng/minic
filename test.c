@@ -1,17 +1,9 @@
+void print_int(int x);
 int main()
 {
-	int a,b,c,*p,*q;
-	if(a == 1)
-		p = &a;
-	else 
-		p = &b;
-	*p = 1;
-	while(a)
-	{
-		*p = 2;
-		q = p;
-		*q = 1;
-		q = &c;
-		*q = 0;
-	}
+	int i, a;
+	i = 1;
+	if(i++ && i == 1) a = 1;
+	else a = 2;
+	print_int(a);
 }
